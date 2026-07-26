@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import backgroundImage from '../public/model1.png';
+import sayoLogo from '../public/sayologo.png';
 
 /* ─────────────────────────────────────────
    DESIGN TOKENS
@@ -330,18 +331,19 @@ const S = {
 };
 
 /* ─────────────────────────────────────────
-   SVG / ICONS
+   LOGO COMPONENT  ← now uses sayologo.png
 ───────────────────────────────────────── */
-function LogoIcon({ className = '' }: { className?: string }) {
+function LogoIcon({ className = '', size = 48 }: { className?: string; size?: number }) {
   return (
-    <svg className={className} viewBox="0 0 112 101" fill="none"
-      style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto' }}>
-      <path d="M56 8 C56 8 20 8 20 44 C20 68 36 88 56 93 C76 88 92 68 92 44 C92 8 56 8 56 8Z"
-        stroke={tokens.color.gold} strokeWidth="4" fill="none" />
-      <path d="M56 18 C56 18 34 30 34 50 C34 65 44 78 56 82 C68 78 78 65 78 50 C78 30 56 18 56 18Z"
-        stroke={tokens.color.gold} strokeWidth="3" fill="none" />
-      <line x1="56" y1="8" x2="56" y2="93" stroke={tokens.color.gold} strokeWidth="2" />
-    </svg>
+    <Image
+      src={sayoLogo}
+      alt="SAYO Logo"
+      width={size}
+      height={size}
+      className={className}
+      style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto', objectFit: 'contain' }}
+      priority
+    />
   );
 }
 
@@ -457,7 +459,7 @@ function useInView(threshold = 0.2) {
 }
 
 /* ─────────────────────────────────────────
-   IS MOBILE HOOK  ← NEW
+   IS MOBILE HOOK
 ───────────────────────────────────────── */
 function useIsMobile(breakpoint = 1024) {
   const [isMobile, setIsMobile] = useState(false);
@@ -492,7 +494,8 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loaded,   setLoaded]   = useState(false);
   const { ref: footerRef, inView: footerVisible } = useInView(0.1);
-  const isMobile = useIsMobile(); // ← NEW
+  const isMobile = useIsMobile(); // breakpoint for nav/menu switch (1024px)
+  const isNarrowScreen = useIsMobile(768); // breakpoint for hero image reposition
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
@@ -510,14 +513,18 @@ export default function Home() {
         ══════════════════════════ */}
         <section style={S.hero}>
 
-          {/* Background */}
+          {/* Background — objectPosition adjusts on mobile so the
+              full face is visible instead of just the side/ear */}
           <div style={S.heroBg}>
             <Image
               src={backgroundImage}
               alt="Beauty model"
               fill priority
               className="hero-bg-img"
-              style={{ objectFit: 'cover', objectPosition: 'right center' }}
+              style={{
+                objectFit: 'cover',
+                objectPosition: isNarrowScreen ? 'center 15%' : 'right center',
+              }}
             />
           </div>
 
@@ -682,7 +689,7 @@ export default function Home() {
               transform: footerVisible ? 'translateX(0)' : 'translateX(-40px)',
               transitionDelay: '0s',
             }}>
-              <LogoIcon />
+              <LogoIcon size={56} />
               <h2 style={S.brandName}>SAYO</h2>
               <p style={S.tagline}>We are experienced in making you more beautiful</p>
               <div style={S.socialRow}>

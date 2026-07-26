@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import sayoLogo from '../../public/sayologo.png';
 
 /* ─────────────────────────────────────────
    DESIGN TOKENS
@@ -260,21 +261,25 @@ const S = {
 };
 
 /* ─────────────────────────────────────────
-   SVG / ICONS
+   LOGO — now uses sayologo.png
 ───────────────────────────────────────── */
-function LogoIcon({ className = '' }: { className?: string }) {
+function LogoIcon({ className = '', size = 48 }: { className?: string; size?: number }) {
   return (
-    <svg className={className} viewBox="0 0 112 101" fill="none"
-      style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto' }}>
-      <path d="M56 8 C56 8 20 8 20 44 C20 68 36 88 56 93 C76 88 92 68 92 44 C92 8 56 8 56 8Z"
-        stroke={tokens.color.gold} strokeWidth="4" fill="none" />
-      <path d="M56 18 C56 18 34 30 34 50 C34 65 44 78 56 82 C68 78 78 65 78 50 C78 30 56 18 56 18Z"
-        stroke={tokens.color.gold} strokeWidth="3" fill="none" />
-      <line x1="56" y1="8" x2="56" y2="93" stroke={tokens.color.gold} strokeWidth="2" />
-    </svg>
+    <Image
+      src={sayoLogo}
+      alt="SAYO Logo"
+      width={size}
+      height={size}
+      className={className}
+      style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto', objectFit: 'contain' }}
+      priority
+    />
   );
 }
 
+/* ─────────────────────────────────────────
+   SVG / ICONS
+───────────────────────────────────────── */
 function IconWhatsApp() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -423,82 +428,204 @@ const REVIEW_BG        = '/review.jpg';
 
 /* ─────────────────────────────────────────
    MOSAIC
+   ────────────────────────────────────────
+   getMosaicMetrics() computes ALL grid track
+   sizes / offsets from a single `scale` value,
+   so the entire mosaic can be enlarged (e.g.
+   slightly bigger on desktop) while keeping
+   every internal image-slice offset correctly
+   proportioned.
 ───────────────────────────────────────── */
-const COL1 = 9.2;
-const COL2 = 9.2;
-const COL3 = 7.1;
-const ROW1 = 6.5;
-const ROW2 = 10;
-const ROW3 = 6.5;
-const GAP  = 1;
+function getMosaicMetrics(scale: number) {
+  const COL1 = 9.2 * scale;
+  const COL2 = 9.2 * scale;
+  const COL3 = 7.1 * scale;
+  const ROW1 = 6.5 * scale;
+  const ROW2 = 10  * scale;
+  const ROW3 = 6.5 * scale;
+  const GAP  = 1   * scale;
 
-const CANVAS_W = COL1 + COL2 + COL3 + GAP * 2;
-const CANVAS_H = ROW1 + ROW2 + ROW3 + GAP * 2;
+  const CANVAS_W = COL1 + COL2 + COL3 + GAP * 2;
+  const CANVAS_H = ROW1 + ROW2 + ROW3 + GAP * 2;
 
-const COL1_X = 0;
-const COL2_X = COL1 + GAP;
-const COL3_X = COL2_X + COL2 + GAP;
+  const COL1_X = 0;
+  const COL2_X = COL1 + GAP;
+  const COL3_X = COL2_X + COL2 + GAP;
 
-const ROW1_Y = 0;
-const ROW2_Y = ROW1 + GAP;
-const ROW3_Y = ROW2_Y + ROW2 + GAP;
+  const ROW1_Y = 0;
+  const ROW2_Y = ROW1 + GAP;
+  const ROW3_Y = ROW2_Y + ROW2 + GAP;
 
-function ImageSlice({ x, y, alt }: { x: number; y: number; alt: string }) {
+  return {
+    COL1, COL2, COL3, ROW1, ROW2, ROW3, GAP,
+    CANVAS_W, CANVAS_H,
+    COL1_X, COL2_X, COL3_X,
+    ROW1_Y, ROW2_Y, ROW3_Y,
+  };
+}
+
+/* A "window" into the master image */
+function ImageSlice({
+  x, y, canvasW, canvasH, alt,
+}: {
+  x: number; y: number; canvasW: number; canvasH: number; alt: string;
+}) {
   return (
     <div style={{
       position: 'absolute',
       top:      `-${y}rem`,
       left:     `-${x}rem`,
-      width:    `${CANVAS_W}rem`,
-      height:   `${CANVAS_H}rem`,
+      width:    `${canvasW}rem`,
+      height:   `${canvasH}rem`,
     }}>
-      <Image src={HERO_ABOUT_IMAGE} alt={alt} fill
+      <Image
+        src={HERO_ABOUT_IMAGE} alt={alt} fill
         sizes="(max-width: 900px) 100vw, 50vw"
-        style={{ objectFit: 'cover' }} />
+        style={{ objectFit: 'cover' }}
+      />
     </div>
   );
 }
 
-function StoryMosaic({ visible }: { visible: boolean }) {
+function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean }) {
+  /* ── Slightly enlarge the whole mosaic on desktop ── */
+  const scale = desktop ? 1.12 : 1;
+  const m = getMosaicMetrics(scale);
+
   return (
-    <div className="story-mosaic" style={{
-      display:             'grid',
-      gridTemplateColumns: `${COL1}rem ${COL2}rem ${COL3}rem`,
-      gridTemplateRows:    `${ROW1}rem ${ROW2}rem ${ROW3}rem`,
-      gap:                 `${GAP}rem`,
-      width:               `${CANVAS_W}rem`,
-      maxWidth:            '100%',
-      margin:              '0 auto',
-    }}>
-      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{ gridColumn: 2, gridRow: 1, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.15s' }}>
-        <ImageSlice x={COL2_X} y={ROW1_Y} alt="Makeup application" />
+    <div
+      className="story-mosaic"
+      style={{
+        display:             'grid',
+        gridTemplateColumns: `${m.COL1}rem ${m.COL2}rem ${m.COL3}rem`,
+        gridTemplateRows:    `${m.ROW1}rem ${m.ROW2}rem ${m.ROW3}rem`,
+        gap:                 `${m.GAP}rem`,
+        width:               `${m.CANVAS_W}rem`,
+        maxWidth:            '100%',
+        margin:              '0 auto',
+      }}
+    >
+      {/* Top — small square (brush near eye) */}
+      <div
+        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
+        style={{
+          gridColumn:     2,
+          gridRow:        1,
+          position:       'relative',
+          borderRadius:   tokens.radius.tile,
+          overflow:       'hidden',
+          opacity:        visible ? 1 : 0,
+          animationDelay: '0.15s',
+        }}
+      >
+        <ImageSlice x={m.COL2_X} y={m.ROW1_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Makeup application" />
       </div>
-      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{ gridColumn: 1, gridRow: 2, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.23s' }}>
-        <ImageSlice x={COL1_X} y={ROW2_Y} alt="Eye makeup detail" />
+
+      {/* Middle-left — medium square (closed eyes, glitter) */}
+      <div
+        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
+        style={{
+          gridColumn:     1,
+          gridRow:        2,
+          position:       'relative',
+          borderRadius:   tokens.radius.tile,
+          overflow:       'hidden',
+          opacity:        visible ? 1 : 0,
+          animationDelay: '0.23s',
+        }}
+      >
+        <ImageSlice x={m.COL1_X} y={m.ROW2_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Eye makeup detail" />
       </div>
-      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{ gridColumn: 2, gridRow: 2, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.31s' }}>
-        <ImageSlice x={COL2_X} y={ROW2_Y} alt="Face closeup" />
+
+      {/* Middle-center — large square (eyes / nose closeup) */}
+      <div
+        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
+        style={{
+          gridColumn:     2,
+          gridRow:        2,
+          position:       'relative',
+          borderRadius:   tokens.radius.tile,
+          overflow:       'hidden',
+          opacity:        visible ? 1 : 0,
+          animationDelay: '0.31s',
+        }}
+      >
+        <ImageSlice x={m.COL2_X} y={m.ROW2_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Face closeup" />
       </div>
-      <div className={visible ? 'tile-reveal' : ''}
-        style={{ gridColumn: 3, gridRow: '1 / 3', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: visible ? 1 : 0, animationDelay: '0.45s' }}>
-        <div className="flower-float" style={{ position: 'relative', width: '85%', height: '85%' }}>
-          <Image src={FLOWER_IMAGE} alt="Decorative flower" fill sizes="15vw" style={{ objectFit: 'contain' }} />
+
+      {/* Right — flower decoration, spans row 1-2 (tall) */}
+      <div
+        className={visible ? 'tile-reveal' : ''}
+        style={{
+          gridColumn:     3,
+          gridRow:        '1 / 3',
+          position:       'relative',
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
+          overflow:       'visible',
+          opacity:        visible ? 1 : 0,
+          animationDelay: '0.45s',
+        }}
+      >
+        {/* ── Enlarged flower — bigger in both mobile & desktop ── */}
+        <div className="flower-float" style={{ position: 'relative', width: '108%', height: '108%' }}>
+          <Image
+            src={FLOWER_IMAGE}
+            alt="Decorative flower"
+            fill
+            sizes="18vw"
+            style={{ objectFit: 'contain' }}
+          />
         </div>
       </div>
-      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{ gridColumn: 1, gridRow: 3, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.39s' }}>
-        <ImageSlice x={COL1_X} y={ROW3_Y} alt="Hair detail" />
+
+      {/* Bottom-left — hair */}
+      <div
+        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
+        style={{
+          gridColumn:     1,
+          gridRow:        3,
+          position:       'relative',
+          borderRadius:   tokens.radius.tile,
+          overflow:       'hidden',
+          opacity:        visible ? 1 : 0,
+          animationDelay: '0.39s',
+        }}
+      >
+        <ImageSlice x={m.COL1_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Hair detail" />
       </div>
-      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{ gridColumn: 2, gridRow: 3, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.47s' }}>
-        <ImageSlice x={COL2_X} y={ROW3_Y} alt="Lips detail" />
+
+      {/* Bottom-center — lips */}
+      <div
+        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
+        style={{
+          gridColumn:     2,
+          gridRow:        3,
+          position:       'relative',
+          borderRadius:   tokens.radius.tile,
+          overflow:       'hidden',
+          opacity:        visible ? 1 : 0,
+          animationDelay: '0.47s',
+        }}
+      >
+        <ImageSlice x={m.COL2_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Lips detail" />
       </div>
-      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{ gridColumn: 3, gridRow: 3, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.55s' }}>
-        <ImageSlice x={COL3_X} y={ROW3_Y} alt="Skin closeup" />
+
+      {/* Bottom-right — cheek */}
+      <div
+        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
+        style={{
+          gridColumn:     3,
+          gridRow:        3,
+          position:       'relative',
+          borderRadius:   tokens.radius.tile,
+          overflow:       'hidden',
+          opacity:        visible ? 1 : 0,
+          animationDelay: '0.55s',
+        }}
+      >
+        <ImageSlice x={m.COL3_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Skin closeup" />
       </div>
     </div>
   );
@@ -506,10 +633,7 @@ function StoryMosaic({ visible }: { visible: boolean }) {
 
 /* ─────────────────────────────────────────
    SHARED GALLERY SUB-COMPONENTS
-   (used in both desktop & mobile)
 ───────────────────────────────────────── */
-
-/* Gold-accented intro text card */
 function GalleryTextCard({
   visible,
   delay,
@@ -562,7 +686,6 @@ function GalleryTextCard({
   );
 }
 
-/* Featured image with badge + bottom label */
 function GalleryFeaturedImage({
   src,
   height,
@@ -591,14 +714,12 @@ function GalleryFeaturedImage({
       }}
     >
       <Image src={src} alt="Beauty treatment" fill sizes={sizes} style={{ objectFit: 'cover' }} />
-      {/* Bottom gradient */}
       <div style={{
         position:   'absolute',
         bottom: 0, left: 0, right: 0,
         height:     '50%',
         background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)',
       }} />
-      {/* Featured badge */}
       <div style={{
         position:      'absolute',
         top:           '1rem',
@@ -614,7 +735,6 @@ function GalleryFeaturedImage({
       }}>
         Featured
       </div>
-      {/* Bottom label */}
       <div style={{
         position:   'absolute',
         bottom:     '1rem',
@@ -654,6 +774,8 @@ export default function AboutPage() {
 
   const isMobile        = useIsMobile(1024);
   const isMobileGallery = useIsMobile(768);
+  /* Matches the `.hero-grid` stacking breakpoint (900px) */
+  const isMobileHero    = useIsMobile(901);
 
   const { ref: heroRef,    inView: heroVisible    } = useInView(0.1);
   const { ref: teamRef,    inView: teamVisible    } = useInView(0.1);
@@ -749,7 +871,8 @@ export default function AboutPage() {
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(2rem, 5vw, 4rem)', padding: 'clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem)', alignItems: 'center', minHeight: '80vh' }}>
           <div className={heroVisible ? 'reveal-left' : ''}
             style={{ opacity: heroVisible ? 1 : 0, animationDelay: '0.2s' }}>
-            <StoryMosaic visible={heroVisible} />
+            {/* Pass desktop flag so mosaic enlarges slightly on wider screens */}
+            <StoryMosaic visible={heroVisible} desktop={!isMobileHero} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1rem, 2vh, 1.75rem)' }}>
             <p className={heroVisible ? 'reveal-right' : ''}
@@ -822,7 +945,6 @@ export default function AboutPage() {
         ══════════════════════════ */}
         <section ref={galleryRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
 
-          {/* Title — both layouts */}
           <h2 className={galleryVisible ? 'reveal-up' : ''}
             style={{ color: tokens.color.gold, fontSize: tokens.font.sectionTitle, fontWeight: 500, textAlign: 'center', marginBottom: 'clamp(2rem, 5vh, 3.5rem)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.1s' }}>
             Transformations &amp; Artistry
@@ -832,18 +954,13 @@ export default function AboutPage() {
           {!isMobileGallery && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.25rem', alignItems: 'stretch' }}>
 
-              {/* ── Col 1: text card + featured image ── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-
-                {/* Gold text card */}
                 <GalleryTextCard
                   visible={galleryVisible}
                   delay="0.2s"
                   minHeight="220px"
                   className={galleryVisible ? 'reveal-left' : ''}
                 />
-
-                {/* Featured image */}
                 <GalleryFeaturedImage
                   src={GALLERY.img5}
                   height="380px"
@@ -854,7 +971,6 @@ export default function AboutPage() {
                 />
               </div>
 
-              {/* ── Col 2: three stacked images ── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
                   style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '195px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.25s' }}>
@@ -877,7 +993,6 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* ── Col 3: tall single image ── */}
               <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
                 style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', minHeight: '640px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}>
                 <Image src={GALLERY.img1} alt="Barber styling" fill sizes="33vw" style={{ objectFit: 'cover' }} />
@@ -889,7 +1004,6 @@ export default function AboutPage() {
           {isMobileGallery && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-              {/* 1. Gold text card */}
               <GalleryTextCard
                 visible={galleryVisible}
                 delay="0.1s"
@@ -897,7 +1011,6 @@ export default function AboutPage() {
                 className={galleryVisible ? 'reveal-up' : ''}
               />
 
-              {/* 2. Featured image */}
               <GalleryFeaturedImage
                 src={GALLERY.img5}
                 height="340px"
@@ -907,7 +1020,6 @@ export default function AboutPage() {
                 className={galleryVisible ? 'reveal-up' : ''}
               />
 
-              {/* 3. Two-col grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
                   style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}>
@@ -919,14 +1031,12 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* 4. Full-width image with gold tint */}
               <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
                 style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '210px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.46s' }}>
                 <Image src={GALLERY.img3} alt="Hair styling" fill sizes="100vw" style={{ objectFit: 'cover' }} />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, rgba(184,134,11,0.2))' }} />
               </div>
 
-              {/* 5. CTA card */}
               <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
                 style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '200px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.54s' }}>
                 <Image src={GALLERY.img4} alt="Salon interior" fill sizes="100vw" style={{ objectFit: 'cover' }} />
@@ -994,10 +1104,9 @@ export default function AboutPage() {
           style={{ position: 'relative', overflow: 'hidden', background: tokens.color.bgFooter, padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)' }}>
           <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
 
-            {/* Brand */}
             <div className="footer-reveal"
               style={{ flex: '1 1 260px', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '1rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(-40px)', transitionDelay: '0s' }}>
-              <LogoIcon />
+              <LogoIcon size={56} />
               <h2 style={{ color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 }}>SAYO</h2>
               <p style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.tagline, lineHeight: 1.6, margin: 0, maxWidth: '260px' }}>
                 We are experienced in making you more beautiful
@@ -1017,7 +1126,6 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Quick Links */}
             <div className="footer-reveal"
               style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.15s' }}>
               <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Quick Links</p>
@@ -1029,7 +1137,6 @@ export default function AboutPage() {
               ))}
             </div>
 
-            {/* Locations */}
             <div className="footer-reveal"
               style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.25s' }}>
               <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Our Locations</p>
@@ -1042,7 +1149,6 @@ export default function AboutPage() {
               ))}
             </div>
 
-            {/* Contact */}
             <div className="footer-reveal"
               style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(40px)', transitionDelay: '0.35s' }}>
               <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Contact Us</p>
@@ -1061,7 +1167,6 @@ export default function AboutPage() {
 
           </div>
 
-          {/* Copyright */}
           <div className="footer-reveal-simple"
             style={{ position: 'relative', zIndex: 10, marginTop: 'clamp(2rem, 4vw, 2.5rem)', paddingTop: 'clamp(1rem, 2vw, 1.5rem)', borderTop: `1px solid ${tokens.color.whiteBorder}`, opacity: footerVisible ? 1 : 0, transitionDelay: '0.7s' }}>
             <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>
