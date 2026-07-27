@@ -72,6 +72,28 @@ const globalCss = `
     from { opacity: 0; transform: scale(0.85); }
     to   { opacity: 1; transform: scale(1);    }
   }
+  @keyframes smokeFlow1 {
+    0%   { transform: translateX(-100%) translateY(20%) rotate(-15deg); opacity: 0; }
+    20%  { opacity: 0.6; }
+    80%  { opacity: 0.4; }
+    100% { transform: translateX(100%) translateY(-10%) rotate(-10deg); opacity: 0; }
+  }
+  @keyframes smokeFlow2 {
+    0%   { transform: translateX(100%) translateY(-20%) rotate(10deg); opacity: 0; }
+    20%  { opacity: 0.5; }
+    80%  { opacity: 0.3; }
+    100% { transform: translateX(-100%) translateY(15%) rotate(15deg); opacity: 0; }
+  }
+  @keyframes particleFloat {
+    0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+    10%       { opacity: 1; }
+    90%       { opacity: 0.8; }
+    50%       { transform: translateY(-30px) translateX(15px); }
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50%       { opacity: 0.25; transform: scale(1.1); }
+  }
 
   .nav-animate   { animation: fadeInDown 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
   .logo-float    { animation: floatY 4s ease-in-out 1.5s infinite; }
@@ -261,7 +283,7 @@ const S = {
 };
 
 /* ─────────────────────────────────────────
-   LOGO — now uses sayologo.png
+   LOGO
 ───────────────────────────────────────── */
 function LogoIcon({ className = '', size = 48 }: { className?: string; size?: number }) {
   return (
@@ -369,9 +391,9 @@ const QUICK_LINKS = ['Home', 'Services', 'Products', 'Reviews'] as const;
 const NAV_HREFS: Record<string, string> = {
   'HOME':      '/',
   'OUR STORY': '/about',
-  'SERVICES':  '#',
-  'PRODUCTS':  '#',
-  'REVIEWS':   '#',
+  'SERVICES':  '/services',
+  'PRODUCTS':  '/products',
+  'REVIEWS':   '/reviews',
 };
 
 const LOCATIONS = ['Colombo', 'Negombo', 'Kiribathgoda'] as const;
@@ -427,14 +449,134 @@ const FLOWER_IMAGE     = '/flower.png';
 const REVIEW_BG        = '/review.jpg';
 
 /* ─────────────────────────────────────────
+   SMOKE BACKGROUND COMPONENT
+───────────────────────────────────────── */
+function SmokeBackground() {
+  const particles = [
+    { top: '35%', left: '8%',  delay: '0s',   dur: '7s'  },
+    { top: '28%', left: '15%', delay: '1.5s', dur: '9s'  },
+    { top: '40%', left: '22%', delay: '3s',   dur: '8s'  },
+    { top: '32%', left: '30%', delay: '0.8s', dur: '11s' },
+    { top: '45%', left: '45%', delay: '2s',   dur: '10s' },
+    { top: '50%', left: '55%', delay: '4s',   dur: '8s'  },
+    { top: '38%', left: '65%', delay: '1s',   dur: '9s'  },
+    { top: '25%', left: '75%', delay: '2.5s', dur: '7s'  },
+    { top: '42%', left: '82%', delay: '3.5s', dur: '12s' },
+    { top: '60%', left: '10%', delay: '1.2s', dur: '10s' },
+    { top: '55%', left: '35%', delay: '2.8s', dur: '8s'  },
+    { top: '65%', left: '60%', delay: '0.5s', dur: '11s' },
+    { top: '20%', left: '50%', delay: '3.2s', dur: '9s'  },
+    { top: '70%', left: '80%', delay: '1.8s', dur: '7s'  },
+  ];
+
+  return (
+    <div style={{
+      position:      'fixed',
+      inset:         0,
+      zIndex:        0,
+      pointerEvents: 'none',
+      background:    '#0a0a0a',
+      overflow:      'hidden',
+    }}>
+      <div style={{
+        position:   'absolute',
+        bottom:     '-10%',
+        left:       '30%',
+        width:      '40%',
+        height:     '40%',
+        background: 'radial-gradient(ellipse, rgba(255,255,255,0.08) 0%, transparent 70%)',
+        animation:  'glowPulse 6s ease-in-out infinite',
+      }} />
+
+      <div style={{
+        position:   'absolute',
+        top:        '-5%',
+        right:      '-5%',
+        width:      '30%',
+        height:     '50%',
+        background: 'radial-gradient(ellipse, rgba(255,255,255,0.06) 0%, transparent 70%)',
+        animation:  'glowPulse 8s ease-in-out 2s infinite',
+      }} />
+
+      <div style={{
+        position:     'absolute',
+        top:          '25%',
+        left:         0,
+        width:        '70%',
+        height:       '35%',
+        background:   'radial-gradient(ellipse 80% 40% at 30% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)',
+        borderRadius: '50%',
+        filter:       'blur(18px)',
+        animation:    'smokeFlow1 18s ease-in-out infinite',
+      }} />
+
+      <div style={{
+        position:     'absolute',
+        top:          '20%',
+        right:        0,
+        width:        '50%',
+        height:       '30%',
+        background:   'radial-gradient(ellipse 70% 40% at 70% 50%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 70%)',
+        borderRadius: '50%',
+        filter:       'blur(22px)',
+        animation:    'smokeFlow2 22s ease-in-out 4s infinite',
+      }} />
+
+      <div style={{
+        position:     'absolute',
+        top:          '30%',
+        left:         '10%',
+        width:        '80%',
+        height:       '25%',
+        background:   'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 45%, rgba(255,255,255,0.06) 70%, transparent 100%)',
+        borderRadius: '50%',
+        filter:       'blur(25px)',
+        transform:    'rotate(-5deg)',
+        animation:    'smokeFlow1 25s ease-in-out 2s infinite',
+      }} />
+
+      <div style={{
+        position:     'absolute',
+        top:          '10%',
+        right:        '5%',
+        width:        '35%',
+        height:       '40%',
+        background:   'radial-gradient(ellipse 60% 80% at 60% 30%, rgba(255,255,255,0.09) 0%, transparent 70%)',
+        filter:       'blur(20px)',
+        animation:    'smokeFlow2 20s ease-in-out 6s infinite',
+      }} />
+
+      <div style={{
+        position:     'absolute',
+        bottom:       '15%',
+        left:         '20%',
+        width:        '60%',
+        height:       '20%',
+        background:   'radial-gradient(ellipse 80% 50% at 50% 50%, rgba(255,255,255,0.07) 0%, transparent 70%)',
+        borderRadius: '50%',
+        filter:       'blur(30px)',
+        animation:    'smokeFlow1 30s ease-in-out 8s infinite',
+      }} />
+
+      {particles.map((p, i) => (
+        <div key={i} style={{
+          position:     'absolute',
+          top:          p.top,
+          left:         p.left,
+          width:        i % 3 === 0 ? '3px' : '2px',
+          height:       i % 3 === 0 ? '3px' : '2px',
+          borderRadius: '50%',
+          background:   'rgba(255,255,255,0.85)',
+          boxShadow:    '0 0 4px rgba(255,255,255,0.6)',
+          animation:    `particleFloat ${p.dur} ease-in-out ${p.delay} infinite`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
    MOSAIC
-   ────────────────────────────────────────
-   getMosaicMetrics() computes ALL grid track
-   sizes / offsets from a single `scale` value,
-   so the entire mosaic can be enlarged (e.g.
-   slightly bigger on desktop) while keeping
-   every internal image-slice offset correctly
-   proportioned.
 ───────────────────────────────────────── */
 function getMosaicMetrics(scale: number) {
   const COL1 = 9.2 * scale;
@@ -464,7 +606,6 @@ function getMosaicMetrics(scale: number) {
   };
 }
 
-/* A "window" into the master image */
 function ImageSlice({
   x, y, canvasW, canvasH, alt,
 }: {
@@ -488,7 +629,6 @@ function ImageSlice({
 }
 
 function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean }) {
-  /* ── Slightly enlarge the whole mosaic on desktop ── */
   const scale = desktop ? 1.12 : 1;
   const m = getMosaicMetrics(scale);
 
@@ -505,7 +645,7 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
         margin:              '0 auto',
       }}
     >
-      {/* Top — small square (brush near eye) */}
+      {/* Top — small square */}
       <div
         className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
         style={{
@@ -521,7 +661,7 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
         <ImageSlice x={m.COL2_X} y={m.ROW1_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Makeup application" />
       </div>
 
-      {/* Middle-left — medium square (closed eyes, glitter) */}
+      {/* Middle-left */}
       <div
         className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
         style={{
@@ -537,7 +677,7 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
         <ImageSlice x={m.COL1_X} y={m.ROW2_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Eye makeup detail" />
       </div>
 
-      {/* Middle-center — large square (eyes / nose closeup) */}
+      {/* Middle-center */}
       <div
         className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
         style={{
@@ -568,8 +708,15 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.45s',
         }}
       >
-        {/* ── Enlarged flower — bigger in both mobile & desktop ── */}
-        <div className="flower-float" style={{ position: 'relative', width: '108%', height: '108%' }}>
+        {/* ── Flower size: bigger on desktop, normal on mobile ── */}
+        <div
+          className="flower-float"
+          style={{
+            position: 'relative',
+            width:    desktop ? '135%' : '108%',
+            height:   desktop ? '135%' : '108%',
+          }}
+        >
           <Image
             src={FLOWER_IMAGE}
             alt="Decorative flower"
@@ -580,7 +727,7 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
         </div>
       </div>
 
-      {/* Bottom-left — hair */}
+      {/* Bottom-left */}
       <div
         className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
         style={{
@@ -596,7 +743,7 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
         <ImageSlice x={m.COL1_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Hair detail" />
       </div>
 
-      {/* Bottom-center — lips */}
+      {/* Bottom-center */}
       <div
         className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
         style={{
@@ -612,7 +759,7 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
         <ImageSlice x={m.COL2_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Lips detail" />
       </div>
 
-      {/* Bottom-right — cheek */}
+      {/* Bottom-right */}
       <div
         className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
         style={{
@@ -632,7 +779,7 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
 }
 
 /* ─────────────────────────────────────────
-   SHARED GALLERY SUB-COMPONENTS
+   GALLERY SUB-COMPONENTS
 ───────────────────────────────────────── */
 function GalleryTextCard({
   visible,
@@ -774,7 +921,6 @@ export default function AboutPage() {
 
   const isMobile        = useIsMobile(1024);
   const isMobileGallery = useIsMobile(768);
-  /* Matches the `.hero-grid` stacking breakpoint (900px) */
   const isMobileHero    = useIsMobile(901);
 
   const { ref: heroRef,    inView: heroVisible    } = useInView(0.1);
@@ -801,380 +947,726 @@ export default function AboutPage() {
       <style>{globalCss}</style>
 
       <main style={{
-        minHeight:       '100vh',
-        backgroundColor: tokens.color.bgDark,
-        fontFamily:      tokens.font.family,
-        color:           tokens.color.white,
+        minHeight:   '100vh',
+        fontFamily:  tokens.font.family,
+        color:       tokens.color.white,
+        position:    'relative',
+        overflow:    'hidden',
+        background:  'transparent',
       }}>
 
-        {/* ══════════════════════════
-            NAVBAR
-        ══════════════════════════ */}
-        <nav
-          className={loaded ? 'nav-animate' : ''}
-          style={{ ...S.nav, opacity: loaded ? undefined : 0 }}
-        >
-          <div style={S.navInner}>
-            <div style={S.logoWrap}>
-              <LogoIcon className="logo-float" />
-              <span style={S.logoText}>SAYO</span>
+        {/* ══ SMOKY BACKGROUND ══ */}
+        <SmokeBackground />
+
+        {/* ══ ALL PAGE CONTENT ══ */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+
+          {/* ════════════════════════
+              NAVBAR
+          ════════════════════════ */}
+          <nav
+            className={loaded ? 'nav-animate' : ''}
+            style={{ ...S.nav, opacity: loaded ? undefined : 0 }}
+          >
+            <div style={S.navInner}>
+              <div style={S.logoWrap}>
+                <LogoIcon className="logo-float" />
+                <span style={S.logoText}>SAYO</span>
+              </div>
+
+              {!isMobile && (
+                <div style={S.navLinks}>
+                  {NAV_ITEMS.map((item, i) => (
+                    <a key={item} href={NAV_HREFS[item]}
+                      className="nav-link-wrap"
+                      style={i === 1 ? S.navLinkActive : S.navLink}
+                      onMouseEnter={e => { if (i !== 1) (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }}
+                      onMouseLeave={e => { if (i !== 1) (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}>
+                      {i === 1 ? `[ ${item} ]` : item}
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {!isMobile && (
+                <a href="#" className="contact-btn-wrap" style={S.contactBtn}>CONTACT US</a>
+              )}
+
+              {isMobile && (
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  aria-label="Toggle menu"
+                  style={{
+                    background: 'none', border: 'none',
+                    color: tokens.color.white, cursor: 'pointer',
+                    padding: '0.5rem', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    transition: 'transform 0.3s ease',
+                  }}
+                >
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    {menuOpen
+                      ? <path d="M6 18L18 6M6 6l12 12" />
+                      : (<><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>)}
+                  </svg>
+                </button>
+              )}
             </div>
 
-            {!isMobile && (
-              <div style={S.navLinks}>
+            {isMobile && menuOpen && (
+              <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
                 {NAV_ITEMS.map((item, i) => (
                   <a key={item} href={NAV_HREFS[item]}
-                    className="nav-link-wrap"
-                    style={i === 1 ? S.navLinkActive : S.navLink}
-                    onMouseEnter={e => { if (i !== 1) (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }}
-                    onMouseLeave={e => { if (i !== 1) (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}>
+                    style={i === 1 ? S.mobileNavLinkActive : S.mobileNavLink}
+                    onClick={() => setMenuOpen(false)}>
                     {i === 1 ? `[ ${item} ]` : item}
                   </a>
                 ))}
+                <a href="#" style={S.mobileContact} onClick={() => setMenuOpen(false)}>CONTACT US</a>
               </div>
             )}
+          </nav>
 
-            {!isMobile && (
-              <a href="#" className="contact-btn-wrap" style={S.contactBtn}>CONTACT US</a>
-            )}
-
-            {isMobile && (
-              <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"
-                style={{ background: 'none', border: 'none', color: tokens.color.white, cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.3s ease' }}>
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  {menuOpen
-                    ? <path d="M6 18L18 6M6 6l12 12" />
-                    : (<><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>)}
-                </svg>
-              </button>
-            )}
-          </div>
-
-          {isMobile && menuOpen && (
-            <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
-              {NAV_ITEMS.map((item, i) => (
-                <a key={item} href={NAV_HREFS[item]}
-                  style={i === 1 ? S.mobileNavLinkActive : S.mobileNavLink}
-                  onClick={() => setMenuOpen(false)}>
-                  {i === 1 ? `[ ${item} ]` : item}
-                </a>
-              ))}
-              <a href="#" style={S.mobileContact} onClick={() => setMenuOpen(false)}>CONTACT US</a>
+          {/* ════════════════════════
+              HERO — OUR STORY
+          ════════════════════════ */}
+          <section
+            ref={heroRef}
+            className="hero-grid"
+            style={{
+              display:             'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap:                 'clamp(2rem, 5vw, 4rem)',
+              padding:             'clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem)',
+              alignItems:          'center',
+              minHeight:           '80vh',
+            }}
+          >
+            <div
+              className={heroVisible ? 'reveal-left' : ''}
+              style={{ opacity: heroVisible ? 1 : 0, animationDelay: '0.2s' }}
+            >
+              <StoryMosaic visible={heroVisible} desktop={!isMobileHero} />
             </div>
-          )}
-        </nav>
 
-        {/* ══════════════════════════
-            HERO — OUR STORY
-        ══════════════════════════ */}
-        <section ref={heroRef} className="hero-grid"
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(2rem, 5vw, 4rem)', padding: 'clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem)', alignItems: 'center', minHeight: '80vh' }}>
-          <div className={heroVisible ? 'reveal-left' : ''}
-            style={{ opacity: heroVisible ? 1 : 0, animationDelay: '0.2s' }}>
-            {/* Pass desktop flag so mosaic enlarges slightly on wider screens */}
-            <StoryMosaic visible={heroVisible} desktop={!isMobileHero} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1rem, 2vh, 1.75rem)' }}>
-            <p className={heroVisible ? 'reveal-right' : ''}
-              style={{ color: tokens.color.gold, fontSize: tokens.font.sectionEyebrow, fontWeight: 600, margin: 0, opacity: heroVisible ? 1 : 0, animationDelay: '0.3s' }}>
-              OUR STORY
-            </p>
-            <h1 className={heroVisible ? 'reveal-right' : ''}
-              style={{ fontSize: tokens.font.sectionTitle, fontWeight: 600, lineHeight: 1.2, margin: 0, opacity: heroVisible ? 1 : 0, animationDelay: '0.45s' }}>
-              We are experience in making you more beautiful
-            </h1>
-            <p className={heroVisible ? 'reveal-right' : ''}
-              style={{ fontSize: tokens.font.body, fontWeight: 400, lineHeight: 1.7, color: tokens.color.whiteMuted, margin: 0, maxWidth: '480px', opacity: heroVisible ? 1 : 0, animationDelay: '0.6s' }}>
-              We will make your skin better and also more glowing skin. And we
-              provide to treatment spa and face with best service our employees,
-            </p>
-          </div>
-        </section>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1rem, 2vh, 1.75rem)' }}>
+              <p
+                className={heroVisible ? 'reveal-right' : ''}
+                style={{
+                  color:          tokens.color.gold,
+                  fontSize:       tokens.font.sectionEyebrow,
+                  fontWeight:     600,
+                  margin:         0,
+                  opacity:        heroVisible ? 1 : 0,
+                  animationDelay: '0.3s',
+                }}
+              >
+                OUR STORY
+              </p>
+              <h1
+                className={heroVisible ? 'reveal-right' : ''}
+                style={{
+                  fontSize:       tokens.font.sectionTitle,
+                  fontWeight:     600,
+                  lineHeight:     1.2,
+                  margin:         0,
+                  opacity:        heroVisible ? 1 : 0,
+                  animationDelay: '0.45s',
+                }}
+              >
+                We are experience in making you more beautiful
+              </h1>
+              <p
+                className={heroVisible ? 'reveal-right' : ''}
+                style={{
+                  fontSize:       tokens.font.body,
+                  fontWeight:     400,
+                  lineHeight:     1.7,
+                  color:          tokens.color.whiteMuted,
+                  margin:         0,
+                  maxWidth:       '480px',
+                  opacity:        heroVisible ? 1 : 0,
+                  animationDelay: '0.6s',
+                }}
+              >
+                We will make your skin better and also more glowing skin. And we
+                provide to treatment spa and face with best service our employees,
+              </p>
+            </div>
+          </section>
 
-        <Divider />
+          <Divider />
 
-        {/* ══════════════════════════
-            MEET THE VISIONARIES
-        ══════════════════════════ */}
-        <section ref={teamRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
-          <h2 className={teamVisible ? 'reveal-up' : ''}
-            style={{ color: tokens.color.gold, fontSize: tokens.font.sectionTitle, fontWeight: 500, textAlign: 'center', marginBottom: 'clamp(2rem, 5vh, 3.5rem)', opacity: teamVisible ? 1 : 0, animationDelay: '0.1s' }}>
-            Meet the Visionaries
-          </h2>
+          {/* ════════════════════════
+              MEET THE VISIONARIES
+          ════════════════════════ */}
+          <section ref={teamRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
+            <h2
+              className={teamVisible ? 'reveal-up' : ''}
+              style={{
+                color:          tokens.color.gold,
+                fontSize:       tokens.font.sectionTitle,
+                fontWeight:     500,
+                textAlign:      'center',
+                marginBottom:   'clamp(2rem, 5vh, 3.5rem)',
+                opacity:        teamVisible ? 1 : 0,
+                animationDelay: '0.1s',
+              }}
+            >
+              Meet the Visionaries
+            </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 560px), 1fr))', gap: '2rem' }}>
-            {STAFF.map((member, idx) => (
-              <div key={member.name}
-                className={`staff-card ${teamVisible ? (idx === 0 ? 'reveal-left' : 'reveal-right') : ''}`}
-                style={{ display: 'flex', borderRadius: tokens.radius.card, overflow: 'hidden', background: tokens.color.cardBg, transition: 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)', opacity: teamVisible ? 1 : 0, animationDelay: `${0.2 + idx * 0.15}s` }}>
-                <div style={{ width: '42%', flexShrink: 0, position: 'relative', minHeight: '480px' }}>
-                  <Image src={member.image} alt={member.name} fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: 'cover' }} />
+            <div style={{
+              display:             'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 560px), 1fr))',
+              gap:                 '2rem',
+            }}>
+              {STAFF.map((member, idx) => (
+                <div
+                  key={member.name}
+                  className={`staff-card ${teamVisible ? (idx === 0 ? 'reveal-left' : 'reveal-right') : ''}`}
+                  style={{
+                    display:        'flex',
+                    borderRadius:   tokens.radius.card,
+                    overflow:       'hidden',
+                    background:     tokens.color.cardBg,
+                    transition:     'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+                    opacity:        teamVisible ? 1 : 0,
+                    animationDelay: `${0.2 + idx * 0.15}s`,
+                  }}
+                >
+                  <div style={{ width: '42%', flexShrink: 0, position: 'relative', minHeight: '480px' }}>
+                    <Image
+                      src={member.image} alt={member.name} fill
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div style={{
+                    padding:       'clamp(1.25rem, 3vw, 2rem)',
+                    display:       'flex',
+                    flexDirection: 'column',
+                    gap:           '0.75rem',
+                    flex:          1,
+                  }}>
+                    <h3 style={{ color: tokens.color.gold, fontSize: tokens.font.cardName, fontWeight: 500, margin: 0 }}>
+                      {member.name}
+                    </h3>
+                    <p style={{ fontSize: tokens.font.body, fontWeight: 300, color: tokens.color.whiteMuted, margin: 0 }}>
+                      {member.role}
+                    </p>
+                    <p style={{ fontSize: tokens.font.body, fontWeight: 300, lineHeight: 1.7, color: tokens.color.whiteMuted, margin: 0 }}>
+                      {member.bio}
+                    </p>
+                    <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
+                    <p style={{ fontSize: '0.8rem', color: tokens.color.whiteDim, margin: 0, fontWeight: 300 }}>
+                      <span style={{ fontWeight: 500 }}>Specialties:</span> {member.specialties}
+                    </p>
+                    <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
+                    <p style={{ fontSize: tokens.font.body, margin: 0, fontWeight: 300 }}>
+                      Experience:{' '}
+                      <span style={{ color: tokens.color.gold, fontSize: '1.25rem', fontWeight: 700 }}>
+                        {member.experience}
+                      </span>
+                    </p>
+                  </div>
                 </div>
-                <div style={{ padding: 'clamp(1.25rem, 3vw, 2rem)', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
-                  <h3 style={{ color: tokens.color.gold, fontSize: tokens.font.cardName, fontWeight: 500, margin: 0 }}>{member.name}</h3>
-                  <p style={{ fontSize: tokens.font.body, fontWeight: 300, color: tokens.color.whiteMuted, margin: 0 }}>{member.role}</p>
-                  <p style={{ fontSize: tokens.font.body, fontWeight: 300, lineHeight: 1.7, color: tokens.color.whiteMuted, margin: 0 }}>{member.bio}</p>
-                  <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
-                  <p style={{ fontSize: '0.8rem', color: tokens.color.whiteDim, margin: 0, fontWeight: 300 }}>
-                    <span style={{ fontWeight: 500 }}>Specialties:</span> {member.specialties}
-                  </p>
-                  <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
-                  <p style={{ fontSize: tokens.font.body, margin: 0, fontWeight: 300 }}>
-                    Experience:{' '}
-                    <span style={{ color: tokens.color.gold, fontSize: '1.25rem', fontWeight: 700 }}>{member.experience}</span>
-                  </p>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(2rem, 4vh, 3rem)' }}>
+              <a
+                href="#"
+                style={{
+                  display:      'inline-block',
+                  border:       `1px solid ${tokens.color.white}`,
+                  borderRadius: '2rem',
+                  padding:      '0.625rem 3rem',
+                  color:        tokens.color.white,
+                  fontSize:     '1.125rem',
+                  fontWeight:   300,
+                  textDecoration: 'none',
+                  transition:   'all 0.3s',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background   = tokens.color.gold;
+                  el.style.borderColor  = tokens.color.gold;
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background   = 'transparent';
+                  el.style.borderColor  = tokens.color.white;
+                }}
+              >
+                VIEW ALL
+              </a>
+            </div>
+          </section>
+
+          <Divider />
+
+          {/* ════════════════════════
+              GALLERY
+          ════════════════════════ */}
+          <section ref={galleryRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
+
+            <h2
+              className={galleryVisible ? 'reveal-up' : ''}
+              style={{
+                color:          tokens.color.gold,
+                fontSize:       tokens.font.sectionTitle,
+                fontWeight:     500,
+                textAlign:      'center',
+                marginBottom:   'clamp(2rem, 5vh, 3.5rem)',
+                opacity:        galleryVisible ? 1 : 0,
+                animationDelay: '0.1s',
+              }}
+            >
+              Transformations &amp; Artistry
+            </h2>
+
+            {/* ── DESKTOP ── */}
+            {!isMobileGallery && (
+              <div style={{
+                display:             'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap:                 '1.25rem',
+                alignItems:          'stretch',
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <GalleryTextCard
+                    visible={galleryVisible} delay="0.2s" minHeight="220px"
+                    className={galleryVisible ? 'reveal-left' : ''}
+                  />
+                  <GalleryFeaturedImage
+                    src={GALLERY.img5} height="380px" sizes="33vw"
+                    visible={galleryVisible} delay="0.32s"
+                    className={galleryVisible ? 'reveal-up' : ''}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div
+                    className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
+                    style={{
+                      position:       'relative',
+                      borderRadius:   tokens.radius.gallery,
+                      overflow:       'hidden',
+                      height:         '195px',
+                      transition:     'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+                      opacity:        galleryVisible ? 1 : 0,
+                      animationDelay: '0.25s',
+                    }}
+                  >
+                    <Image src={GALLERY.img2} alt="Hair tools" fill sizes="33vw" style={{ objectFit: 'cover' }} />
+                  </div>
+                  <div
+                    className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
+                    style={{
+                      position:       'relative',
+                      borderRadius:   tokens.radius.gallery,
+                      overflow:       'hidden',
+                      height:         '230px',
+                      transition:     'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+                      opacity:        galleryVisible ? 1 : 0,
+                      animationDelay: '0.35s',
+                    }}
+                  >
+                    <Image src={GALLERY.img3} alt="Hair styling" fill sizes="33vw" style={{ objectFit: 'cover' }} />
+                  </div>
+                  <div style={{
+                    position:     'relative',
+                    borderRadius: tokens.radius.gallery,
+                    overflow:     'hidden',
+                    flex:         1,
+                    minHeight:    '180px',
+                  }}>
+                    <Image src={GALLERY.img4} alt="Salon interior" fill sizes="33vw" style={{ objectFit: 'cover' }} />
+                    <div style={{
+                      position:       'absolute',
+                      inset:          0,
+                      background:     'rgba(0,0,0,0.45)',
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: 'center',
+                    }}>
+                      <a
+                        href="#"
+                        style={{
+                          background:    tokens.color.goldAlpha,
+                          borderRadius:  tokens.radius.card,
+                          padding:       '0.875rem 2.5rem',
+                          fontSize:      'clamp(0.9rem, 1.8vw, 1.4rem)',
+                          fontWeight:    700,
+                          color:         'rgba(255,255,255,0.9)',
+                          textDecoration: 'none',
+                          transition:    'background 0.3s',
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.gold; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.goldAlpha; }}
+                      >
+                        OUR GALLERY
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
+                  style={{
+                    position:       'relative',
+                    borderRadius:   tokens.radius.gallery,
+                    overflow:       'hidden',
+                    minHeight:      '640px',
+                    transition:     'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+                    opacity:        galleryVisible ? 1 : 0,
+                    animationDelay: '0.3s',
+                  }}
+                >
+                  <Image src={GALLERY.img1} alt="Barber styling" fill sizes="33vw" style={{ objectFit: 'cover' }} />
                 </div>
               </div>
-            ))}
-          </div>
+            )}
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(2rem, 4vh, 3rem)' }}>
-            <a href="#"
-              style={{ display: 'inline-block', border: `1px solid ${tokens.color.white}`, borderRadius: '2rem', padding: '0.625rem 3rem', color: tokens.color.white, fontSize: '1.125rem', fontWeight: 300, textDecoration: 'none', transition: 'all 0.3s' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.gold; el.style.borderColor = tokens.color.gold; }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.borderColor = tokens.color.white; }}>
-              VIEW ALL
-            </a>
-          </div>
-        </section>
-
-        <Divider />
-
-        {/* ══════════════════════════
-            GALLERY
-        ══════════════════════════ */}
-        <section ref={galleryRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
-
-          <h2 className={galleryVisible ? 'reveal-up' : ''}
-            style={{ color: tokens.color.gold, fontSize: tokens.font.sectionTitle, fontWeight: 500, textAlign: 'center', marginBottom: 'clamp(2rem, 5vh, 3.5rem)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.1s' }}>
-            Transformations &amp; Artistry
-          </h2>
-
-          {/* ══ DESKTOP (≥ 768px) ══ */}
-          {!isMobileGallery && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.25rem', alignItems: 'stretch' }}>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* ── MOBILE ── */}
+            {isMobileGallery && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <GalleryTextCard
-                  visible={galleryVisible}
-                  delay="0.2s"
-                  minHeight="220px"
-                  className={galleryVisible ? 'reveal-left' : ''}
-                />
-                <GalleryFeaturedImage
-                  src={GALLERY.img5}
-                  height="380px"
-                  sizes="33vw"
-                  visible={galleryVisible}
-                  delay="0.32s"
+                  visible={galleryVisible} delay="0.1s" minHeight="auto"
                   className={galleryVisible ? 'reveal-up' : ''}
                 />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '195px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.25s' }}>
-                  <Image src={GALLERY.img2} alt="Hair tools" fill sizes="33vw" style={{ objectFit: 'cover' }} />
+                <GalleryFeaturedImage
+                  src={GALLERY.img5} height="340px" sizes="100vw"
+                  visible={galleryVisible} delay="0.2s"
+                  className={galleryVisible ? 'reveal-up' : ''}
+                />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div
+                    className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
+                    style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}
+                  >
+                    <Image src={GALLERY.img1} alt="Barber styling" fill sizes="50vw" style={{ objectFit: 'cover' }} />
+                  </div>
+                  <div
+                    className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
+                    style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.38s' }}
+                  >
+                    <Image src={GALLERY.img2} alt="Hair tools" fill sizes="50vw" style={{ objectFit: 'cover' }} />
+                  </div>
                 </div>
-                <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '230px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.35s' }}>
-                  <Image src={GALLERY.img3} alt="Hair styling" fill sizes="33vw" style={{ objectFit: 'cover' }} />
+                <div
+                  className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
+                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '210px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.46s' }}
+                >
+                  <Image src={GALLERY.img3} alt="Hair styling" fill sizes="100vw" style={{ objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, rgba(184,134,11,0.2))' }} />
                 </div>
-                <div style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', flex: 1, minHeight: '180px' }}>
-                  <Image src={GALLERY.img4} alt="Salon interior" fill sizes="33vw" style={{ objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <a href="#"
-                      style={{ background: tokens.color.goldAlpha, borderRadius: tokens.radius.card, padding: '0.875rem 2.5rem', fontSize: 'clamp(0.9rem, 1.8vw, 1.4rem)', fontWeight: 700, color: 'rgba(255,255,255,0.9)', textDecoration: 'none', transition: 'background 0.3s' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.gold; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.goldAlpha; }}>
+                <div
+                  className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
+                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '200px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.54s' }}
+                >
+                  <Image src={GALLERY.img4} alt="Salon interior" fill sizes="100vw" style={{ objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 100%)' }} />
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    gap: '0.875rem', padding: '1.5rem',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
+                      <div style={{ width: '2rem', height: '1px', background: tokens.color.gold }} />
+                      <span style={{ color: tokens.color.whiteMuted, fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                        See all our work
+                      </span>
+                      <div style={{ width: '2rem', height: '1px', background: tokens.color.gold }} />
+                    </div>
+                    <a
+                      href="#"
+                      style={{
+                        background:    tokens.color.gold,
+                        borderRadius:  '9999px',
+                        padding:       '0.75rem 2.25rem',
+                        fontSize:      '0.9375rem',
+                        fontWeight:    700,
+                        color:         tokens.color.white,
+                        textDecoration: 'none',
+                        letterSpacing: '0.08em',
+                        transition:    'transform 0.25s, box-shadow 0.25s',
+                        boxShadow:     '0 4px 20px rgba(184,134,11,0.4)',
+                      }}
+                      onMouseEnter={e => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.transform  = 'scale(1.05)';
+                        el.style.boxShadow  = '0 6px 28px rgba(184,134,11,0.6)';
+                      }}
+                      onMouseLeave={e => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.transform  = 'scale(1)';
+                        el.style.boxShadow  = '0 4px 20px rgba(184,134,11,0.4)';
+                      }}
+                    >
                       OUR GALLERY
                     </a>
                   </div>
                 </div>
               </div>
+            )}
+          </section>
 
-              <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', minHeight: '640px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}>
-                <Image src={GALLERY.img1} alt="Barber styling" fill sizes="33vw" style={{ objectFit: 'cover' }} />
-              </div>
+          <Divider />
+
+          {/* ════════════════════════
+              REVIEWS
+          ════════════════════════ */}
+          <section
+            ref={reviewRef}
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              padding:  'clamp(4rem, 10vh, 7rem) clamp(1.5rem, 5vw, 5rem)',
+            }}
+          >
+            <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+              <Image src={REVIEW_BG} alt="Reviews background" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.70)' }} />
             </div>
-          )}
-
-          {/* ══ MOBILE (< 768px) ══ */}
-          {isMobileGallery && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-              <GalleryTextCard
-                visible={galleryVisible}
-                delay="0.1s"
-                minHeight="auto"
-                className={galleryVisible ? 'reveal-up' : ''}
-              />
-
-              <GalleryFeaturedImage
-                src={GALLERY.img5}
-                height="340px"
-                sizes="100vw"
-                visible={galleryVisible}
-                delay="0.2s"
-                className={galleryVisible ? 'reveal-up' : ''}
-              />
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}>
-                  <Image src={GALLERY.img1} alt="Barber styling" fill sizes="50vw" style={{ objectFit: 'cover' }} />
-                </div>
-                <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.38s' }}>
-                  <Image src={GALLERY.img2} alt="Hair tools" fill sizes="50vw" style={{ objectFit: 'cover' }} />
-                </div>
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <h2
+                className={reviewVisible ? 'reveal-up' : ''}
+                style={{
+                  color:          tokens.color.gold,
+                  fontSize:       tokens.font.sectionTitle,
+                  fontWeight:     500,
+                  textAlign:      'center',
+                  marginBottom:   'clamp(2rem, 5vh, 3.5rem)',
+                  opacity:        reviewVisible ? 1 : 0,
+                  animationDelay: '0.1s',
+                }}
+              >
+                What Our Clients Say
+              </h2>
+              <div
+                className={reviewVisible ? 'reveal-up' : ''}
+                style={{
+                  maxWidth:       '800px',
+                  margin:         '0 auto',
+                  textAlign:      'center',
+                  opacity:        reviewVisible ? 1 : 0,
+                  animationDelay: '0.25s',
+                }}
+              >
+                <p style={{ fontSize: 'clamp(1rem, 2.2vw, 1.3rem)', fontWeight: 400, lineHeight: 1.8, color: tokens.color.white, margin: '0 0 1.5rem' }}>
+                  {REVIEWS[activeReview].quote}
+                </p>
+                <p style={{ color: tokens.color.gold, fontWeight: 600, fontSize: '1rem', margin: 0 }}>
+                  — {REVIEWS[activeReview].author}
+                </p>
               </div>
-
-              <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '210px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.46s' }}>
-                <Image src={GALLERY.img3} alt="Hair styling" fill sizes="100vw" style={{ objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, rgba(184,134,11,0.2))' }} />
-              </div>
-
-              <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '200px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.54s' }}>
-                <Image src={GALLERY.img4} alt="Salon interior" fill sizes="100vw" style={{ objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 100%)' }} />
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.875rem', padding: '1.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-                    <div style={{ width: '2rem', height: '1px', background: tokens.color.gold }} />
-                    <span style={{ color: tokens.color.whiteMuted, fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                      See all our work
-                    </span>
-                    <div style={{ width: '2rem', height: '1px', background: tokens.color.gold }} />
-                  </div>
-                  <a href="#"
-                    style={{ background: tokens.color.gold, borderRadius: '9999px', padding: '0.75rem 2.25rem', fontSize: '0.9375rem', fontWeight: 700, color: tokens.color.white, textDecoration: 'none', letterSpacing: '0.08em', transition: 'transform 0.25s, box-shadow 0.25s', boxShadow: '0 4px 20px rgba(184,134,11,0.4)' }}
-                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'scale(1.05)'; el.style.boxShadow = '0 6px 28px rgba(184,134,11,0.6)'; }}
-                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'scale(1)'; el.style.boxShadow = '0 4px 20px rgba(184,134,11,0.4)'; }}>
-                    OUR GALLERY
-                  </a>
-                </div>
-              </div>
-
-            </div>
-          )}
-        </section>
-
-        <Divider />
-
-        {/* ══════════════════════════
-            REVIEWS
-        ══════════════════════════ */}
-        <section ref={reviewRef}
-          style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(4rem, 10vh, 7rem) clamp(1.5rem, 5vw, 5rem)' }}>
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <Image src={REVIEW_BG} alt="Reviews background" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.70)' }} />
-          </div>
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <h2 className={reviewVisible ? 'reveal-up' : ''}
-              style={{ color: tokens.color.gold, fontSize: tokens.font.sectionTitle, fontWeight: 500, textAlign: 'center', marginBottom: 'clamp(2rem, 5vh, 3.5rem)', opacity: reviewVisible ? 1 : 0, animationDelay: '0.1s' }}>
-              What Our Clients Say
-            </h2>
-            <div className={reviewVisible ? 'reveal-up' : ''}
-              style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', opacity: reviewVisible ? 1 : 0, animationDelay: '0.25s' }}>
-              <p style={{ fontSize: 'clamp(1rem, 2.2vw, 1.3rem)', fontWeight: 400, lineHeight: 1.8, color: tokens.color.white, margin: '0 0 1.5rem' }}>
-                {REVIEWS[activeReview].quote}
-              </p>
-              <p style={{ color: tokens.color.gold, fontWeight: 600, fontSize: '1rem', margin: 0 }}>
-                — {REVIEWS[activeReview].author}
-              </p>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '3rem' }}>
-              {REVIEWS.map((_, i) => (
-                <button key={i} onClick={() => setActiveReview(i)}
-                  aria-label={`Review ${i + 1}`} className="review-dot"
-                  style={{ width: '2rem', height: '2rem', borderRadius: tokens.radius.dot, background: i === activeReview ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.30)', border: 'none', cursor: 'pointer' }} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══════════════════════════
-            FOOTER
-        ══════════════════════════ */}
-        <footer ref={footerRef}
-          style={{ position: 'relative', overflow: 'hidden', background: tokens.color.bgFooter, padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)' }}>
-          <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
-
-            <div className="footer-reveal"
-              style={{ flex: '1 1 260px', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '1rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(-40px)', transitionDelay: '0s' }}>
-              <LogoIcon size={56} />
-              <h2 style={{ color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 }}>SAYO</h2>
-              <p style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.tagline, lineHeight: 1.6, margin: 0, maxWidth: '260px' }}>
-                We are experienced in making you more beautiful
-              </p>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                {[
-                  { label: 'WhatsApp',  Icon: IconWhatsApp  },
-                  { label: 'Facebook',  Icon: IconFacebook  },
-                  { label: 'Instagram', Icon: IconInstagram },
-                ].map(({ label, Icon }, i) => (
-                  <a key={label} href="#" aria-label={label}
-                    className="social-icon footer-reveal-bounce"
-                    style={{ color: tokens.color.white, opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'scale(1)' : 'scale(0.5)', transitionDelay: `${0.4 + i * 0.1}s` }}>
-                    <Icon />
-                  </a>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '3rem' }}>
+                {REVIEWS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveReview(i)}
+                    aria-label={`Review ${i + 1}`}
+                    className="review-dot"
+                    style={{
+                      width:      '2rem',
+                      height:     '2rem',
+                      borderRadius: tokens.radius.dot,
+                      background: i === activeReview ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.30)',
+                      border:     'none',
+                      cursor:     'pointer',
+                    }}
+                  />
                 ))}
               </div>
             </div>
+          </section>
 
-            <div className="footer-reveal"
-              style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.15s' }}>
-              <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Quick Links</p>
-              {QUICK_LINKS.map((link, i) => (
-                <a key={link} href="#" className="quick-link footer-reveal-fast"
-                  style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, textDecoration: 'none', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.25 + i * 0.08}s` }}>
-                  {link}
-                </a>
-              ))}
-            </div>
+          {/* ════════════════════════
+              FOOTER
+          ════════════════════════ */}
+          <footer
+            ref={footerRef}
+            style={{
+              position:   'relative',
+              overflow:   'hidden',
+              background: tokens.color.bgFooter,
+              padding:    'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)',
+            }}
+          >
+            <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
 
-            <div className="footer-reveal"
-              style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.25s' }}>
-              <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Our Locations</p>
-              {LOCATIONS.map((loc, i) => (
-                <div key={loc} className="footer-reveal-fast"
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.35 + i * 0.08}s` }}>
-                  <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><IconLocation /></span>
-                  <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{loc}</p>
+              <div
+                className="footer-reveal"
+                style={{
+                  flex:          '1 1 260px',
+                  maxWidth:      '320px',
+                  display:       'flex',
+                  flexDirection: 'column',
+                  gap:           '1rem',
+                  opacity:       footerVisible ? 1 : 0,
+                  transform:     footerVisible ? 'translateX(0)' : 'translateX(-40px)',
+                  transitionDelay: '0s',
+                }}
+              >
+                <LogoIcon size={56} />
+                <h2 style={{ color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 }}>
+                  SAYO
+                </h2>
+                <p style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.tagline, lineHeight: 1.6, margin: 0, maxWidth: '260px' }}>
+                  We are experienced in making you more beautiful
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                  {[
+                    { label: 'WhatsApp',  Icon: IconWhatsApp  },
+                    { label: 'Facebook',  Icon: IconFacebook  },
+                    { label: 'Instagram', Icon: IconInstagram },
+                  ].map(({ label, Icon }, i) => (
+                    <a
+                      key={label} href="#" aria-label={label}
+                      className="social-icon footer-reveal-bounce"
+                      style={{
+                        color:           tokens.color.white,
+                        opacity:         footerVisible ? 1 : 0,
+                        transform:       footerVisible ? 'scale(1)' : 'scale(0.5)',
+                        transitionDelay: `${0.4 + i * 0.1}s`,
+                      }}
+                    >
+                      <Icon />
+                    </a>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div
+                className="footer-reveal"
+                style={{
+                  flex:          '1 1 160px',
+                  display:       'flex',
+                  flexDirection: 'column',
+                  gap:           '0.85rem',
+                  opacity:       footerVisible ? 1 : 0,
+                  transform:     footerVisible ? 'translateX(0)' : 'translateX(20px)',
+                  transitionDelay: '0.15s',
+                }}
+              >
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
+                  Quick Links
+                </p>
+                {QUICK_LINKS.map((link, i) => (
+                  <a
+                    key={link} href="#"
+                    className="quick-link footer-reveal-fast"
+                    style={{
+                      color:           tokens.color.whiteDim,
+                      fontSize:        tokens.font.quickLink,
+                      fontWeight:      500,
+                      textDecoration:  'none',
+                      opacity:         footerVisible ? 1 : 0,
+                      transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
+                      transitionDelay: `${0.25 + i * 0.08}s`,
+                    }}
+                  >
+                    {link}
+                  </a>
+                ))}
+              </div>
+
+              <div
+                className="footer-reveal"
+                style={{
+                  flex:          '1 1 160px',
+                  display:       'flex',
+                  flexDirection: 'column',
+                  gap:           '0.85rem',
+                  opacity:       footerVisible ? 1 : 0,
+                  transform:     footerVisible ? 'translateX(0)' : 'translateX(20px)',
+                  transitionDelay: '0.25s',
+                }}
+              >
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
+                  Our Locations
+                </p>
+                {LOCATIONS.map((loc, i) => (
+                  <div
+                    key={loc}
+                    className="footer-reveal-fast"
+                    style={{
+                      display:         'flex',
+                      alignItems:      'flex-start',
+                      gap:             '8px',
+                      opacity:         footerVisible ? 1 : 0,
+                      transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
+                      transitionDelay: `${0.35 + i * 0.08}s`,
+                    }}
+                  >
+                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><IconLocation /></span>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{loc}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                className="footer-reveal"
+                style={{
+                  flex:          '1 1 160px',
+                  display:       'flex',
+                  flexDirection: 'column',
+                  gap:           '0.85rem',
+                  opacity:       footerVisible ? 1 : 0,
+                  transform:     footerVisible ? 'translateX(0)' : 'translateX(40px)',
+                  transitionDelay: '0.35s',
+                }}
+              >
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
+                  Contact Us
+                </p>
+                {[
+                  { Icon: IconPhone,    text: '+94 77 123 4567' },
+                  { Icon: IconMail,     text: 'hello@sayobeauty.com' },
+                  { Icon: IconLocation, text: '123 Galle Road, Colombo, Sri Lanka' },
+                ].map(({ Icon, text }, i) => (
+                  <div
+                    key={text}
+                    className="footer-reveal-fast"
+                    style={{
+                      display:         'flex',
+                      alignItems:      'flex-start',
+                      gap:             '8px',
+                      opacity:         footerVisible ? 1 : 0,
+                      transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
+                      transitionDelay: `${0.45 + i * 0.08}s`,
+                    }}
+                  >
+                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><Icon /></span>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{text}</p>
+                  </div>
+                ))}
+              </div>
+
             </div>
 
-            <div className="footer-reveal"
-              style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(40px)', transitionDelay: '0.35s' }}>
-              <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Contact Us</p>
-              {[
-                { Icon: IconPhone,    text: '+94 77 123 4567' },
-                { Icon: IconMail,     text: 'hello@sayobeauty.com' },
-                { Icon: IconLocation, text: '123 Galle Road, Colombo, Sri Lanka' },
-              ].map(({ Icon, text }, i) => (
-                <div key={text} className="footer-reveal-fast"
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.45 + i * 0.08}s` }}>
-                  <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><Icon /></span>
-                  <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{text}</p>
-                </div>
-              ))}
+            <div
+              className="footer-reveal-simple"
+              style={{
+                position:        'relative',
+                zIndex:          10,
+                marginTop:       'clamp(2rem, 4vw, 2.5rem)',
+                paddingTop:      'clamp(1rem, 2vw, 1.5rem)',
+                borderTop:       `1px solid ${tokens.color.whiteBorder}`,
+                opacity:         footerVisible ? 1 : 0,
+                transitionDelay: '0.7s',
+              }}
+            >
+              <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>
+                © {new Date().getFullYear()} SAYO Beauty. All rights reserved.
+              </p>
             </div>
+          </footer>
 
-          </div>
-
-          <div className="footer-reveal-simple"
-            style={{ position: 'relative', zIndex: 10, marginTop: 'clamp(2rem, 4vw, 2.5rem)', paddingTop: 'clamp(1rem, 2vw, 1.5rem)', borderTop: `1px solid ${tokens.color.whiteBorder}`, opacity: footerVisible ? 1 : 0, transitionDelay: '0.7s' }}>
-            <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>
-              © {new Date().getFullYear()} SAYO Beauty. All rights reserved.
-            </p>
-          </div>
-        </footer>
-
+        </div>
       </main>
     </>
   );

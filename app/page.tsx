@@ -482,9 +482,9 @@ const LOCATIONS   = ['Colombo', 'Negombo', 'Kiribathgoda'] as const;
 const NAV_HREFS: Record<string, string> = {
   'HOME':      '/',
   'OUR STORY': '/about',
-  'SERVICES':  '#',
-  'PRODUCTS':  '#',
-  'REVIEWS':   '#',
+  'SERVICES':  '/services',
+  'PRODUCTS':  '/products',
+  'REVIEWS':   '/reviews',
 };
 
 /* ─────────────────────────────────────────
@@ -571,7 +571,7 @@ export default function Home() {
 
               {/* ── DESKTOP: Contact Us button (hidden on mobile) ── */}
               {!isMobile && (
-                <a href="#" className="contact-btn-wrap" style={S.contactBtn}>
+                <a href="/contact" className="contact-btn-wrap" style={S.contactBtn}>
                   CONTACT US
                 </a>
               )}
@@ -617,7 +617,7 @@ export default function Home() {
                     {i === 0 ? `[ ${item} ]` : item}
                   </a>
                 ))}
-                <a href="#" style={S.mobileContact} onClick={() => setMenuOpen(false)}>
+                <a href="/contact" style={S.mobileContact} onClick={() => setMenuOpen(false)}>
                   CONTACT US
                 </a>
               </div>
@@ -637,7 +637,7 @@ export default function Home() {
               natural products to cater for any skin.
             </p>
             <a
-              href="#"
+              href="/contact"
               style={S.ctaBtn}
               className={`cta-btn-wrap ${loaded ? 'cta-animate' : ''}`}
               onMouseEnter={e => {
@@ -698,7 +698,7 @@ export default function Home() {
                   { label: 'Facebook',  Icon: IconFacebook  },
                   { label: 'Instagram', Icon: IconInstagram },
                 ].map(({ label, Icon }, i) => (
-                  <a key={label} href="#" aria-label={label}
+                  <a key={label} href="/contact" aria-label={label}
                     className="social-icon footer-reveal-bounce"
                     style={{
                       ...S.socialLink,
@@ -721,7 +721,7 @@ export default function Home() {
             }}>
               <p style={S.quickLabel}>Quick Links</p>
               {QUICK_LINKS.map((link, i) => (
-                <a key={link} href={link === 'Our Story' ? '/about' : '#'}
+                <a key={link} href={link === 'Our Story' ? '/about' : '/contact'}
                   className="quick-link footer-reveal-fast"
                   style={{
                     ...S.quickLink,
