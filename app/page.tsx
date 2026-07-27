@@ -766,7 +766,7 @@ export default function Home() {
             }}>
               <p style={S.quickLabel}>Contact Us</p>
               {[
-                { delay: '0.45s', Icon: IconPhone,    text: '+94 77 123 4567' },
+                { delay: '0.45s', Icon: IconPhone,    text: '+94 77 233 6233' },
                 { delay: '0.53s', Icon: IconMail,     text: 'hello@sayobeauty.com' },
                 { delay: '0.61s', Icon: IconLocation, text: '123 Galle Road, Colombo, Sri Lanka' },
               ].map(({ delay, Icon, text }) => (

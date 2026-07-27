@@ -1624,7 +1624,7 @@ export default function AboutPage() {
                   Contact Us
                 </p>
                 {[
-                  { Icon: IconPhone,    text: '+94 77 123 4567' },
+                  { Icon: IconPhone,    text: '+94 77 233 6233' },
                   { Icon: IconMail,     text: 'hello@sayobeauty.com' },
                   { Icon: IconLocation, text: '123 Galle Road, Colombo, Sri Lanka' },
                 ].map(({ Icon, text }, i) => (

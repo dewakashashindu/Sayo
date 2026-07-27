@@ -1459,7 +1459,7 @@ export default function ServicesPage() {
                   Contact Us
                 </p>
                 {[
-                  { Icon: IconPhoneFooter, text: '+94 77 109 6580' },
+                  { Icon: IconPhoneFooter, text: '+94 77 233 6233' },
                   { Icon: IconMailFooter, text: 'Example@email.com' },
                   { Icon: IconMapPinFooter, text: 'No. 45, Galle Road, Colombo 03, Sri Lanka' },
                 ].map(({ Icon, text }, i) => (

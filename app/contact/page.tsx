@@ -55,7 +55,7 @@ const BRANCH_LOCATIONS = [
   {
     name:    'Colombo — Head Office',
     address: 'No. 45, Galle Road, Colombo 03, Sri Lanka',
-    phone:   '0771096580 / 0775894321',
+    phone:   '0772336233',
     email:   'info@sayobeauty.com',
     isHead:  true,
     mapHref: 'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
@@ -63,7 +63,7 @@ const BRANCH_LOCATIONS = [
   {
     name:    'Negombo Branch',
     address: 'No. 12, Poruthota Road, Negombo, Sri Lanka',
-    phone:   '0312223344',
+    phone:   '0772336233',
     email:   'negombo@sayobeauty.com',
     isHead:  false,
     mapHref: 'https://maps.google.com/?q=Poruthota+Road+Negombo+Sri+Lanka',
@@ -71,7 +71,7 @@ const BRANCH_LOCATIONS = [
   {
     name:    'Kiribathgoda Branch',
     address: 'No. 78, Kandy Road, Kiribathgoda, Sri Lanka',
-    phone:   '0112987654',
+    phone:   '0772336233',
     email:   'kiribathgoda@sayobeauty.com',
     isHead:  false,
     mapHref: 'https://maps.google.com/?q=Kandy+Road+Kiribathgoda+Sri+Lanka',
@@ -801,7 +801,7 @@ export default function ContactPage() {
                 <IconChat />
                 Send an Inquiry
               </a>
-              <a href="tel:0771096580" className="hero-cta-secondary">
+              <a href="tel:0772336233" className="hero-cta-secondary">
                 <IconPhoneCall />
                 Call Us Now
               </a>
@@ -934,7 +934,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p style={{ color: tokens.color.whiteDim69, fontSize: 'clamp(0.7rem,1.1vw,0.875rem)', fontWeight: 500, margin: '0 0 0.2rem', letterSpacing: '0.08em' }}>PHONE</p>
-                      <p style={{ color: tokens.color.white, fontSize: 'clamp(0.875rem,1.4vw,1rem)', fontWeight: 500, margin: 0 }}>0771096580 / 0775894321</p>
+                      <p style={{ color: tokens.color.white, fontSize: 'clamp(0.875rem,1.4vw,1rem)', fontWeight: 500, margin: 0 }}>0772336233 </p>
                     </div>
                   </div>
                   <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
@@ -1060,7 +1060,7 @@ export default function ContactPage() {
               <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(40px)', transitionDelay: '0.35s' }}>
                 <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Contact Us</p>
                 {[
-                  { Icon: IconPhoneFooter,  text: '+94 77 109 6580' },
+                  { Icon: IconPhoneFooter,  text: '+94 77 233 6233' },
                   { Icon: IconMailFooter,   text: 'Example@email.com' },
                   { Icon: IconMapPinFooter, text: 'No. 45, Galle Road, Colombo 03, Sri Lanka' },
                 ].map(({ Icon, text }, i) => (
