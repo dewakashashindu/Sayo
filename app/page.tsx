@@ -1,6 +1,8 @@
+//home page
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import backgroundImage from '../public/model1.png';
 import sayoLogo from '../public/sayologo.png';
@@ -497,6 +499,31 @@ export default function Home() {
   const isMobile = useIsMobile(); // breakpoint for nav/menu switch (1024px)
   const isNarrowScreen = useIsMobile(768); // breakpoint for hero image reposition
 
+  const router = useRouter();
+
+  /* ── Secret admin access: triple-click on copyright text ── */
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleCopyrightClick = () => {
+    clickCountRef.current += 1;
+
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+    }
+
+    if (clickCountRef.current >= 3) {
+      clickCountRef.current = 0;
+      router.push('/admin');
+      return;
+    }
+
+    // Reset the counter if the next click doesn't come within 1.5s
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+    }, 1500);
+  };
+
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(t);
@@ -788,7 +815,13 @@ export default function Home() {
             opacity: footerVisible ? 1 : 0,
             transitionDelay: '0.7s',
           }}>
-            <p style={S.copyright}>© 2025 SAYO Beauty. All rights reserved.</p>
+            <p
+              style={{ ...S.copyright, cursor: 'pointer', userSelect: 'none' }}
+              onClick={handleCopyrightClick}
+              title="" // no visual hint — stays secret
+            >
+              © 2025 SAYO Beauty. All rights reserved.
+            </p>
           </div>
         </footer>
 
