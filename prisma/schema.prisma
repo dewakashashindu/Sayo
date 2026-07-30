@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String   @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteConfig {
+  id         Int      @id @default(autoincrement())
+  configKey  String   @unique @db.VarChar(50)
+  configData Json
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([configKey])
+}
+
+model AdminActivityLog {
+  id            Int      @id @default(autoincrement())
+  adminUsername String   @db.VarChar(100)
+  action        String   @db.VarChar(255)
+  section       String   @db.VarChar(50)
+  timestamp     DateTime @default(now())
+
+  @@index([adminUsername])
+  @@index([timestamp])
+}

@@ -1,4 +1,3 @@
-//services page
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -28,25 +27,25 @@ const tokens = {
     whiteBorder: 'rgba(255,255,255,0.10)',
   },
   font: {
-    family:    'Inter, sans-serif',
-    nav:       'clamp(0.875rem, 1.2vw, 1.05rem)',
-    logoText:  'clamp(1.125rem, 1.5vw, 1.375rem)',
-    heroTitle: 'clamp(2rem, 4.5vw, 4rem)',
-    heroSub:   'clamp(0.9rem, 1.6vw, 1.4rem)',
-    section:   'clamp(1.1rem, 2vw, 1.6rem)',
-    tabLabel:  'clamp(0.9rem, 1.6vw, 1.4rem)',
-    label:     '0.75rem',
-    tagline:   'clamp(0.875rem, 1.2vw, 1rem)',
-    brand:     'clamp(1.5rem, 3vw, 2.5rem)',
-    priceName: 'clamp(0.85rem, 1.3vw, 1rem)',
+    family:          'Inter, sans-serif',
+    nav:             'clamp(0.875rem, 1.2vw, 1.05rem)',
+    logoText:        'clamp(1.125rem, 1.5vw, 1.375rem)',
+    heroTitle:       'clamp(2rem, 4.5vw, 4rem)',
+    heroSub:         'clamp(0.9rem, 1.6vw, 1.4rem)',
+    section:         'clamp(1.1rem, 2vw, 1.6rem)',
+    tabLabel:        'clamp(0.9rem, 1.6vw, 1.4rem)',
+    label:           '0.75rem',
+    tagline:         'clamp(0.875rem, 1.2vw, 1rem)',
+    brand:           'clamp(1.5rem, 3vw, 2.5rem)',
+    priceName:       'clamp(0.85rem, 1.3vw, 1rem)',
     pricePriceValue: 'clamp(0.85rem, 1.3vw, 1.05rem)',
   },
   radius: {
-    nav:     '0.75rem',
-    card:    '1.25rem',
-    tab:     '0.9375rem',
-    pill:    '1.25rem',
-    icon:    '9999px',
+    nav:  '0.75rem',
+    card: '1.25rem',
+    tab:  '0.9375rem',
+    pill: '1.25rem',
+    icon: '9999px',
   },
   layout: {
     maxWidth: '108rem',
@@ -59,11 +58,11 @@ const tokens = {
 ───────────────────────────────────────── */
 const NAV_ITEMS = ['HOME', 'OUR STORY', 'SERVICES', 'PRODUCTS', 'REVIEWS'] as const;
 const NAV_HREFS: Record<string, string> = {
-  'HOME': '/',
+  'HOME':      '/',
   'OUR STORY': '/about',
-  'SERVICES': '/services',
-  'PRODUCTS': '/products',
-  'REVIEWS': '/reviews',
+  'SERVICES':  '/services',
+  'PRODUCTS':  '/products',
+  'REVIEWS':   '/reviews',
 };
 const ACTIVE_NAV = 'SERVICES';
 
@@ -88,11 +87,10 @@ const CATEGORIES = [
 
 type CategoryKey = typeof CATEGORIES[number]['key'];
 
-type PriceItem = {
-  name: string;
-  price1: string;
-  price2?: string;
-};
+// ✅ DEFAULT CATEGORY — change this to whatever you want as the initial selection
+const DEFAULT_CATEGORY: CategoryKey = 'NAIL';
+
+type PriceItem = { name: string; price1: string; price2?: string };
 
 const PRICE_LIST: Record<GenderKey, Record<CategoryKey, PriceItem[]>> = {
   her: {
@@ -100,7 +98,7 @@ const PRICE_LIST: Record<GenderKey, Record<CategoryKey, PriceItem[]>> = {
       { name: 'Full Arms Wax',     price1: '2,500.00' },
       { name: 'Full Legs Wax',     price1: '3,500.00' },
       { name: 'Underarm Wax',      price1: '1,200.00' },
-      { name: 'Eyebrow Threading', price1: '800.00' },
+      { name: 'Eyebrow Threading', price1: '800.00'   },
       { name: 'Full Body Wax',     price1: '7,500.00', price2: '6,800.00' },
     ],
     HAIR: [
@@ -135,8 +133,8 @@ const PRICE_LIST: Record<GenderKey, Record<CategoryKey, PriceItem[]>> = {
       { name: 'Bridal Package - Full', price1: '45,000.00' },
       { name: 'Bridal Hair & Makeup',  price1: '18,000.00' },
       { name: 'Pre-Bridal Package',    price1: '22,000.00' },
-      { name: 'Trial Makeup',          price1: '6,500.00' },
-      { name: 'Bridal Draping',        price1: '5,000.00' },
+      { name: 'Trial Makeup',          price1: '6,500.00'  },
+      { name: 'Bridal Draping',        price1: '5,000.00'  },
     ],
   },
   his: {
@@ -149,8 +147,8 @@ const PRICE_LIST: Record<GenderKey, Record<CategoryKey, PriceItem[]>> = {
     ],
     HAIR: [
       { name: 'Haircut - Classic', price1: '1,800.00' },
-      { name: 'Beard Trim',        price1: '900.00' },
-      { name: 'Hair Wash',         price1: '700.00' },
+      { name: 'Beard Trim',        price1: '900.00'   },
+      { name: 'Hair Wash',         price1: '700.00'   },
       { name: 'Head Massage',      price1: '1,500.00', price2: '1,200.00' },
       { name: 'Hair Color',        price1: '3,500.00' },
     ],
@@ -164,7 +162,7 @@ const PRICE_LIST: Record<GenderKey, Record<CategoryKey, PriceItem[]>> = {
     NAIL: [
       { name: 'Basic Manicure',   price1: '1,200.00' },
       { name: 'Basic Pedicure',   price1: '1,500.00' },
-      { name: 'Nail Trim & Buff', price1: '800.00' },
+      { name: 'Nail Trim & Buff', price1: '800.00'   },
       { name: 'Callus Removal',   price1: '1,000.00' },
       { name: 'Hand Spa',         price1: '2,200.00' },
     ],
@@ -179,8 +177,8 @@ const PRICE_LIST: Record<GenderKey, Record<CategoryKey, PriceItem[]>> = {
       { name: 'Groom Package',       price1: '25,000.00' },
       { name: 'Groom Hair & Makeup', price1: '10,000.00' },
       { name: 'Pre-Groom Package',   price1: '14,000.00' },
-      { name: 'Groom Facial',        price1: '4,500.00' },
-      { name: 'Groom Grooming',      price1: '3,500.00' },
+      { name: 'Groom Facial',        price1: '4,500.00'  },
+      { name: 'Groom Grooming',      price1: '3,500.00'  },
     ],
   },
 };
@@ -208,7 +206,7 @@ const globalCss = `
   }
   @keyframes floatY {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50%      { transform: translateY(-8px); }
   }
 
   .nav-animate { animation: fadeInDown 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
@@ -220,10 +218,8 @@ const globalCss = `
   .nav-link-wrap::after {
     content: '';
     position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 0;
-    height: 2px;
+    bottom: -3px; left: 0;
+    width: 0; height: 2px;
     background: #B8860B;
     transition: width 0.3s ease;
   }
@@ -232,8 +228,7 @@ const globalCss = `
   .contact-btn-wrap { position: relative; overflow: hidden; }
   .contact-btn-wrap::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: white;
     transform: scaleX(0);
     transform-origin: left;
@@ -244,47 +239,26 @@ const globalCss = `
   .contact-btn-wrap:hover { color: #000 !important; }
 
   .gender-tab, .category-tab {
-    cursor: pointer;
-    border: none;
-    outline: none;
-    font-family: Inter, sans-serif;
-    color: #fff;
+    cursor: pointer; border: none; outline: none;
+    font-family: Inter, sans-serif; color: #fff;
     transition: background 0.3s ease, border-color 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
   }
   .gender-tab:hover, .category-tab:hover { transform: translateY(-3px); }
 
-  .gender-tab-active {
-    background: rgba(184,134,11,0.49);
-    box-shadow: 0 8px 26px rgba(184,134,11,0.25);
-  }
-  .gender-tab-inactive {
-    background: transparent;
-    border: 3px solid rgba(184,134,11,0.49);
-  }
+  .gender-tab-active   { background: rgba(184,134,11,0.49); box-shadow: 0 8px 26px rgba(184,134,11,0.25); }
+  .gender-tab-inactive { background: transparent; border: 3px solid rgba(184,134,11,0.49); }
   .gender-tab-inactive:hover { background: rgba(184,134,11,0.15); }
 
-  .category-tab-active {
-    background: #B8860B;
-    box-shadow: 0 8px 24px rgba(184,134,11,0.4);
-  }
-  .category-tab-inactive {
-    background: transparent;
-    border: 3px solid rgba(255,255,255,0.7);
-  }
-  .category-tab-inactive:hover {
-    border-color: #B8860B;
-    background: rgba(184,134,11,0.12);
-  }
+  .category-tab-active   { background: #B8860B; box-shadow: 0 8px 24px rgba(184,134,11,0.4); }
+  .category-tab-inactive { background: transparent; border: 3px solid rgba(255,255,255,0.7); }
+  .category-tab-inactive:hover { border-color: #B8860B; background: rgba(184,134,11,0.12); }
 
   :root {
     --gallery-card-min: clamp(110px, 14vw, 193px);
     --gallery-card-max: clamp(240px, 28vw, 487px);
   }
 
-  .gallery-scroll-outer {
-    width: 100%;
-    overflow: hidden;
-  }
+  .gallery-scroll-outer { width: 100%; overflow: hidden; }
 
   ul.gallery-scroll {
     container-type: inline-size;
@@ -303,6 +277,7 @@ const globalCss = `
     scrollbar-width: thin;
     scrollbar-color: #B8860B transparent;
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto;
   }
 
   ul.gallery-scroll[data-dragging='true'] { cursor: grabbing; }
@@ -333,8 +308,7 @@ const globalCss = `
 
   ul.gallery-scroll li article {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     border-radius: 1.25rem;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.55);
@@ -342,10 +316,8 @@ const globalCss = `
   }
 
   ul.gallery-scroll li img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
     object-fit: cover;
     filter: grayscale(0.55) contrast(1.15) brightness(0.85);
     transition: filter 0.4s ease;
@@ -354,114 +326,61 @@ const globalCss = `
   }
 
   ul.gallery-scroll li a {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     z-index: 2;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    display: flex; align-items: flex-end; justify-content: center;
     padding: 1rem;
-    text-align: center;
-    text-decoration: none;
+    text-align: center; text-decoration: none;
     color: #fff;
     font-size: clamp(0.7rem, 1vw, 0.85rem);
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
     background: linear-gradient(0deg, rgba(0,0,0,0.65) 0%, transparent 55%);
   }
 
   ul.gallery-scroll::-webkit-scrollbar { height: 6px; }
-  ul.gallery-scroll::-webkit-scrollbar-thumb {
-    background: #B8860B;
-    border-radius: 999px;
-  }
+  ul.gallery-scroll::-webkit-scrollbar-thumb { background: #B8860B; border-radius: 999px; }
   ul.gallery-scroll::-webkit-scrollbar-track { background: transparent; }
 
-  .price-row {
-    transition: background 0.2s ease, padding-left 0.2s ease;
-  }
-  .price-row:hover {
-    background: rgba(184,134,11,0.1) !important;
-    padding-left: 1.75rem !important;
-  }
+  .price-row { transition: background 0.2s ease, padding-left 0.2s ease; }
+  .price-row:hover { background: rgba(184,134,11,0.1) !important; padding-left: 1.75rem !important; }
   .price-list-reveal {
     transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1);
   }
 
   .social-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 42px; height: 42px; border-radius: 50%;
     background: rgba(255,255,255,0.08);
     border: 1.5px solid rgba(255,255,255,0.15);
     transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s, border-color 0.3s;
-    color: white;
-    text-decoration: none;
+    color: white; text-decoration: none;
   }
   .social-icon:hover {
     transform: scale(1.12) translateY(-3px);
-    background: #B8860B;
-    border-color: #B8860B;
+    background: #B8860B; border-color: #B8860B;
   }
 
   .footer-grid { display: flex; flex-direction: column; flex-wrap: wrap; gap: 2.5rem; }
   @media (min-width: 1024px) {
-    .footer-grid {
-      flex-direction: row;
-      flex-wrap: nowrap;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
+    .footer-grid { flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; }
   }
   @media (min-width: 640px) and (max-width: 1023px) {
-    .footer-grid {
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: space-between;
-    }
+    .footer-grid { flex-direction: row; flex-wrap: wrap; justify-content: space-between; }
   }
 
-  .footer-reveal {
-    transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
-  }
-  .footer-reveal-fast {
-    transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
-  }
-  .footer-reveal-bounce {
-    transition: opacity 0.5s cubic-bezier(0.34,1.56,0.64,1), transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
-  }
+  .footer-reveal        { transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .footer-reveal-fast   { transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+  .footer-reveal-bounce { transition: opacity 0.5s cubic-bezier(0.34,1.56,0.64,1), transform 0.5s cubic-bezier(0.34,1.56,0.64,1); }
   .footer-reveal-simple { transition: opacity 1s ease; }
 
   .quick-link { position: relative; transition: padding-left 0.25s, color 0.25s; }
-  .quick-link:hover {
-    padding-left: 8px;
-    color: #B8860B !important;
-  }
-  .quick-link::before {
-    content: '›';
-    position: absolute;
-    left: -4px;
-    opacity: 0;
-    transition: opacity 0.25s, left 0.25s;
-    color: #B8860B;
-  }
-  .quick-link:hover::before {
-    opacity: 1;
-    left: 0;
-  }
+  .quick-link:hover { padding-left: 8px; color: #B8860B !important; }
+  .quick-link::before { content: '›'; position: absolute; left: -4px; opacity: 0; transition: opacity 0.25s, left 0.25s; color: #B8860B; }
+  .quick-link:hover::before { opacity: 1; left: 0; }
 
-  .gender-tabs-wrap, .category-tabs-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
+  .gender-tabs-wrap, .category-tabs-wrap { display: flex; flex-wrap: wrap; justify-content: center; }
   @media (max-width: 768px) {
-    .gender-tabs-wrap { gap: 0.75rem !important; }
+    .gender-tabs-wrap   { gap: 0.75rem !important; }
     .category-tabs-wrap { gap: 0.6rem !important; }
   }
 `;
@@ -471,15 +390,12 @@ const globalCss = `
 ───────────────────────────────────────── */
 const S = {
   nav: {
-    position: 'relative',
-    zIndex: 20,
+    position: 'relative', zIndex: 20,
     padding: 'clamp(1rem, 3vw, 3rem) clamp(1rem, 3vw, 3.125rem)',
   } as React.CSSProperties,
 
   navInner: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     background: tokens.color.navBg,
     borderRadius: tokens.radius.nav,
     padding: 'clamp(0.75rem, 2vw, 1.5rem) clamp(1rem, 2vw, 2rem)',
@@ -488,44 +404,35 @@ const S = {
   } as React.CSSProperties,
 
   logoWrap: {
-    display: 'flex',
-    alignItems: 'center',
+    display: 'flex', alignItems: 'center',
     gap: 'clamp(0.5rem, 1vw, 0.75rem)',
   } as React.CSSProperties,
 
   logoText: {
     color: tokens.color.white,
     fontSize: tokens.font.logoText,
-    fontWeight: 600,
-    letterSpacing: '0.15em',
+    fontWeight: 600, letterSpacing: '0.15em',
   } as React.CSSProperties,
 
   navLinks: {
-    display: 'flex',
-    alignItems: 'center',
+    display: 'flex', alignItems: 'center',
     gap: 'clamp(1.25rem, 2.5vw, 2.5rem)',
   } as React.CSSProperties,
 
   navLink: {
-    fontSize: tokens.font.nav,
-    fontWeight: 500,
-    textDecoration: 'none',
-    transition: 'color 0.2s',
-    whiteSpace: 'nowrap',
+    fontSize: tokens.font.nav, fontWeight: 500,
+    textDecoration: 'none', transition: 'color 0.2s', whiteSpace: 'nowrap',
   } as React.CSSProperties,
 
   contactBtn: {
     color: tokens.color.white,
-    fontSize: tokens.font.nav,
-    fontWeight: 500,
+    fontSize: tokens.font.nav, fontWeight: 500,
     textDecoration: 'none',
     border: `3px solid ${tokens.color.white}`,
     borderRadius: tokens.radius.nav,
     padding: 'clamp(0.375rem, 0.5vw, 0.5rem) clamp(1rem, 1.5vw, 1.75rem)',
-    transition: 'all 0.3s',
-    whiteSpace: 'nowrap',
-    position: 'relative',
-    zIndex: 1,
+    transition: 'all 0.3s', whiteSpace: 'nowrap',
+    position: 'relative', zIndex: 1,
   } as React.CSSProperties,
 
   mobileMenu: {
@@ -533,27 +440,20 @@ const S = {
     background: 'rgba(0,0,0,0.92)',
     borderRadius: tokens.radius.nav,
     padding: '1rem 1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
+    display: 'flex', flexDirection: 'column', gap: '1rem',
   } as React.CSSProperties,
 
   mobileNavLink: {
     color: tokens.color.white,
-    fontSize: '1rem',
-    fontWeight: 500,
-    textDecoration: 'none',
+    fontSize: '1rem', fontWeight: 500, textDecoration: 'none',
   } as React.CSSProperties,
 
   mobileContact: {
     color: tokens.color.white,
-    fontSize: '1rem',
-    textAlign: 'center' as const,
-    padding: '0.625rem 0',
-    borderRadius: '0.75rem',
+    fontSize: '1rem', textAlign: 'center' as const,
+    padding: '0.625rem 0', borderRadius: '0.75rem',
     border: `2px solid ${tokens.color.white}`,
-    textDecoration: 'none',
-    transition: 'all 0.2s',
+    textDecoration: 'none', transition: 'all 0.2s',
   } as React.CSSProperties,
 };
 
@@ -563,10 +463,8 @@ const S = {
 function LogoIcon({ className = '', size = 48 }: { className?: string; size?: number }) {
   return (
     <Image
-      src={sayoLogo}
-      alt="SAYO Logo"
-      width={size}
-      height={size}
+      src={sayoLogo} alt="SAYO Logo"
+      width={size} height={size}
       className={className}
       style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto', objectFit: 'contain' }}
       priority
@@ -634,14 +532,10 @@ function useInView(threshold = 0.15) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setInView(true);
-      },
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
       { threshold }
     );
-
     obs.observe(el);
     return () => obs.disconnect();
   }, [threshold]);
@@ -651,14 +545,12 @@ function useInView(threshold = 0.15) {
 
 function useIsMobile(breakpoint = 1024) {
   const [isMobile, setIsMobile] = useState(false);
-
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < breakpoint);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, [breakpoint]);
-
   return isMobile;
 }
 
@@ -668,14 +560,10 @@ function useIsMobile(breakpoint = 1024) {
 function Divider() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: '0 clamp(1rem, 4vw, 3.5rem)' }}>
-      <div
-        style={{
-          width: '100%',
-          maxWidth: tokens.layout.inner,
-          height: '1px',
-          background: 'rgba(255,255,255,0.5)',
-        }}
-      />
+      <div style={{
+        width: '100%', maxWidth: tokens.layout.inner,
+        height: '1px', background: 'rgba(255,255,255,0.5)',
+      }} />
     </div>
   );
 }
@@ -685,28 +573,32 @@ function Divider() {
 ───────────────────────────────────────── */
 export default function ServicesPage() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [gender, setGender] = useState<GenderKey>('her');
-  const [category, setCategory] = useState<CategoryKey>('WAX');
+  const [loaded,   setLoaded]   = useState(false);
+  const [gender,   setGender]   = useState<GenderKey>('her');
 
-  const isMobile = useIsMobile(1024);
+  // ✅ DEFAULT IS NOW 'NAIL' — matches the screenshot
+  const [category, setCategory] = useState<CategoryKey>(DEFAULT_CATEGORY);
 
-  const { ref: heroRef, inView: heroVisible } = useInView(0.05);
-  const { ref: toggleRef, inView: toggleVisible } = useInView(0.1);
+  // ✅ Track whether category change came from a TAB CLICK or from scroll detection
+  const categorySource   = useRef<'tab' | 'scroll'>('tab'); // start as 'tab' so initial scroll fires
+  const observerPaused   = useRef(true); // ✅ start PAUSED — resume only after initial scroll settles
+  const galleryListRef   = useRef<HTMLUListElement>(null);
+  const isMobile         = useIsMobile(1024);
+
+  const { ref: heroRef,     inView: heroVisible     } = useInView(0.05);
+  const { ref: toggleRef,   inView: toggleVisible   } = useInView(0.1);
   const { ref: categoryRef, inView: categoryVisible } = useInView(0.1);
-  const { ref: galleryRef, inView: galleryVisible } = useInView(0.1);
-  const { ref: priceRef, inView: priceVisible } = useInView(0.1);
-  const { ref: footerRef, inView: footerVisible } = useInView(0.1);
+  const { ref: galleryRef,  inView: galleryVisible  } = useInView(0.1);
+  const { ref: priceRef,    inView: priceVisible    } = useInView(0.1);
+  const { ref: footerRef,   inView: footerVisible   } = useInView(0.1);
 
-  const galleryListRef = useRef<HTMLUListElement>(null);
-  const isProgrammaticScroll = useRef(false);
-
+  /* ── Page load ── */
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  /* Draggable gallery */
+  /* ── Register GSAP Draggable ── */
   useEffect(() => {
     gsap.registerPlugin(Draggable, InertiaPlugin);
 
@@ -725,23 +617,23 @@ export default function ServicesPage() {
       inertia: true,
       allowContextMenu: true,
       onPressInit: function (this: Draggable & { scrollLeft?: number }) {
-        isProgrammaticScroll.current = false;
         list.dataset.dragging = 'false';
-        this.scrollLeft = list.scrollLeft;
+        this.scrollLeft       = list.scrollLeft;
         gsap.set(proxy, { clearProps: 'all' });
       },
-      onDragStart: () => { list.dataset.dragging = 'true'; },
+      onDragStart: () => {
+        list.dataset.dragging  = 'true';
+        observerPaused.current = false; // enable observer when user drags
+      },
       onDragEnd: () => { list.dataset.dragging = 'false'; },
-      onDrag: updateScroll,
+      onDrag:        updateScroll,
       onThrowUpdate: updateScroll,
     });
 
-    return () => {
-      draggable.forEach(d => d.kill());
-    };
+    return () => { draggable.forEach(d => d.kill()); };
   }, []);
 
-  /* Detect centered card */
+  /* ── IntersectionObserver: detect centered card during manual scroll/drag ── */
   useEffect(() => {
     const list = galleryListRef.current;
     if (!list) return;
@@ -750,12 +642,16 @@ export default function ServicesPage() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (isProgrammaticScroll.current) return;
+        // Skip if paused (programmatic scroll in progress)
+        if (observerPaused.current) return;
 
         entries.forEach(entry => {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
             const key = entry.target.getAttribute('data-key') as CategoryKey | null;
-            if (key) setCategory(key);
+            if (key) {
+              categorySource.current = 'scroll';
+              setCategory(key);
+            }
           }
         });
       },
@@ -766,7 +662,7 @@ export default function ServicesPage() {
     return () => observer.disconnect();
   }, []);
 
-  /* Tab click -> center card */
+  /* ── Programmatic scroll: center the active category card ── */
   useEffect(() => {
     const list = galleryListRef.current;
     if (!list) return;
@@ -774,27 +670,30 @@ export default function ServicesPage() {
     const target = list.querySelector<HTMLElement>(`li[data-key="${category}"]`);
     if (!target) return;
 
-    isProgrammaticScroll.current = true;
+    // Pause observer so scroll doesn't trigger state changes
+    observerPaused.current = true;
 
     let rafId = 0;
     let frame = 0;
-    const MAX_FRAMES = 120;
-    const EASE = 0.18;
+    const MAX_FRAMES = 150;
+    const EASE       = 0.15;
 
     const step = () => {
-      if (list.dataset.dragging === 'true' || !isProgrammaticScroll.current) {
-        isProgrammaticScroll.current = false;
+      if (list.dataset.dragging === 'true') {
+        // User grabbed — hand control back
+        observerPaused.current = false;
         return;
       }
 
-      const listRect = list.getBoundingClientRect();
+      const listRect   = list.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
-      const error =
+      const error      =
         targetRect.left + targetRect.width / 2 -
-        (listRect.left + listRect.width / 2);
+        (listRect.left  + listRect.width  / 2);
 
       if (Math.abs(error) < 0.5 || frame >= MAX_FRAMES) {
-        isProgrammaticScroll.current = false;
+        // Scroll done — wait a beat then re-enable observer
+        setTimeout(() => { observerPaused.current = false; }, 350);
         return;
       }
 
@@ -803,60 +702,56 @@ export default function ServicesPage() {
       rafId = requestAnimationFrame(step);
     };
 
-    rafId = requestAnimationFrame(step);
+    // Small delay on mount so layout is ready
+    const startTimer = setTimeout(() => {
+      rafId = requestAnimationFrame(step);
+    }, frame === 0 ? 120 : 0);
 
     return () => {
+      clearTimeout(startTimer);
       cancelAnimationFrame(rafId);
-      isProgrammaticScroll.current = false;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
-  const priceItems = PRICE_LIST[gender][category];
-  const activeGenderLabel =
-    GENDER_OPTIONS.find(g => g.key === gender)?.label ?? '';
+  const priceItems        = PRICE_LIST[gender][category];
+  const activeGenderLabel = GENDER_OPTIONS.find(g => g.key === gender)?.label ?? '';
+
+  /* ── Tab click handler ── */
+  const handleTabClick = (key: CategoryKey) => {
+    categorySource.current = 'tab';
+    setCategory(key);
+  };
 
   return (
     <>
       <style>{globalCss}</style>
 
-      <main
-        style={{
-          minHeight: '100vh',
-          backgroundColor: 'transparent',
-          fontFamily: tokens.font.family,
-          color: tokens.color.white,
-        }}
-      >
-        {/* Background */}
+      <main style={{
+        minHeight: '100vh',
+        backgroundColor: 'transparent',
+        fontFamily: tokens.font.family,
+        color: tokens.color.white,
+      }}>
+
+        {/* ── Background ── */}
         <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
           <Image
             src="/services-bg.jpg"
             alt="Services background"
-            fill
-            priority
-            sizes="100vw"
+            fill priority sizes="100vw"
             style={{ objectFit: 'cover', objectPosition: 'center' }}
           />
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(270deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%)',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(0deg, rgba(4,4,5,0.6) 0%, transparent 30%)',
-            }}
-          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(270deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(4,4,5,0.6) 0%, transparent 30%)' }} />
         </div>
 
         <div style={{ position: 'relative', zIndex: 10 }}>
-          {/* NAVBAR */}
+
+          {/* ════════════ NAVBAR ════════════ */}
           <nav className={loaded ? 'nav-animate' : ''} style={{ ...S.nav, opacity: loaded ? undefined : 0 }}>
             <div style={S.navInner}>
+
               <div style={S.logoWrap}>
                 <LogoIcon className="logo-float" />
                 <span style={S.logoText}>SAYO</span>
@@ -871,16 +766,9 @@ export default function ServicesPage() {
                         key={item}
                         href={NAV_HREFS[item]}
                         className="nav-link-wrap"
-                        style={{
-                          ...S.navLink,
-                          color: isActive ? tokens.color.gold : tokens.color.white,
-                        }}
-                        onMouseEnter={e => {
-                          if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.gold;
-                        }}
-                        onMouseLeave={e => {
-                          if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.white;
-                        }}
+                        style={{ ...S.navLink, color: isActive ? tokens.color.gold : tokens.color.white }}
+                        onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }}
+                        onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}
                       >
                         {isActive ? `[ ${item} ]` : item}
                       </a>
@@ -899,27 +787,13 @@ export default function ServicesPage() {
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
                   aria-label="Toggle menu"
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: tokens.color.white,
-                    cursor: 'pointer',
-                    padding: '0.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                  style={{ background: 'none', border: 'none', color: tokens.color.white, cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    {menuOpen ? (
-                      <path d="M6 18L18 6M6 6l12 12" />
-                    ) : (
-                      <>
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="3" y1="12" x2="21" y2="12" />
-                        <line x1="3" y1="18" x2="21" y2="18" />
-                      </>
-                    )}
+                    {menuOpen
+                      ? <path d="M6 18L18 6M6 6l12 12" />
+                      : (<><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>)
+                    }
                   </svg>
                 </button>
               )}
@@ -929,12 +803,8 @@ export default function ServicesPage() {
               <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
                 {NAV_ITEMS.map((item) => (
                   <a
-                    key={item}
-                    href={NAV_HREFS[item]}
-                    style={{
-                      ...S.mobileNavLink,
-                      color: item === ACTIVE_NAV ? tokens.color.gold : tokens.color.white,
-                    }}
+                    key={item} href={NAV_HREFS[item]}
+                    style={{ ...S.mobileNavLink, color: item === ACTIVE_NAV ? tokens.color.gold : tokens.color.white }}
                     onClick={() => setMenuOpen(false)}
                   >
                     {item === ACTIVE_NAV ? `[ ${item} ]` : item}
@@ -947,13 +817,11 @@ export default function ServicesPage() {
             )}
           </nav>
 
-          {/* HERO */}
+          {/* ════════════ HERO ════════════ */}
           <div
             ref={heroRef}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
               textAlign: 'center',
               padding: 'clamp(2rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem)',
               gap: 'clamp(1.25rem, 2.5vw, 2rem)',
@@ -964,10 +832,8 @@ export default function ServicesPage() {
               style={{
                 color: tokens.color.gold,
                 fontSize: tokens.font.heroTitle,
-                fontWeight: 500,
-                lineHeight: 1.2,
-                maxWidth: '56rem',
-                margin: 0,
+                fontWeight: 500, lineHeight: 1.2,
+                maxWidth: '56rem', margin: 0,
                 opacity: heroVisible ? 1 : 0,
                 animationDelay: '0.1s',
                 textShadow: '0 4px 40px rgba(184,134,11,0.3)',
@@ -981,10 +847,8 @@ export default function ServicesPage() {
               style={{
                 color: tokens.color.whiteMuted,
                 fontSize: tokens.font.heroSub,
-                fontWeight: 500,
-                lineHeight: 1.7,
-                maxWidth: '52rem',
-                margin: 0,
+                fontWeight: 500, lineHeight: 1.7,
+                maxWidth: '52rem', margin: 0,
                 opacity: heroVisible ? 1 : 0,
                 animationDelay: '0.25s',
               }}
@@ -998,13 +862,11 @@ export default function ServicesPage() {
 
           <Divider />
 
-          {/* GENDER TOGGLE */}
+          {/* ════════════ GENDER TOGGLE ════════════ */}
           <div
             ref={toggleRef}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
               textAlign: 'center',
               gap: 'clamp(1.5rem, 3vw, 2.5rem)',
               padding: 'clamp(2rem, 4vw, 3.25rem) clamp(1.25rem, 5vw, 4rem)',
@@ -1014,11 +876,8 @@ export default function ServicesPage() {
               className={toggleVisible ? 'reveal-up' : ''}
               style={{
                 color: tokens.color.white,
-                fontSize: tokens.font.section,
-                fontWeight: 500,
-                maxWidth: '46rem',
-                margin: 0,
-                lineHeight: 1.6,
+                fontSize: tokens.font.section, fontWeight: 500,
+                maxWidth: '46rem', margin: 0, lineHeight: 1.6,
                 opacity: toggleVisible ? 1 : 0,
                 animationDelay: '0.05s',
               }}
@@ -1028,11 +887,7 @@ export default function ServicesPage() {
 
             <div
               className={`gender-tabs-wrap ${toggleVisible ? 'reveal-up' : ''}`}
-              style={{
-                gap: 'clamp(1.25rem, 3vw, 2.5rem)',
-                opacity: toggleVisible ? 1 : 0,
-                animationDelay: '0.15s',
-              }}
+              style={{ gap: 'clamp(1.25rem, 3vw, 2.5rem)', opacity: toggleVisible ? 1 : 0, animationDelay: '0.15s' }}
             >
               {GENDER_OPTIONS.map((opt) => {
                 const isActive = gender === opt.key;
@@ -1045,8 +900,7 @@ export default function ServicesPage() {
                       minWidth: 'clamp(180px, 22vw, 268px)',
                       padding: 'clamp(1rem, 2vh, 1.5rem) clamp(1.5rem, 3vw, 2.5rem)',
                       borderRadius: tokens.radius.pill,
-                      fontSize: tokens.font.tabLabel,
-                      fontWeight: 500,
+                      fontSize: tokens.font.tabLabel, fontWeight: 500,
                     }}
                   >
                     {opt.label}
@@ -1058,7 +912,7 @@ export default function ServicesPage() {
 
           <Divider />
 
-          {/* CATEGORY TABS */}
+          {/* ════════════ CATEGORY TABS ════════════ */}
           <div
             ref={categoryRef}
             style={{ padding: 'clamp(2rem, 4vw, 3.25rem) clamp(1.25rem, 5vw, 4rem) 0' }}
@@ -1078,14 +932,13 @@ export default function ServicesPage() {
                 return (
                   <button
                     key={cat.key}
-                    onClick={() => setCategory(cat.key)}
+                    onClick={() => handleTabClick(cat.key)}
                     className={`category-tab ${isActive ? 'category-tab-active' : 'category-tab-inactive'}`}
                     style={{
                       minWidth: 'clamp(110px, 14vw, 193px)',
                       height: 'clamp(52px, 6.5vh, 66px)',
                       borderRadius: tokens.radius.tab,
-                      fontSize: tokens.font.tabLabel,
-                      fontWeight: 600,
+                      fontSize: tokens.font.tabLabel, fontWeight: 600,
                       flex: '1 1 auto',
                     }}
                   >
@@ -1096,7 +949,7 @@ export default function ServicesPage() {
             </div>
           </div>
 
-          {/* GALLERY */}
+          {/* ════════════ GALLERY CAROUSEL ════════════ */}
           <div
             ref={galleryRef}
             className="gallery-scroll-outer"
@@ -1110,12 +963,15 @@ export default function ServicesPage() {
               {CATEGORIES.map((cat) => (
                 <li key={cat.key} data-key={cat.key}>
                   <article>
-                    <Image src={cat.image} alt={cat.label} fill sizes="487px" draggable={false} />
+                    <Image
+                      src={cat.image} alt={cat.label}
+                      fill sizes="487px" draggable={false}
+                    />
                     <a
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        setCategory(cat.key);
+                        handleTabClick(cat.key);
                       }}
                     >
                       {cat.label}
@@ -1126,7 +982,7 @@ export default function ServicesPage() {
             </ul>
           </div>
 
-          {/* PRICE LIST */}
+          {/* ════════════ PRICE LIST ════════════ */}
           <div
             ref={priceRef}
             style={{
@@ -1134,6 +990,8 @@ export default function ServicesPage() {
             }}
           >
             <div style={{ maxWidth: tokens.layout.inner, margin: '0 auto' }}>
+
+              {/* Heading */}
               <div
                 className="price-list-reveal"
                 style={{
@@ -1143,30 +1001,23 @@ export default function ServicesPage() {
                   transform: priceVisible ? 'translateY(0)' : 'translateY(20px)',
                 }}
               >
-                <p
-                  style={{
-                    color: tokens.color.gold,
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    margin: 0,
-                  }}
-                >
+                <p style={{
+                  color: tokens.color.gold,
+                  fontSize: '0.8rem', fontWeight: 600,
+                  letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0,
+                }}>
                   {activeGenderLabel} &middot; Price List
                 </p>
-                <h3
-                  style={{
-                    color: tokens.color.white,
-                    fontSize: tokens.font.section,
-                    fontWeight: 600,
-                    marginTop: '0.5rem',
-                  }}
-                >
+                <h3 style={{
+                  color: tokens.color.white,
+                  fontSize: tokens.font.section, fontWeight: 600,
+                  marginTop: '0.5rem',
+                }}>
                   {CATEGORIES.find((c) => c.key === category)?.label}
                 </h3>
               </div>
 
+              {/* Table */}
               <div
                 key={`${gender}-${category}`}
                 className="price-list-reveal"
@@ -1179,81 +1030,46 @@ export default function ServicesPage() {
                   transform: priceVisible ? 'translateY(0)' : 'translateY(20px)',
                 }}
               >
-                {/* Header Row */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: 'clamp(0.9rem, 1.8vw, 1.1rem) clamp(1.25rem, 3vw, 2rem)',
-                    background: 'rgba(184,134,11,0.14)',
-                    borderBottom: '1px solid rgba(255,255,255,0.08)',
-                    gap: '1rem',
-                  }}
-                >
-                  <span
-                    style={{
-                      color: tokens.color.white,
-                      fontSize: '0.82rem',
-                      fontWeight: 600,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
+                {/* Header row */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: 'clamp(0.9rem, 1.8vw, 1.1rem) clamp(1.25rem, 3vw, 2rem)',
+                  background: 'rgba(184,134,11,0.14)',
+                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  gap: '1rem',
+                }}>
+                  <span style={{ color: tokens.color.white, fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     Service
                   </span>
-
-                  <span
-                    style={{
-                      color: tokens.color.gold,
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      minWidth: '7rem',
-                      textAlign: 'right',
-                      flexShrink: 0,
-                    }}
-                  >
+                  <span style={{
+                    color: tokens.color.gold, fontSize: '0.78rem', fontWeight: 700,
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    minWidth: '7rem', textAlign: 'right', flexShrink: 0,
+                  }}>
                     Price
                   </span>
                 </div>
 
-                {/* Rows */}
+                {/* Price rows */}
                 {priceItems.map((item, i) => (
                   <div
                     key={item.name}
                     className="price-row"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                       padding: 'clamp(0.9rem, 1.8vw, 1.25rem) clamp(1.25rem, 3vw, 2rem)',
                       background: i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'transparent',
                       borderBottom: i !== priceItems.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
                       gap: '1rem',
                     }}
                   >
-                    <span
-                      style={{
-                        color: tokens.color.whiteMuted,
-                        fontSize: tokens.font.priceName,
-                        fontWeight: 500,
-                      }}
-                    >
+                    <span style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.priceName, fontWeight: 500 }}>
                       {item.name}
                     </span>
-
-                    <span
-                      style={{
-                        color: tokens.color.gold,
-                        fontSize: tokens.font.pricePriceValue,
-                        fontWeight: 600,
-                        minWidth: '7rem',
-                        textAlign: 'right',
-                        flexShrink: 0,
-                      }}
-                    >
+                    <span style={{
+                      color: tokens.color.gold, fontSize: tokens.font.pricePriceValue, fontWeight: 600,
+                      minWidth: '7rem', textAlign: 'right', flexShrink: 0,
+                    }}>
                       {item.price1}
                     </span>
                   </div>
@@ -1264,64 +1080,44 @@ export default function ServicesPage() {
 
           <Divider />
 
-          {/* FOOTER */}
+          {/* ════════════ FOOTER ════════════ */}
           <footer
             ref={footerRef}
             style={{
-              position: 'relative',
-              overflow: 'hidden',
+              position: 'relative', overflow: 'hidden',
               background: tokens.color.bgFooter,
               padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)',
               marginTop: 'clamp(2rem, 4vw, 3rem)',
             }}
           >
             <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
+
+              {/* Brand */}
               <div
                 className="footer-reveal"
                 style={{
-                  flex: '1 1 260px',
-                  maxWidth: '320px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
+                  flex: '1 1 260px', maxWidth: '320px',
+                  display: 'flex', flexDirection: 'column', gap: '1rem',
                   opacity: footerVisible ? 1 : 0,
                   transform: footerVisible ? 'translateX(0)' : 'translateX(-40px)',
                   transitionDelay: '0s',
                 }}
               >
                 <LogoIcon size={56} />
-                <h2
-                  style={{
-                    color: tokens.color.white,
-                    fontSize: tokens.font.brand,
-                    fontWeight: 600,
-                    letterSpacing: '0.15em',
-                    margin: 0,
-                  }}
-                >
+                <h2 style={{ color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 }}>
                   SAYO
                 </h2>
-                <p
-                  style={{
-                    color: tokens.color.whiteMuted,
-                    fontSize: tokens.font.tagline,
-                    lineHeight: 1.6,
-                    margin: 0,
-                    maxWidth: '260px',
-                  }}
-                >
+                <p style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.tagline, lineHeight: 1.6, margin: 0, maxWidth: '260px' }}>
                   We are experienced in making you more beautiful
                 </p>
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                   {[
-                    { label: 'WhatsApp', Icon: IconWhatsApp },
-                    { label: 'Facebook', Icon: IconFacebook },
+                    { label: 'WhatsApp',  Icon: IconWhatsApp  },
+                    { label: 'Facebook',  Icon: IconFacebook  },
                     { label: 'Instagram', Icon: IconInstagram },
                   ].map(({ label, Icon }, i) => (
                     <a
-                      key={label}
-                      href="#"
-                      aria-label={label}
+                      key={label} href="#" aria-label={label}
                       className="social-icon footer-reveal-bounce"
                       style={{
                         color: tokens.color.white,
@@ -1336,40 +1132,27 @@ export default function ServicesPage() {
                 </div>
               </div>
 
+              {/* Quick Links */}
               <div
                 className="footer-reveal"
                 style={{
                   flex: '1 1 160px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.85rem',
+                  display: 'flex', flexDirection: 'column', gap: '0.85rem',
                   opacity: footerVisible ? 1 : 0,
                   transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
                   transitionDelay: '0.15s',
                 }}
               >
-                <p
-                  style={{
-                    color: tokens.color.gold,
-                    fontSize: tokens.font.label,
-                    fontWeight: 600,
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    margin: 0,
-                  }}
-                >
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
                   Quick Links
                 </p>
                 {QUICK_LINKS.map((link, i) => (
                   <a
-                    key={link}
-                    href="#"
+                    key={link} href="#"
                     className="quick-link footer-reveal-fast"
                     style={{
-                      color: tokens.color.whiteDim,
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                      textDecoration: 'none',
+                      color: tokens.color.whiteDim, fontSize: '0.875rem',
+                      fontWeight: 500, textDecoration: 'none',
                       opacity: footerVisible ? 1 : 0,
                       transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
                       transitionDelay: `${0.25 + i * 0.08}s`,
@@ -1380,28 +1163,18 @@ export default function ServicesPage() {
                 ))}
               </div>
 
+              {/* Locations */}
               <div
                 className="footer-reveal"
                 style={{
                   flex: '1 1 160px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.85rem',
+                  display: 'flex', flexDirection: 'column', gap: '0.85rem',
                   opacity: footerVisible ? 1 : 0,
                   transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
                   transitionDelay: '0.25s',
                 }}
               >
-                <p
-                  style={{
-                    color: tokens.color.gold,
-                    fontSize: tokens.font.label,
-                    fontWeight: 600,
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    margin: 0,
-                  }}
-                >
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
                   Our Locations
                 </p>
                 {LOCATIONS.map((loc, i) => (
@@ -1409,9 +1182,7 @@ export default function ServicesPage() {
                     key={loc}
                     className="footer-reveal-fast"
                     style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '8px',
+                      display: 'flex', alignItems: 'flex-start', gap: '8px',
                       opacity: footerVisible ? 1 : 0,
                       transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
                       transitionDelay: `${0.35 + i * 0.08}s`,
@@ -1420,57 +1191,37 @@ export default function ServicesPage() {
                     <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}>
                       <IconMapPinFooter />
                     </span>
-                    <p
-                      style={{
-                        color: tokens.color.whiteDim,
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                        lineHeight: 1.5,
-                        margin: 0,
-                      }}
-                    >
+                    <p style={{ color: tokens.color.whiteDim, fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5, margin: 0 }}>
                       {loc}
                     </p>
                   </div>
                 ))}
               </div>
 
+              {/* Contact */}
               <div
                 className="footer-reveal"
                 style={{
                   flex: '1 1 160px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.85rem',
+                  display: 'flex', flexDirection: 'column', gap: '0.85rem',
                   opacity: footerVisible ? 1 : 0,
                   transform: footerVisible ? 'translateX(0)' : 'translateX(40px)',
                   transitionDelay: '0.35s',
                 }}
               >
-                <p
-                  style={{
-                    color: tokens.color.gold,
-                    fontSize: tokens.font.label,
-                    fontWeight: 600,
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    margin: 0,
-                  }}
-                >
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
                   Contact Us
                 </p>
                 {[
-                  { Icon: IconPhoneFooter, text: '+94 77 233 6233' },
-                  { Icon: IconMailFooter, text: 'Example@email.com' },
+                  { Icon: IconPhoneFooter,  text: '+94 77 233 6233' },
+                  { Icon: IconMailFooter,   text: 'Example@email.com' },
                   { Icon: IconMapPinFooter, text: 'No. 45, Galle Road, Colombo 03, Sri Lanka' },
                 ].map(({ Icon, text }, i) => (
                   <div
                     key={text}
                     className="footer-reveal-fast"
                     style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '8px',
+                      display: 'flex', alignItems: 'flex-start', gap: '8px',
                       opacity: footerVisible ? 1 : 0,
                       transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
                       transitionDelay: `${0.45 + i * 0.08}s`,
@@ -1479,15 +1230,7 @@ export default function ServicesPage() {
                     <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}>
                       <Icon />
                     </span>
-                    <p
-                      style={{
-                        color: tokens.color.whiteDim,
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                        lineHeight: 1.5,
-                        margin: 0,
-                      }}
-                    >
+                    <p style={{ color: tokens.color.whiteDim, fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5, margin: 0 }}>
                       {text}
                     </p>
                   </div>
@@ -1495,11 +1238,11 @@ export default function ServicesPage() {
               </div>
             </div>
 
+            {/* Copyright */}
             <div
               className="footer-reveal-simple"
               style={{
-                position: 'relative',
-                zIndex: 10,
+                position: 'relative', zIndex: 10,
                 marginTop: 'clamp(2rem, 4vw, 2.5rem)',
                 paddingTop: 'clamp(1rem, 2vw, 1.5rem)',
                 borderTop: `1px solid ${tokens.color.whiteBorder}`,
@@ -1507,18 +1250,12 @@ export default function ServicesPage() {
                 transitionDelay: '0.7s',
               }}
             >
-              <p
-                style={{
-                  color: tokens.color.whiteFaint,
-                  fontSize: '0.813rem',
-                  textAlign: 'center',
-                  margin: 0,
-                }}
-              >
+              <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>
                 © {new Date().getFullYear()} SAYO Beauty. All rights reserved.
               </p>
             </div>
           </footer>
+
         </div>
       </main>
     </>

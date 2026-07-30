@@ -349,6 +349,476 @@ function LogoIcon({ className = '', size = 48 }: { className?: string; size?: nu
   );
 }
 
+/* ─────────────────────────────────────────
+   BRAND STORY SECTION
+───────────────────────────────────────── */
+function BrandStorySection() {
+  const { ref, inView } = useInView(0.2);
+  return (
+    <section ref={ref} style={{
+      position: 'relative', overflow: 'hidden',
+      background: '#1c1c1c',
+      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
+    }}>
+      {/* top-left gold accent line */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0,
+        width: '35%', height: '2px',
+        background: `linear-gradient(90deg, ${tokens.color.gold}, transparent)`,
+      }} />
+
+      <div style={{
+        display: 'flex', alignItems: 'stretch',
+        gap: 'clamp(2rem, 5vw, 5rem)',
+        maxWidth: '1200px', margin: '0 auto', flexWrap: 'wrap',
+      }}>
+        {/* LEFT — replace this div with your <Image> or <video> */}
+        <div style={{
+          flex: '1 1 340px',
+          minHeight: 'clamp(300px, 40vw, 520px)',
+          borderRadius: '1.25rem', overflow: 'hidden',
+          position: 'relative', background: '#2a2520',
+          opacity: inView ? 1 : 0,
+          transform: inView ? 'translateX(0)' : 'translateX(-40px)',
+          transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)',
+        }}>
+          {/* ↓ swap this placeholder with <Image src={treatmentPhoto} fill … /> */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(135deg,#2a2520 0%,#1a1a1a 60%,#0d0d0d 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{
+              color: tokens.color.gold, opacity: 0.2,
+              fontSize: '0.8rem', letterSpacing: '0.2em',
+              textTransform: 'uppercase', fontFamily: tokens.font.family,
+            }}>Treatment Photo / Video</span>
+          </div>
+          {/* bottom-right gold accent */}
+          <div style={{
+            position: 'absolute', bottom: 0, right: 0,
+            width: '40%', height: '3px',
+            background: `linear-gradient(270deg, ${tokens.color.gold}, transparent)`,
+          }} />
+        </div>
+
+        {/* RIGHT — text */}
+        <div style={{
+          flex: '1 1 320px', display: 'flex', flexDirection: 'column',
+          justifyContent: 'center', gap: 'clamp(1rem, 2vw, 1.75rem)',
+          opacity: inView ? 1 : 0,
+          transform: inView ? 'translateX(0)' : 'translateX(40px)',
+          transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s',
+        }}>
+          <p style={{
+            color: tokens.color.gold, fontSize: tokens.font.label,
+            fontWeight: 600, letterSpacing: '0.25em',
+            textTransform: 'uppercase', margin: 0, fontFamily: tokens.font.family,
+          }}>Our Philosophy</p>
+
+          <h2 style={{
+            color: tokens.color.white,
+            fontSize: 'clamp(1.75rem, 4vw, 3rem)',
+            fontWeight: 600, lineHeight: 1.15, margin: 0,
+            fontFamily: tokens.font.family,
+          }}>Beauty That&apos;s Kind —<br />To You &amp; The World</h2>
+
+          <div style={{ width: '3rem', height: '2px', background: tokens.color.gold }} />
+
+          <p style={{
+            color: tokens.color.whiteMuted,
+            fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
+            lineHeight: 1.8, margin: 0, fontFamily: tokens.font.family,
+          }}>
+            At SAYO, every treatment begins with a promise: only nature&apos;s finest
+            ingredients ever touch your skin. Our formulations are 100% cruelty-free —
+            tested on results, never on animals.
+          </p>
+
+          <p style={{
+            color: tokens.color.whiteMuted,
+            fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
+            lineHeight: 1.8, margin: 0, fontFamily: tokens.font.family,
+          }}>
+            What sets us apart is care in the details — personalised consultations,
+            bespoke blends, and a sanctuary space so you leave feeling genuinely renewed,
+            not just refreshed.
+          </p>
+
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.25rem' }}>
+            {['100% Natural', 'Cruelty-Free', 'Personalised Care'].map(tag => (
+              <span key={tag} style={{
+                color: tokens.color.gold,
+                border: '1.5px solid rgba(184,134,11,0.4)',
+                borderRadius: '2rem', padding: '0.35rem 1rem',
+                fontSize: '0.78rem', fontWeight: 500, letterSpacing: '0.08em',
+                background: 'rgba(184,134,11,0.07)', fontFamily: tokens.font.family,
+              }}>{tag}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────
+   FEATURED SERVICES DATA + SECTION
+───────────────────────────────────────── */
+const FEATURED_SERVICES = [
+  { icon: '✂', title: 'Hair Styling',     from: '1,500', href: '/services',
+    desc: 'Precision cuts, luxury blowouts and colour transformations tailored to your texture and vision.' },
+  { icon: '✦', title: 'Skincare',          from: '3,000', href: '/services',
+    desc: 'Deep-cleansing facials, brightening treatments and anti-aging rituals using plant-based actives.' },
+  { icon: '◈', title: 'Makeup',            from: '4,500', href: '/services',
+    desc: 'Editorial, bridal, or everyday glam — applied with professional-grade, skin-friendly products.' },
+  { icon: '◉', title: 'Body Treatments',   from: '4,200', href: '/services',
+    desc: 'Aromatherapy massages, detox wraps, and full-body scrubs to restore and rebalance.' },
+] as const;
+
+function FeaturedServicesSection() {
+  const { ref, inView } = useInView(0.15);
+  return (
+    <section ref={ref} style={{
+      background: '#111111',
+      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
+      position: 'relative', overflow: 'hidden',
+    }}>
+      {/* subtle grid texture */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,0.015) 60px)',
+      }} />
+
+      {/* header */}
+      <div style={{
+        textAlign: 'center', marginBottom: 'clamp(2.5rem, 5vw, 4rem)',
+        position: 'relative', zIndex: 1,
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(28px)',
+        transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)',
+      }}>
+        <p style={{
+          color: tokens.color.gold, fontSize: tokens.font.label,
+          fontWeight: 600, letterSpacing: '0.25em',
+          textTransform: 'uppercase', margin: '0 0 0.75rem',
+          fontFamily: tokens.font.family,
+        }}>What We Offer</p>
+        <h2 style={{
+          color: tokens.color.white,
+          fontSize: 'clamp(1.75rem, 4vw, 3rem)',
+          fontWeight: 600, lineHeight: 1.2, margin: '0 0 0.9rem',
+          fontFamily: tokens.font.family,
+        }}>Our Signature Services</h2>
+        <p style={{
+          color: tokens.color.whiteMuted,
+          fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)',
+          maxWidth: '500px', margin: '0 auto', lineHeight: 1.7,
+          fontFamily: tokens.font.family,
+        }}>Each service is designed as an experience — not just a treatment.</p>
+      </div>
+
+      {/* bento grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(255px, 1fr))',
+        gap: '1.25rem', maxWidth: '1200px', margin: '0 auto',
+        position: 'relative', zIndex: 1,
+      }}>
+        {FEATURED_SERVICES.map((svc, i) => (
+          <div key={svc.title}
+            style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '1.25rem',
+              padding: 'clamp(1.5rem, 3vw, 2rem)',
+              display: 'flex', flexDirection: 'column', gap: '0.9rem',
+              position: 'relative', overflow: 'hidden',
+              opacity: inView ? 1 : 0,
+              transform: inView ? 'translateY(0)' : 'translateY(40px)',
+              transition: `opacity 0.7s ease ${0.1 + i * 0.1}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${0.1 + i * 0.1}s`,
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = 'rgba(184,134,11,0.06)';
+              el.style.borderColor = 'rgba(184,134,11,0.35)';
+              el.style.transform = 'translateY(-4px)';
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = 'rgba(255,255,255,0.03)';
+              el.style.borderColor = 'rgba(255,255,255,0.08)';
+              el.style.transform = 'translateY(0)';
+            }}
+          >
+            {/* top shimmer line */}
+            <div style={{
+              position: 'absolute', top: 0, left: '1.5rem', right: '1.5rem', height: '1px',
+              background: `linear-gradient(90deg,transparent,${tokens.color.gold},transparent)`,
+              opacity: 0.3,
+            }} />
+            <span style={{ fontSize: '1.4rem', color: tokens.color.gold, lineHeight: 1 }}>{svc.icon}</span>
+            <h3 style={{
+              color: tokens.color.white,
+              fontSize: 'clamp(1.05rem, 1.8vw, 1.3rem)',
+              fontWeight: 600, margin: 0, fontFamily: tokens.font.family,
+            }}>{svc.title}</h3>
+            <p style={{
+              color: tokens.color.whiteMuted,
+              fontSize: 'clamp(0.875rem, 1.2vw, 0.95rem)',
+              lineHeight: 1.7, margin: 0, flex: 1, fontFamily: tokens.font.family,
+            }}>{svc.desc}</p>
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.6rem',
+              marginTop: '0.25rem',
+            }}>
+              <span style={{
+                color: tokens.color.whiteDim, fontSize: '0.8rem',
+                fontFamily: tokens.font.family,
+              }}>
+                From{' '}
+                <span style={{ color: tokens.color.gold, fontWeight: 700, fontSize: '0.95rem' }}>
+                  Rs. {svc.from}
+                </span>
+              </span>
+              <a href={svc.href} style={{
+                color: tokens.color.white, background: tokens.color.goldAlpha,
+                borderRadius: tokens.radius.cta,
+                padding: '0.4rem 1.1rem', fontSize: '0.8rem', fontWeight: 600,
+                textDecoration: 'none', letterSpacing: '0.05em',
+                transition: 'background 0.3s, transform 0.2s',
+                fontFamily: tokens.font.family, whiteSpace: 'nowrap',
+              }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background = tokens.color.gold;
+                  el.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background = tokens.color.goldAlpha;
+                  el.style.transform = 'scale(1)';
+                }}
+              >Book Now</a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* view all */}
+      <div style={{
+        textAlign: 'center', marginTop: 'clamp(2rem, 4vw, 3rem)',
+        position: 'relative', zIndex: 1,
+        opacity: inView ? 1 : 0,
+        transition: 'opacity 0.8s ease 0.5s',
+      }}>
+        <a href="/services" style={{
+          color: tokens.color.gold, fontSize: '0.85rem', fontWeight: 500,
+          textDecoration: 'none', letterSpacing: '0.15em', textTransform: 'uppercase',
+          borderBottom: '1px solid rgba(184,134,11,0.4)', paddingBottom: '3px',
+          transition: 'border-color 0.3s', fontFamily: tokens.font.family,
+        }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = tokens.color.gold; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,134,11,0.4)'; }}
+        >View All Services →</a>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────
+   PRODUCT SHOWCASE DATA + SECTION
+───────────────────────────────────────── */
+const PRODUCTS = [
+  { name: 'Rose Hip Face Oil',       category: 'Skincare',  price: '3,800', rating: 4.9, reviews: 124 },
+  { name: 'Argan Hair Serum',        category: 'Hair Care', price: '2,600', rating: 4.8, reviews: 98  },
+  { name: 'Charcoal Cleansing Mask', category: 'Skincare',  price: '2,200', rating: 4.7, reviews: 76  },
+  { name: 'Coconut Scalp Treatment', category: 'Hair Care', price: '1,900', rating: 4.9, reviews: 143 },
+  { name: 'Green Tea Toner',         category: 'Skincare',  price: '1,600', rating: 4.6, reviews: 61  },
+  { name: 'Keratin Repair Mask',     category: 'Hair Care', price: '3,100', rating: 4.8, reviews: 89  },
+] as const;
+
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <span style={{ display: 'inline-flex', gap: '2px', alignItems: 'center' }}>
+      {[1,2,3,4,5].map(n => (
+        <svg key={n} width="11" height="11" viewBox="0 0 24 24"
+          fill={n <= Math.round(rating) ? tokens.color.gold : 'rgba(184,134,11,0.2)'}>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+function ProductShowcaseSection() {
+  const { ref, inView } = useInView(0.1);
+  return (
+    <section ref={ref} style={{
+      background: '#181818',
+      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
+      position: 'relative', overflow: 'hidden',
+    }}>
+      {/* ambient gold orb */}
+      <div style={{
+        position: 'absolute', top: '-8rem', right: '-8rem',
+        width: '34rem', height: '34rem', borderRadius: '50%',
+        background: 'radial-gradient(circle,rgba(184,134,11,0.07) 0%,transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* header row */}
+      <div style={{
+        display: 'flex', alignItems: 'flex-end',
+        justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.25rem',
+        maxWidth: '1200px', margin: '0 auto',
+        marginBottom: 'clamp(2.5rem, 5vw, 4rem)',
+        position: 'relative', zIndex: 1,
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(28px)',
+        transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)',
+      }}>
+        <div>
+          <p style={{
+            color: tokens.color.gold, fontSize: tokens.font.label,
+            fontWeight: 600, letterSpacing: '0.25em',
+            textTransform: 'uppercase', margin: '0 0 0.75rem',
+            fontFamily: tokens.font.family,
+          }}>Natural Products</p>
+          <h2 style={{
+            color: tokens.color.white,
+            fontSize: 'clamp(1.75rem, 4vw, 3rem)',
+            fontWeight: 600, lineHeight: 1.2, margin: 0,
+            fontFamily: tokens.font.family,
+          }}>Shop Our Collection</h2>
+        </div>
+        <a href="/products" style={{
+          color: tokens.color.gold, fontSize: '0.85rem', fontWeight: 500,
+          textDecoration: 'none', letterSpacing: '0.15em', textTransform: 'uppercase',
+          borderBottom: '1px solid rgba(184,134,11,0.4)', paddingBottom: '3px',
+          whiteSpace: 'nowrap', transition: 'border-color 0.3s',
+          fontFamily: tokens.font.family,
+        }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = tokens.color.gold; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,134,11,0.4)'; }}
+        >View All →</a>
+      </div>
+
+      {/* product grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+        gap: '1.25rem', maxWidth: '1200px', margin: '0 auto',
+        position: 'relative', zIndex: 1,
+      }}>
+        {PRODUCTS.map((p, i) => (
+          <div key={p.name}
+            style={{
+              background: 'rgba(255,255,255,0.025)',
+              border: '1px solid rgba(255,255,255,0.07)',
+              borderRadius: '1.25rem', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column',
+              opacity: inView ? 1 : 0,
+              transform: inView ? 'translateY(0)' : 'translateY(50px)',
+              transition: `opacity 0.7s ease ${i * 0.06}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${i * 0.06}s`,
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.borderColor = 'rgba(184,134,11,0.3)';
+              el.style.transform = 'translateY(-6px)';
+              el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.45)';
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.borderColor = 'rgba(255,255,255,0.07)';
+              el.style.transform = 'translateY(0)';
+              el.style.boxShadow = 'none';
+            }}
+          >
+            {/* image area — replace with <Image /> */}
+            <div style={{
+              height: '175px', position: 'relative',
+              background: 'linear-gradient(135deg,#232020 0%,#1a1a1a 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <div style={{
+                width: '60px', height: '60px', borderRadius: '50%',
+                background: 'rgba(184,134,11,0.1)',
+                border: '1.5px solid rgba(184,134,11,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ color: tokens.color.gold, fontSize: '1.35rem' }}>✿</span>
+              </div>
+              {/* category badge */}
+              <span style={{
+                position: 'absolute', top: '0.65rem', left: '0.65rem',
+                background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)',
+                color: tokens.color.gold,
+                fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.12em',
+                textTransform: 'uppercase', padding: '0.22rem 0.55rem',
+                borderRadius: '999px', fontFamily: tokens.font.family,
+              }}>{p.category}</span>
+            </div>
+
+            {/* info */}
+            <div style={{
+              padding: '1.1rem', display: 'flex',
+              flexDirection: 'column', gap: '0.55rem', flex: 1,
+            }}>
+              <h3 style={{
+                color: tokens.color.white,
+                fontSize: 'clamp(0.875rem, 1.2vw, 0.95rem)',
+                fontWeight: 600, margin: 0, lineHeight: 1.35,
+                fontFamily: tokens.font.family,
+              }}>{p.name}</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <StarRating rating={p.rating} />
+                <span style={{
+                  color: tokens.color.whiteFaint, fontSize: '0.7rem',
+                  fontFamily: tokens.font.family,
+                }}>{p.rating} ({p.reviews})</span>
+              </div>
+              <div style={{
+                display: 'flex', alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 'auto', paddingTop: '0.5rem',
+                flexWrap: 'wrap', gap: '0.45rem',
+              }}>
+                <span style={{
+                  color: tokens.color.gold,
+                  fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
+                  fontWeight: 700, fontFamily: tokens.font.family,
+                }}>Rs. {p.price}</span>
+                <button style={{
+                  color: tokens.color.white, background: tokens.color.goldAlpha,
+                  border: 'none', borderRadius: tokens.radius.cta,
+                  padding: '0.38rem 0.9rem', fontSize: '0.75rem', fontWeight: 600,
+                  cursor: 'pointer', letterSpacing: '0.05em',
+                  transition: 'background 0.3s, transform 0.2s',
+                  fontFamily: tokens.font.family, whiteSpace: 'nowrap',
+                }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = tokens.color.gold;
+                    el.style.transform = 'scale(1.06)';
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = tokens.color.goldAlpha;
+                    el.style.transform = 'scale(1)';
+                  }}
+                >Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+
 function GoldenCurve() {
   return (
     <div style={S.curveWrap}>
@@ -702,6 +1172,21 @@ export default function Home() {
           <GoldenCurve />
 
         </section>
+
+        {/* ══════════════════════════
+            BRAND STORY
+        ══════════════════════════ */}
+        <BrandStorySection />
+
+        {/* ══════════════════════════
+            FEATURED SERVICES
+        ══════════════════════════ */}
+        <FeaturedServicesSection />
+
+        {/* ══════════════════════════
+            PRODUCT SHOWCASE
+        ══════════════════════════ */}
+        <ProductShowcaseSection />
 
         {/* ══════════════════════════
             FOOTER

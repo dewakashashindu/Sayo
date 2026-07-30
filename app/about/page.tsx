@@ -1,4 +1,3 @@
-//our story page
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -178,6 +177,8 @@ const globalCss = `
   @media (max-width: 900px) {
     .hero-grid { grid-template-columns: 1fr !important; }
   }
+
+  /* Mobile mosaic keeps original scale */
   @media (max-width: 480px) {
     .story-mosaic { transform: scale(0.82); transform-origin: center; }
   }
@@ -450,7 +451,7 @@ const FLOWER_IMAGE     = '/flower.png';
 const REVIEW_BG        = '/review.jpg';
 
 /* ─────────────────────────────────────────
-   SMOKE BACKGROUND COMPONENT
+   SMOKE BACKGROUND
 ───────────────────────────────────────── */
 function SmokeBackground() {
   const particles = [
@@ -480,85 +481,52 @@ function SmokeBackground() {
       overflow:      'hidden',
     }}>
       <div style={{
-        position:   'absolute',
-        bottom:     '-10%',
-        left:       '30%',
-        width:      '40%',
-        height:     '40%',
+        position:   'absolute', bottom: '-10%', left: '30%',
+        width:      '40%', height: '40%',
         background: 'radial-gradient(ellipse, rgba(255,255,255,0.08) 0%, transparent 70%)',
         animation:  'glowPulse 6s ease-in-out infinite',
       }} />
-
       <div style={{
-        position:   'absolute',
-        top:        '-5%',
-        right:      '-5%',
-        width:      '30%',
-        height:     '50%',
+        position:   'absolute', top: '-5%', right: '-5%',
+        width:      '30%', height: '50%',
         background: 'radial-gradient(ellipse, rgba(255,255,255,0.06) 0%, transparent 70%)',
         animation:  'glowPulse 8s ease-in-out 2s infinite',
       }} />
-
       <div style={{
-        position:     'absolute',
-        top:          '25%',
-        left:         0,
-        width:        '70%',
-        height:       '35%',
+        position:     'absolute', top: '25%', left: 0,
+        width:        '70%', height: '35%',
         background:   'radial-gradient(ellipse 80% 40% at 30% 50%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)',
-        borderRadius: '50%',
-        filter:       'blur(18px)',
+        borderRadius: '50%', filter: 'blur(18px)',
         animation:    'smokeFlow1 18s ease-in-out infinite',
       }} />
-
       <div style={{
-        position:     'absolute',
-        top:          '20%',
-        right:        0,
-        width:        '50%',
-        height:       '30%',
+        position:     'absolute', top: '20%', right: 0,
+        width:        '50%', height: '30%',
         background:   'radial-gradient(ellipse 70% 40% at 70% 50%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 40%, transparent 70%)',
-        borderRadius: '50%',
-        filter:       'blur(22px)',
+        borderRadius: '50%', filter: 'blur(22px)',
         animation:    'smokeFlow2 22s ease-in-out 4s infinite',
       }} />
-
       <div style={{
-        position:     'absolute',
-        top:          '30%',
-        left:         '10%',
-        width:        '80%',
-        height:       '25%',
+        position:     'absolute', top: '30%', left: '10%',
+        width:        '80%', height: '25%',
         background:   'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.10) 45%, rgba(255,255,255,0.06) 70%, transparent 100%)',
-        borderRadius: '50%',
-        filter:       'blur(25px)',
-        transform:    'rotate(-5deg)',
+        borderRadius: '50%', filter: 'blur(25px)', transform: 'rotate(-5deg)',
         animation:    'smokeFlow1 25s ease-in-out 2s infinite',
       }} />
-
       <div style={{
-        position:     'absolute',
-        top:          '10%',
-        right:        '5%',
-        width:        '35%',
-        height:       '40%',
+        position:     'absolute', top: '10%', right: '5%',
+        width:        '35%', height: '40%',
         background:   'radial-gradient(ellipse 60% 80% at 60% 30%, rgba(255,255,255,0.09) 0%, transparent 70%)',
         filter:       'blur(20px)',
         animation:    'smokeFlow2 20s ease-in-out 6s infinite',
       }} />
-
       <div style={{
-        position:     'absolute',
-        bottom:       '15%',
-        left:         '20%',
-        width:        '60%',
-        height:       '20%',
+        position:     'absolute', bottom: '15%', left: '20%',
+        width:        '60%', height: '20%',
         background:   'radial-gradient(ellipse 80% 50% at 50% 50%, rgba(255,255,255,0.07) 0%, transparent 70%)',
-        borderRadius: '50%',
-        filter:       'blur(30px)',
+        borderRadius: '50%', filter: 'blur(30px)',
         animation:    'smokeFlow1 30s ease-in-out 8s infinite',
       }} />
-
       {particles.map((p, i) => (
         <div key={i} style={{
           position:     'absolute',
@@ -577,16 +545,47 @@ function SmokeBackground() {
 }
 
 /* ─────────────────────────────────────────
-   MOSAIC
+   MOSAIC — separate metrics for desktop vs mobile
 ───────────────────────────────────────── */
-function getMosaicMetrics(scale: number) {
-  const COL1 = 9.2 * scale;
-  const COL2 = 9.2 * scale;
-  const COL3 = 7.1 * scale;
-  const ROW1 = 6.5 * scale;
-  const ROW2 = 10  * scale;
-  const ROW3 = 6.5 * scale;
-  const GAP  = 1   * scale;
+
+// Mobile metrics — original sizes (unchanged)
+function getMosaicMetricsMobile() {
+  const COL1 = 9.2;
+  const COL2 = 9.2;
+  const COL3 = 7.1;
+  const ROW1 = 6.5;
+  const ROW2 = 10;
+  const ROW3 = 6.5;
+  const GAP  = 1;
+
+  const CANVAS_W = COL1 + COL2 + COL3 + GAP * 2;
+  const CANVAS_H = ROW1 + ROW2 + ROW3 + GAP * 2;
+
+  const COL1_X = 0;
+  const COL2_X = COL1 + GAP;
+  const COL3_X = COL2_X + COL2 + GAP;
+
+  const ROW1_Y = 0;
+  const ROW2_Y = ROW1 + GAP;
+  const ROW3_Y = ROW2_Y + ROW2 + GAP;
+
+  return {
+    COL1, COL2, COL3, ROW1, ROW2, ROW3, GAP,
+    CANVAS_W, CANVAS_H,
+    COL1_X, COL2_X, COL3_X,
+    ROW1_Y, ROW2_Y, ROW3_Y,
+  };
+}
+
+// Desktop metrics — larger sizes
+function getMosaicMetricsDesktop() {
+  const COL1 = 14;
+  const COL2 = 14;
+  const COL3 = 11;
+  const ROW1 = 10;
+  const ROW2 = 15;
+  const ROW3 = 10;
+  const GAP  = 1.2;
 
   const CANVAS_W = COL1 + COL2 + COL3 + GAP * 2;
   const CANVAS_H = ROW1 + ROW2 + ROW3 + GAP * 2;
@@ -630,8 +629,7 @@ function ImageSlice({
 }
 
 function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean }) {
-  const scale = desktop ? 1.12 : 1;
-  const m = getMosaicMetrics(scale);
+  const m = desktop ? getMosaicMetricsDesktop() : getMosaicMetricsMobile();
 
   return (
     <div
@@ -659,7 +657,11 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.15s',
         }}
       >
-        <ImageSlice x={m.COL2_X} y={m.ROW1_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Makeup application" />
+        <ImageSlice
+          x={m.COL2_X} y={m.ROW1_Y}
+          canvasW={m.CANVAS_W} canvasH={m.CANVAS_H}
+          alt="Makeup application"
+        />
       </div>
 
       {/* Middle-left */}
@@ -675,7 +677,11 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.23s',
         }}
       >
-        <ImageSlice x={m.COL1_X} y={m.ROW2_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Eye makeup detail" />
+        <ImageSlice
+          x={m.COL1_X} y={m.ROW2_Y}
+          canvasW={m.CANVAS_W} canvasH={m.CANVAS_H}
+          alt="Eye makeup detail"
+        />
       </div>
 
       {/* Middle-center */}
@@ -691,10 +697,14 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.31s',
         }}
       >
-        <ImageSlice x={m.COL2_X} y={m.ROW2_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Face closeup" />
+        <ImageSlice
+          x={m.COL2_X} y={m.ROW2_Y}
+          canvasW={m.CANVAS_W} canvasH={m.CANVAS_H}
+          alt="Face closeup"
+        />
       </div>
 
-      {/* Right — flower decoration, spans row 1-2 (tall) */}
+      {/* Right — flower decoration, spans row 1-2 */}
       <div
         className={visible ? 'tile-reveal' : ''}
         style={{
@@ -709,13 +719,12 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.45s',
         }}
       >
-        {/* ── Flower size: bigger on desktop, normal on mobile ── */}
         <div
           className="flower-float"
           style={{
             position: 'relative',
-            width:    desktop ? '135%' : '108%',
-            height:   desktop ? '135%' : '108%',
+            width:    desktop ? '140%' : '108%',
+            height:   desktop ? '140%' : '108%',
           }}
         >
           <Image
@@ -741,7 +750,11 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.39s',
         }}
       >
-        <ImageSlice x={m.COL1_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Hair detail" />
+        <ImageSlice
+          x={m.COL1_X} y={m.ROW3_Y}
+          canvasW={m.CANVAS_W} canvasH={m.CANVAS_H}
+          alt="Hair detail"
+        />
       </div>
 
       {/* Bottom-center */}
@@ -757,7 +770,11 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.47s',
         }}
       >
-        <ImageSlice x={m.COL2_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Lips detail" />
+        <ImageSlice
+          x={m.COL2_X} y={m.ROW3_Y}
+          canvasW={m.CANVAS_W} canvasH={m.CANVAS_H}
+          alt="Lips detail"
+        />
       </div>
 
       {/* Bottom-right */}
@@ -773,7 +790,11 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
           animationDelay: '0.55s',
         }}
       >
-        <ImageSlice x={m.COL3_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Skin closeup" />
+        <ImageSlice
+          x={m.COL3_X} y={m.ROW3_Y}
+          canvasW={m.CANVAS_W} canvasH={m.CANVAS_H}
+          alt="Skin closeup"
+        />
       </div>
     </div>
   );
@@ -783,15 +804,9 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
    GALLERY SUB-COMPONENTS
 ───────────────────────────────────────── */
 function GalleryTextCard({
-  visible,
-  delay,
-  minHeight = '200px',
-  className = '',
+  visible, delay, minHeight = '200px', className = '',
 }: {
-  visible: boolean;
-  delay: string;
-  minHeight?: string;
-  className?: string;
+  visible: boolean; delay: string; minHeight?: string; className?: string;
 }) {
   return (
     <div
@@ -812,19 +827,14 @@ function GalleryTextCard({
       }}
     >
       <div style={{
-        width:        '2.5rem',
-        height:       '3px',
-        background:   tokens.color.gold,
-        borderRadius: '9999px',
+        width: '2.5rem', height: '3px',
+        background: tokens.color.gold, borderRadius: '9999px',
         marginBottom: '1.25rem',
       }} />
       <p style={{
-        fontSize:   'clamp(0.875rem, 1.4vw, 1.05rem)',
-        fontWeight: 400,
-        lineHeight: 1.75,
-        margin:     0,
-        color:      tokens.color.whiteMuted,
-        textAlign:  'center',
+        fontSize: 'clamp(0.875rem, 1.4vw, 1.05rem)', fontWeight: 400,
+        lineHeight: 1.75, margin: 0,
+        color: tokens.color.whiteMuted, textAlign: 'center',
       }}>
         Explore our latest work, behind-the-scenes moments, and client
         transformations. From timeless Sri Lankan bridal looks to sleek
@@ -835,75 +845,45 @@ function GalleryTextCard({
 }
 
 function GalleryFeaturedImage({
-  src,
-  height,
-  sizes,
-  visible,
-  delay,
-  className = '',
+  src, height, sizes, visible, delay, className = '',
 }: {
-  src: string;
-  height: string;
-  sizes: string;
-  visible: boolean;
-  delay: string;
-  className?: string;
+  src: string; height: string; sizes: string;
+  visible: boolean; delay: string; className?: string;
 }) {
   return (
     <div
       className={`mobile-gallery-img ${className}`}
       style={{
-        position:       'relative',
-        borderRadius:   tokens.radius.gallery,
-        overflow:       'hidden',
-        height,
-        opacity:        visible ? 1 : 0,
-        animationDelay: delay,
+        position: 'relative', borderRadius: tokens.radius.gallery,
+        overflow: 'hidden', height,
+        opacity: visible ? 1 : 0, animationDelay: delay,
       }}
     >
       <Image src={src} alt="Beauty treatment" fill sizes={sizes} style={{ objectFit: 'cover' }} />
       <div style={{
-        position:   'absolute',
-        bottom: 0, left: 0, right: 0,
-        height:     '50%',
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
         background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)',
       }} />
       <div style={{
-        position:      'absolute',
-        top:           '1rem',
-        left:          '1rem',
-        background:    tokens.color.gold,
-        color:         tokens.color.white,
-        fontSize:      '0.7rem',
-        fontWeight:    700,
-        letterSpacing: '0.12em',
-        padding:       '0.3rem 0.875rem',
-        borderRadius:  '9999px',
+        position: 'absolute', top: '1rem', left: '1rem',
+        background: tokens.color.gold, color: tokens.color.white,
+        fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em',
+        padding: '0.3rem 0.875rem', borderRadius: '9999px',
         textTransform: 'uppercase',
       }}>
         Featured
       </div>
       <div style={{
-        position:   'absolute',
-        bottom:     '1rem',
-        left:       '1rem',
-        right:      '1rem',
-        display:    'flex',
-        alignItems: 'center',
-        gap:        '0.5rem',
+        position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem',
+        display: 'flex', alignItems: 'center', gap: '0.5rem',
       }}>
         <div style={{
-          width:        '1.5rem',
-          height:       '2px',
-          background:   tokens.color.gold,
-          borderRadius: '9999px',
-          flexShrink:   0,
+          width: '1.5rem', height: '2px',
+          background: tokens.color.gold, borderRadius: '9999px', flexShrink: 0,
         }} />
         <span style={{
-          color:         tokens.color.white,
-          fontSize:      '0.875rem',
-          fontWeight:    500,
-          letterSpacing: '0.05em',
+          color: tokens.color.white, fontSize: '0.875rem',
+          fontWeight: 500, letterSpacing: '0.05em',
         }}>
           Premium Beauty Service
         </span>
@@ -948,23 +928,19 @@ export default function AboutPage() {
       <style>{globalCss}</style>
 
       <main style={{
-        minHeight:   '100vh',
-        fontFamily:  tokens.font.family,
-        color:       tokens.color.white,
-        position:    'relative',
-        overflow:    'hidden',
-        background:  'transparent',
+        minHeight:  '100vh',
+        fontFamily: tokens.font.family,
+        color:      tokens.color.white,
+        position:   'relative',
+        overflow:   'hidden',
+        background: 'transparent',
       }}>
 
-        {/* ══ SMOKY BACKGROUND ══ */}
         <SmokeBackground />
 
-        {/* ══ ALL PAGE CONTENT ══ */}
         <div style={{ position: 'relative', zIndex: 1 }}>
 
-          {/* ════════════════════════
-              NAVBAR
-          ════════════════════════ */}
+          {/* ══════════ NAVBAR ══════════ */}
           <nav
             className={loaded ? 'nav-animate' : ''}
             style={{ ...S.nav, opacity: loaded ? undefined : 0 }}
@@ -978,11 +954,14 @@ export default function AboutPage() {
               {!isMobile && (
                 <div style={S.navLinks}>
                   {NAV_ITEMS.map((item, i) => (
-                    <a key={item} href={NAV_HREFS[item]}
+                    <a
+                      key={item}
+                      href={NAV_HREFS[item]}
                       className="nav-link-wrap"
                       style={i === 1 ? S.navLinkActive : S.navLink}
                       onMouseEnter={e => { if (i !== 1) (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }}
-                      onMouseLeave={e => { if (i !== 1) (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}>
+                      onMouseLeave={e => { if (i !== 1) (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}
+                    >
                       {i === 1 ? `[ ${item} ]` : item}
                     </a>
                   ))}
@@ -990,7 +969,9 @@ export default function AboutPage() {
               )}
 
               {!isMobile && (
-                <a href="#" className="contact-btn-wrap" style={S.contactBtn}>CONTACT US</a>
+                <a href="#" className="contact-btn-wrap" style={S.contactBtn}>
+                  CONTACT US
+                </a>
               )}
 
               {isMobile && (
@@ -1008,7 +989,13 @@ export default function AboutPage() {
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     {menuOpen
                       ? <path d="M6 18L18 6M6 6l12 12" />
-                      : (<><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>)}
+                      : (
+                        <>
+                          <line x1="3" y1="6"  x2="21" y2="6"  />
+                          <line x1="3" y1="12" x2="21" y2="12" />
+                          <line x1="3" y1="18" x2="21" y2="18" />
+                        </>
+                      )}
                   </svg>
                 </button>
               )}
@@ -1017,20 +1004,23 @@ export default function AboutPage() {
             {isMobile && menuOpen && (
               <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
                 {NAV_ITEMS.map((item, i) => (
-                  <a key={item} href={NAV_HREFS[item]}
+                  <a
+                    key={item}
+                    href={NAV_HREFS[item]}
                     style={i === 1 ? S.mobileNavLinkActive : S.mobileNavLink}
-                    onClick={() => setMenuOpen(false)}>
+                    onClick={() => setMenuOpen(false)}
+                  >
                     {i === 1 ? `[ ${item} ]` : item}
                   </a>
                 ))}
-                <a href="#" style={S.mobileContact} onClick={() => setMenuOpen(false)}>CONTACT US</a>
+                <a href="#" style={S.mobileContact} onClick={() => setMenuOpen(false)}>
+                  CONTACT US
+                </a>
               </div>
             )}
           </nav>
 
-          {/* ════════════════════════
-              HERO — OUR STORY
-          ════════════════════════ */}
+          {/* ══════════ HERO — OUR STORY ══════════ */}
           <section
             ref={heroRef}
             className="hero-grid"
@@ -1043,13 +1033,22 @@ export default function AboutPage() {
               minHeight:           '80vh',
             }}
           >
+            {/* LEFT — mosaic */}
             <div
               className={heroVisible ? 'reveal-left' : ''}
               style={{ opacity: heroVisible ? 1 : 0, animationDelay: '0.2s' }}
             >
-              <StoryMosaic visible={heroVisible} desktop={!isMobileHero} />
+              {/* Desktop → larger mosaic */}
+              {!isMobileHero && (
+                <StoryMosaic visible={heroVisible} desktop={true} />
+              )}
+              {/* Mobile → original size mosaic */}
+              {isMobileHero && (
+                <StoryMosaic visible={heroVisible} desktop={false} />
+              )}
             </div>
 
+            {/* RIGHT — text */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1rem, 2vh, 1.75rem)' }}>
               <p
                 className={heroVisible ? 'reveal-right' : ''}
@@ -1098,9 +1097,7 @@ export default function AboutPage() {
 
           <Divider />
 
-          {/* ════════════════════════
-              MEET THE VISIONARIES
-          ════════════════════════ */}
+          {/* ══════════ MEET THE VISIONARIES ══════════ */}
           <section ref={teamRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
             <h2
               className={teamVisible ? 'reveal-up' : ''}
@@ -1179,25 +1176,25 @@ export default function AboutPage() {
               <a
                 href="#"
                 style={{
-                  display:      'inline-block',
-                  border:       `1px solid ${tokens.color.white}`,
-                  borderRadius: '2rem',
-                  padding:      '0.625rem 3rem',
-                  color:        tokens.color.white,
-                  fontSize:     '1.125rem',
-                  fontWeight:   300,
+                  display:        'inline-block',
+                  border:         `1px solid ${tokens.color.white}`,
+                  borderRadius:   '2rem',
+                  padding:        '0.625rem 3rem',
+                  color:          tokens.color.white,
+                  fontSize:       '1.125rem',
+                  fontWeight:     300,
                   textDecoration: 'none',
-                  transition:   'all 0.3s',
+                  transition:     'all 0.3s',
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLElement;
-                  el.style.background   = tokens.color.gold;
-                  el.style.borderColor  = tokens.color.gold;
+                  el.style.background  = tokens.color.gold;
+                  el.style.borderColor = tokens.color.gold;
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLElement;
-                  el.style.background   = 'transparent';
-                  el.style.borderColor  = tokens.color.white;
+                  el.style.background  = 'transparent';
+                  el.style.borderColor = tokens.color.white;
                 }}
               >
                 VIEW ALL
@@ -1207,11 +1204,8 @@ export default function AboutPage() {
 
           <Divider />
 
-          {/* ════════════════════════
-              GALLERY
-          ════════════════════════ */}
+          {/* ══════════ GALLERY ══════════ */}
           <section ref={galleryRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
-
             <h2
               className={galleryVisible ? 'reveal-up' : ''}
               style={{
@@ -1227,7 +1221,7 @@ export default function AboutPage() {
               Transformations &amp; Artistry
             </h2>
 
-            {/* ── DESKTOP ── */}
+            {/* ── DESKTOP GALLERY ── */}
             {!isMobileGallery && (
               <div style={{
                 display:             'grid',
@@ -1235,6 +1229,7 @@ export default function AboutPage() {
                 gap:                 '1.25rem',
                 alignItems:          'stretch',
               }}>
+                {/* Col 1 */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <GalleryTextCard
                     visible={galleryVisible} delay="0.2s" minHeight="220px"
@@ -1247,6 +1242,7 @@ export default function AboutPage() {
                   />
                 </div>
 
+                {/* Col 2 */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <div
                     className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
@@ -1295,14 +1291,14 @@ export default function AboutPage() {
                       <a
                         href="#"
                         style={{
-                          background:    tokens.color.goldAlpha,
-                          borderRadius:  tokens.radius.card,
-                          padding:       '0.875rem 2.5rem',
-                          fontSize:      'clamp(0.9rem, 1.8vw, 1.4rem)',
-                          fontWeight:    700,
-                          color:         'rgba(255,255,255,0.9)',
+                          background:     tokens.color.goldAlpha,
+                          borderRadius:   tokens.radius.card,
+                          padding:        '0.875rem 2.5rem',
+                          fontSize:       'clamp(0.9rem, 1.8vw, 1.4rem)',
+                          fontWeight:     700,
+                          color:          'rgba(255,255,255,0.9)',
                           textDecoration: 'none',
-                          transition:    'background 0.3s',
+                          transition:     'background 0.3s',
                         }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.gold; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.goldAlpha; }}
@@ -1313,6 +1309,7 @@ export default function AboutPage() {
                   </div>
                 </div>
 
+                {/* Col 3 */}
                 <div
                   className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
                   style={{
@@ -1330,7 +1327,7 @@ export default function AboutPage() {
               </div>
             )}
 
-            {/* ── MOBILE ── */}
+            {/* ── MOBILE GALLERY ── */}
             {isMobileGallery && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <GalleryTextCard
@@ -1345,35 +1342,51 @@ export default function AboutPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div
                     className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                    style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}
+                    style={{
+                      position: 'relative', borderRadius: tokens.radius.gallery,
+                      overflow: 'hidden', height: '190px',
+                      opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s',
+                    }}
                   >
                     <Image src={GALLERY.img1} alt="Barber styling" fill sizes="50vw" style={{ objectFit: 'cover' }} />
                   </div>
                   <div
                     className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                    style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.38s' }}
+                    style={{
+                      position: 'relative', borderRadius: tokens.radius.gallery,
+                      overflow: 'hidden', height: '190px',
+                      opacity: galleryVisible ? 1 : 0, animationDelay: '0.38s',
+                    }}
                   >
                     <Image src={GALLERY.img2} alt="Hair tools" fill sizes="50vw" style={{ objectFit: 'cover' }} />
                   </div>
                 </div>
                 <div
                   className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '210px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.46s' }}
+                  style={{
+                    position: 'relative', borderRadius: tokens.radius.gallery,
+                    overflow: 'hidden', height: '210px',
+                    opacity: galleryVisible ? 1 : 0, animationDelay: '0.46s',
+                  }}
                 >
                   <Image src={GALLERY.img3} alt="Hair styling" fill sizes="100vw" style={{ objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, rgba(184,134,11,0.2))' }} />
                 </div>
                 <div
                   className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '200px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.54s' }}
+                  style={{
+                    position: 'relative', borderRadius: tokens.radius.gallery,
+                    overflow: 'hidden', height: '200px',
+                    opacity: galleryVisible ? 1 : 0, animationDelay: '0.54s',
+                  }}
                 >
                   <Image src={GALLERY.img4} alt="Salon interior" fill sizes="100vw" style={{ objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 100%)' }} />
                   <div style={{
-                    position: 'absolute', inset: 0,
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center',
-                    gap: '0.875rem', padding: '1.5rem',
+                    position:       'absolute', inset: 0,
+                    display:        'flex', flexDirection: 'column',
+                    alignItems:     'center', justifyContent: 'center',
+                    gap:            '0.875rem', padding: '1.5rem',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
                       <div style={{ width: '2rem', height: '1px', background: tokens.color.gold }} />
@@ -1385,26 +1398,26 @@ export default function AboutPage() {
                     <a
                       href="#"
                       style={{
-                        background:    tokens.color.gold,
-                        borderRadius:  '9999px',
-                        padding:       '0.75rem 2.25rem',
-                        fontSize:      '0.9375rem',
-                        fontWeight:    700,
-                        color:         tokens.color.white,
+                        background:     tokens.color.gold,
+                        borderRadius:   '9999px',
+                        padding:        '0.75rem 2.25rem',
+                        fontSize:       '0.9375rem',
+                        fontWeight:     700,
+                        color:          tokens.color.white,
                         textDecoration: 'none',
-                        letterSpacing: '0.08em',
-                        transition:    'transform 0.25s, box-shadow 0.25s',
-                        boxShadow:     '0 4px 20px rgba(184,134,11,0.4)',
+                        letterSpacing:  '0.08em',
+                        transition:     'transform 0.25s, box-shadow 0.25s',
+                        boxShadow:      '0 4px 20px rgba(184,134,11,0.4)',
                       }}
                       onMouseEnter={e => {
                         const el = e.currentTarget as HTMLElement;
-                        el.style.transform  = 'scale(1.05)';
-                        el.style.boxShadow  = '0 6px 28px rgba(184,134,11,0.6)';
+                        el.style.transform = 'scale(1.05)';
+                        el.style.boxShadow = '0 6px 28px rgba(184,134,11,0.6)';
                       }}
                       onMouseLeave={e => {
                         const el = e.currentTarget as HTMLElement;
-                        el.style.transform  = 'scale(1)';
-                        el.style.boxShadow  = '0 4px 20px rgba(184,134,11,0.4)';
+                        el.style.transform = 'scale(1)';
+                        el.style.boxShadow = '0 4px 20px rgba(184,134,11,0.4)';
                       }}
                     >
                       OUR GALLERY
@@ -1417,16 +1430,10 @@ export default function AboutPage() {
 
           <Divider />
 
-          {/* ════════════════════════
-              REVIEWS
-          ════════════════════════ */}
+          {/* ══════════ REVIEWS ══════════ */}
           <section
             ref={reviewRef}
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-              padding:  'clamp(4rem, 10vh, 7rem) clamp(1.5rem, 5vw, 5rem)',
-            }}
+            style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(4rem, 10vh, 7rem) clamp(1.5rem, 5vw, 5rem)' }}
           >
             <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
               <Image src={REVIEW_BG} alt="Reviews background" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
@@ -1472,12 +1479,12 @@ export default function AboutPage() {
                     aria-label={`Review ${i + 1}`}
                     className="review-dot"
                     style={{
-                      width:      '2rem',
-                      height:     '2rem',
+                      width:        '2rem',
+                      height:       '2rem',
                       borderRadius: tokens.radius.dot,
-                      background: i === activeReview ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.30)',
-                      border:     'none',
-                      cursor:     'pointer',
+                      background:   i === activeReview ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.30)',
+                      border:       'none',
+                      cursor:       'pointer',
                     }}
                   />
                 ))}
@@ -1485,9 +1492,7 @@ export default function AboutPage() {
             </div>
           </section>
 
-          {/* ════════════════════════
-              FOOTER
-          ════════════════════════ */}
+          {/* ══════════ FOOTER ══════════ */}
           <footer
             ref={footerRef}
             style={{
@@ -1499,16 +1504,17 @@ export default function AboutPage() {
           >
             <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
 
+              {/* Brand */}
               <div
                 className="footer-reveal"
                 style={{
-                  flex:          '1 1 260px',
-                  maxWidth:      '320px',
-                  display:       'flex',
-                  flexDirection: 'column',
-                  gap:           '1rem',
-                  opacity:       footerVisible ? 1 : 0,
-                  transform:     footerVisible ? 'translateX(0)' : 'translateX(-40px)',
+                  flex:            '1 1 260px',
+                  maxWidth:        '320px',
+                  display:         'flex',
+                  flexDirection:   'column',
+                  gap:             '1rem',
+                  opacity:         footerVisible ? 1 : 0,
+                  transform:       footerVisible ? 'translateX(0)' : 'translateX(-40px)',
                   transitionDelay: '0s',
                 }}
               >
@@ -1541,15 +1547,16 @@ export default function AboutPage() {
                 </div>
               </div>
 
+              {/* Quick Links */}
               <div
                 className="footer-reveal"
                 style={{
-                  flex:          '1 1 160px',
-                  display:       'flex',
-                  flexDirection: 'column',
-                  gap:           '0.85rem',
-                  opacity:       footerVisible ? 1 : 0,
-                  transform:     footerVisible ? 'translateX(0)' : 'translateX(20px)',
+                  flex:            '1 1 160px',
+                  display:         'flex',
+                  flexDirection:   'column',
+                  gap:             '0.85rem',
+                  opacity:         footerVisible ? 1 : 0,
+                  transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
                   transitionDelay: '0.15s',
                 }}
               >
@@ -1575,15 +1582,16 @@ export default function AboutPage() {
                 ))}
               </div>
 
+              {/* Locations */}
               <div
                 className="footer-reveal"
                 style={{
-                  flex:          '1 1 160px',
-                  display:       'flex',
-                  flexDirection: 'column',
-                  gap:           '0.85rem',
-                  opacity:       footerVisible ? 1 : 0,
-                  transform:     footerVisible ? 'translateX(0)' : 'translateX(20px)',
+                  flex:            '1 1 160px',
+                  display:         'flex',
+                  flexDirection:   'column',
+                  gap:             '0.85rem',
+                  opacity:         footerVisible ? 1 : 0,
+                  transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
                   transitionDelay: '0.25s',
                 }}
               >
@@ -1604,20 +1612,23 @@ export default function AboutPage() {
                     }}
                   >
                     <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><IconLocation /></span>
-                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{loc}</p>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>
+                      {loc}
+                    </p>
                   </div>
                 ))}
               </div>
 
+              {/* Contact */}
               <div
                 className="footer-reveal"
                 style={{
-                  flex:          '1 1 160px',
-                  display:       'flex',
-                  flexDirection: 'column',
-                  gap:           '0.85rem',
-                  opacity:       footerVisible ? 1 : 0,
-                  transform:     footerVisible ? 'translateX(0)' : 'translateX(40px)',
+                  flex:            '1 1 160px',
+                  display:         'flex',
+                  flexDirection:   'column',
+                  gap:             '0.85rem',
+                  opacity:         footerVisible ? 1 : 0,
+                  transform:       footerVisible ? 'translateX(0)' : 'translateX(40px)',
                   transitionDelay: '0.35s',
                 }}
               >
@@ -1642,7 +1653,9 @@ export default function AboutPage() {
                     }}
                   >
                     <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><Icon /></span>
-                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{text}</p>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>
+                      {text}
+                    </p>
                   </div>
                 ))}
               </div>
