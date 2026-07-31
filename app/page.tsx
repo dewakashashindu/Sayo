@@ -1020,7 +1020,7 @@ export default function Home() {
               className="hero-bg-img"
               style={{
                 objectFit: 'cover',
-                objectPosition: isNarrowScreen ? 'center 15%' : 'right center',
+                objectPosition: isNarrowScreen ? 'center 15%' : '75% center',
               }}
             />
           </div>

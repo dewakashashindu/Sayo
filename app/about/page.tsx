@@ -1289,7 +1289,7 @@ export default function AboutPage() {
                       justifyContent: 'center',
                     }}>
                       <a
-                        href="#"
+                        href="/gallery"
                         style={{
                           background:     tokens.color.goldAlpha,
                           borderRadius:   tokens.radius.card,
