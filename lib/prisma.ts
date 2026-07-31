@@ -5,13 +5,24 @@ const globalForPrisma = globalThis as unknown as {
   cloudPrisma: PrismaClient | undefined;
 };
 
+
+const cloudUrl =
+  process.env.CLOUD_DATABASE_URL ||
+  process.env.DATABASE_URL ||
+  "";
+
+
+const localUrl =
+  process.env.LOCAL_DATABASE_URL ||
+  cloudUrl;
+
 // 1. Local MySQL Client Instance
 export const localPrisma =
   globalForPrisma.localPrisma ??
   new PrismaClient({
     datasources: {
       db: {
-        url: process.env.LOCAL_DATABASE_URL,
+        url: localUrl,
       },
     },
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
@@ -23,13 +34,12 @@ export const cloudPrisma =
   new PrismaClient({
     datasources: {
       db: {
-        url: process.env.CLOUD_DATABASE_URL,
+        url: cloudUrl,
       },
     },
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   });
 
-// Development mode එකේදී Next.js Hot Reloading නිසා duplicate connections නොහැදීමට
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.localPrisma = localPrisma;
   globalForPrisma.cloudPrisma = cloudPrisma;
