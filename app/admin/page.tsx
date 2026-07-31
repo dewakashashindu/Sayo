@@ -1115,7 +1115,12 @@ export default function SayoAdminPage() {
               ].map(({ label, key }) => (
                 <div key={key}>
                   <label style={fieldLabel}>{label}</label>
-                  <input type="text" value={(navData as Record<string, string>)[key]} onChange={e => setNavData({ ...navData, [key]: e.target.value })} style={inputStyle} />
+                  <input 
+  type="text" 
+  value={((navData as unknown) as Record<string, string>)[key] ?? ''} 
+  onChange={e => setNavData({ ...navData, [key]: e.target.value })} 
+  style={inputStyle} 
+/>
                 </div>
               ))}
             </div>
@@ -1162,21 +1167,26 @@ export default function SayoAdminPage() {
               ].map(({ label, key }) => (
                 <div key={key}>
                   <label style={fieldLabel}>{label}</label>
-                  <input type="text" value={(homeData as Record<string, string>)[key]} onChange={e => setHomeData({ ...homeData, [key]: e.target.value })} style={inputStyle} />
+                  <input 
+  type="text" 
+  value={((homeData as unknown) as Record<string, string>)[key] ?? ''} 
+  onChange={e => setHomeData({ ...homeData, [key]: e.target.value })} 
+  style={inputStyle} 
+/>
                 </div>
               ))}
               <div>
                 <label style={fieldLabel}>Body Description</label>
-                <textarea rows={4} value={homeData.hero_body} onChange={e => setHomeData({ ...homeData, hero_body: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} />
+                <textarea rows={4} value={((homeData as unknown) as Record<string, string>)['hero_body'] ?? ''} onChange={e => setHomeData({ ...homeData, hero_body: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
                 <div>
                   <label style={fieldLabel}>CTA Button Text</label>
-                  <input type="text" value={homeData.hero_cta_text} onChange={e => setHomeData({ ...homeData, hero_cta_text: e.target.value })} style={inputStyle} />
+                  <input type="text" value={((homeData as unknown) as Record<string, string>)['hero_cta_text'] ?? ''} onChange={e => setHomeData({ ...homeData, hero_cta_text: e.target.value })} style={inputStyle} />
                 </div>
                 <div>
                   <label style={fieldLabel}>CTA Button URL</label>
-                  <input type="text" value={homeData.hero_cta_link} onChange={e => setHomeData({ ...homeData, hero_cta_link: e.target.value })} style={inputStyle} />
+                  <input type="text" value={((homeData as unknown) as Record<string, string>)['hero_cta_link'] ?? ''} onChange={e => setHomeData({ ...homeData, hero_cta_link: e.target.value })} style={inputStyle} />
                 </div>
               </div>
             </div>
@@ -1204,9 +1214,9 @@ export default function SayoAdminPage() {
               <h2 style={sectionTitle}>Our Story — Hero Section</h2>
               <p style={sectionDesc}>Eyebrow, heading, and body text shown at the top of the About page.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div><label style={fieldLabel}>Eyebrow Text</label><input type="text" value={aboutData.hero_eyebrow} onChange={e => setAboutData({ ...aboutData, hero_eyebrow: e.target.value })} style={inputStyle} /></div>
-                <div><label style={fieldLabel}>Main Heading</label><input type="text" value={aboutData.hero_heading} onChange={e => setAboutData({ ...aboutData, hero_heading: e.target.value })} style={inputStyle} /></div>
-                <div><label style={fieldLabel}>Body Paragraph</label><textarea rows={4} value={aboutData.hero_body} onChange={e => setAboutData({ ...aboutData, hero_body: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} /></div>
+                <div><label style={fieldLabel}>Eyebrow Text</label><input type="text" value={((aboutData as unknown) as Record<string, string>)['hero_eyebrow'] ?? ''} onChange={e => setAboutData({ ...aboutData, hero_eyebrow: e.target.value })} style={inputStyle} /></div>
+                <div><label style={fieldLabel}>Main Heading</label><input type="text" value={((aboutData as unknown) as Record<string, string>)['hero_heading'] ?? ''} onChange={e => setAboutData({ ...aboutData, hero_heading: e.target.value })} style={inputStyle} /></div>
+                <div><label style={fieldLabel}>Body Paragraph</label><textarea rows={4} value={((aboutData as unknown) as Record<string, string>)['hero_body'] ?? ''} onChange={e => setAboutData({ ...aboutData, hero_body: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} /></div>
               </div>
             </section>
 
@@ -1215,7 +1225,7 @@ export default function SayoAdminPage() {
               <h2 style={sectionTitle}>Team Section</h2>
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={fieldLabel}>Section Title</label>
-                <input type="text" value={aboutData.team_section_title} onChange={e => setAboutData({ ...aboutData, team_section_title: e.target.value })} style={inputStyle} />
+                <input type="text" value={((aboutData as unknown) as Record<string, string>)['team_section_title'] ?? ''} onChange={e => setAboutData({ ...aboutData, team_section_title: e.target.value })} style={inputStyle} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <label style={{ ...fieldLabel, fontSize: '0.9rem', color: tokens.color.gold }}>Staff Members ({aboutData.staff.length})</label>
@@ -1256,8 +1266,8 @@ export default function SayoAdminPage() {
               <h2 style={sectionTitle}>Gallery Section</h2>
               <p style={sectionDesc}>Only titles/text — images are managed directly in code.</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div><label style={fieldLabel}>Gallery Section Title</label><input type="text" value={aboutData.gallery_section_title} onChange={e => setAboutData({ ...aboutData, gallery_section_title: e.target.value })} style={inputStyle} /></div>
-                <div><label style={fieldLabel}>Gallery Description</label><textarea rows={3} value={aboutData.gallery_description} onChange={e => setAboutData({ ...aboutData, gallery_description: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} /></div>
+                <div><label style={fieldLabel}>Gallery Section Title</label><input type="text" value={((aboutData as unknown) as Record<string, string>)['gallery_section_title'] ?? ''} onChange={e => setAboutData({ ...aboutData, gallery_section_title: e.target.value })} style={inputStyle} /></div>
+                <div><label style={fieldLabel}>Gallery Description</label><textarea rows={3} value={((aboutData as unknown) as Record<string, string>)['gallery_description'] ?? ''} onChange={e => setAboutData({ ...aboutData, gallery_description: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} /></div>
               </div>
             </section>
 
@@ -1266,7 +1276,7 @@ export default function SayoAdminPage() {
               <h2 style={sectionTitle}>Client Reviews Carousel</h2>
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={fieldLabel}>Section Title</label>
-                <input type="text" value={aboutData.review_section_title} onChange={e => setAboutData({ ...aboutData, review_section_title: e.target.value })} style={inputStyle} />
+                <input type="text" value={((aboutData as unknown) as Record<string, string>)['review_section_title'] ?? ''} onChange={e => setAboutData({ ...aboutData, review_section_title: e.target.value })} style={inputStyle} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <label style={{ ...fieldLabel, fontSize: '0.9rem', color: tokens.color.gold }}>Reviews ({aboutData.reviews.length})</label>
@@ -1540,7 +1550,12 @@ export default function SayoAdminPage() {
                 ].map(({ label, key }) => (
                   <div key={key}>
                     <label style={fieldLabel}>{label}</label>
-                    <input type="text" value={(contactData as Record<string, string>)[key]} onChange={e => setContactData({ ...contactData, [key]: e.target.value })} style={inputStyle} placeholder="https://..." />
+                   <input 
+  type="text" 
+  value={((navData as unknown) as Record<string, string>)[key] ?? ''} 
+  onChange={e => setNavData({ ...navData, [key]: e.target.value })} 
+  style={inputStyle} 
+/>
                   </div>
                 ))}
               </div>
@@ -1692,7 +1707,12 @@ export default function SayoAdminPage() {
                 ].map(({ label, key }) => (
                   <div key={key}>
                     <label style={fieldLabel}>{label}</label>
-                    <input type="text" value={(footerData as Record<string, string>)[key]} onChange={e => setFooterData({ ...footerData, [key]: e.target.value })} style={inputStyle} />
+                   <input 
+  type="text" 
+  value={((navData as unknown) as Record<string, string>)[key] ?? ''} 
+  onChange={e => setNavData({ ...navData, [key]: e.target.value })} 
+  style={inputStyle} 
+/>
                   </div>
                 ))}
               </div>
@@ -1710,7 +1730,7 @@ export default function SayoAdminPage() {
                 ].map(({ label, key }) => (
                   <div key={key}>
                     <label style={fieldLabel}>{label}</label>
-                    <input type="text" value={(footerData as Record<string, string>)[key]} onChange={e => setFooterData({ ...footerData, [key]: e.target.value })} style={inputStyle} placeholder="https://..." />
+                    <input type="text" value={((footerData as unknown) as Record<string, string>)[key] ?? ''} onChange={e => setFooterData({ ...footerData, [key]: e.target.value })} style={inputStyle} placeholder="https://..." />
                   </div>
                 ))}
               </div>
