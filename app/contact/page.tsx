@@ -50,34 +50,86 @@ const tokens = {
 } as const;
 
 /* ─────────────────────────────────────────
-   BRANCH LOCATIONS DATA
+   TYPES
 ───────────────────────────────────────── */
-const BRANCH_LOCATIONS = [
-  {
-    name:    'Colombo — Head Office',
-    address: 'No. 45, Galle Road, Colombo 03, Sri Lanka',
-    phone:   '0772336233',
-    email:   'info@sayobeauty.com',
-    isHead:  true,
-    mapHref: 'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
-  },
-  {
-    name:    'Negombo Branch',
-    address: 'No. 12, Poruthota Road, Negombo, Sri Lanka',
-    phone:   '0772336233',
-    email:   'negombo@sayobeauty.com',
-    isHead:  false,
-    mapHref: 'https://maps.google.com/?q=Poruthota+Road+Negombo+Sri+Lanka',
-  },
-  {
-    name:    'Kiribathgoda Branch',
-    address: 'No. 78, Kandy Road, Kiribathgoda, Sri Lanka',
-    phone:   '0772336233',
-    email:   'kiribathgoda@sayobeauty.com',
-    isHead:  false,
-    mapHref: 'https://maps.google.com/?q=Kandy+Road+Kiribathgoda+Sri+Lanka',
-  },
-] as const;
+type StatItem = { value: string; label: string };
+
+type BranchLocation = {
+  name:    string;
+  address: string;
+  phone:   string;
+  email:   string;
+  isHead:  boolean;
+  mapHref: string;
+};
+
+type ContactData = {
+  hero_eyebrow:       string;
+  hero_heading:       string;
+  hero_subtitle:      string;
+  cta_primary_text:   string;
+  cta_secondary_text: string;
+  phone_number:       string;
+  email_address:      string;
+  stats:              StatItem[];
+  map_embed_src:      string;
+  map_address:        string;
+  map_open_href:      string;
+  social_instagram:   string;
+  social_facebook:    string;
+  social_whatsapp:    string;
+  branches:           BranchLocation[];
+};
+
+/* ─────────────────────────────────────────
+   DEFAULTS (fallback while loading / on error)
+───────────────────────────────────────── */
+const CONTACT_DEFAULTS: ContactData = {
+  hero_eyebrow:       'Luxury Concierge Experience',
+  hero_heading:       'GET IN TOUCH',
+  hero_subtitle:      'Experience personalized luxury tailored specifically for your needs. Our dedicated concierge team in Colombo is here to orchestrate your journey into refined elegance.',
+  cta_primary_text:   'Send an Inquiry',
+  cta_secondary_text: 'Call Us Now',
+  phone_number:       '0772336233',
+  email_address:      'info@sayobeauty.com',
+  stats: [
+    { value: '3',   label: 'Locations' },
+    { value: '10+', label: 'Years of Excellence' },
+    { value: '5K+', label: 'Happy Clients' },
+  ],
+  map_embed_src: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.0558055526335!2d79.85803897585825!3d6.883918893115073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25bc5b891a4b5%3A0xc60aa90940280873!2s45%2C%203%20Galle%20Rd%2C%20Colombo%2000500!5e0!3m2!1sen!2slk!4v1785130068196!5m2!1sen!2slk',
+  map_address:   'No. 45, Galle Road, Colombo 03, Sri Lanka',
+  map_open_href: 'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
+  social_instagram: '',
+  social_facebook:  '',
+  social_whatsapp:  '',
+  branches: [
+    {
+      name:    'Colombo — Head Office',
+      address: 'No. 45, Galle Road, Colombo 03, Sri Lanka',
+      phone:   '0772336233',
+      email:   'info@sayobeauty.com',
+      isHead:  true,
+      mapHref: 'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
+    },
+    {
+      name:    'Negombo Branch',
+      address: 'No. 12, Poruthota Road, Negombo, Sri Lanka',
+      phone:   '0772336233',
+      email:   'negombo@sayobeauty.com',
+      isHead:  false,
+      mapHref: 'https://maps.google.com/?q=Poruthota+Road+Negombo+Sri+Lanka',
+    },
+    {
+      name:    'Kiribathgoda Branch',
+      address: 'No. 78, Kandy Road, Kiribathgoda, Sri Lanka',
+      phone:   '0772336233',
+      email:   'kiribathgoda@sayobeauty.com',
+      isHead:  false,
+      mapHref: 'https://maps.google.com/?q=Kandy+Road+Kiribathgoda+Sri+Lanka',
+    },
+  ],
+};
 
 /* ─────────────────────────────────────────
    GLOBAL CSS
@@ -120,6 +172,7 @@ const globalCss = `
     0%, 100% { opacity: 1; }
     50%       { opacity: 0.5; }
   }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   .nav-animate  { animation: fadeInDown 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
   .logo-float   { animation: floatY 4s ease-in-out 1.5s infinite; }
@@ -335,11 +388,6 @@ const NAV_HREFS: Record<string, string> = {
   'SERVICES': '/services', 'PRODUCTS': '/products', 'REVIEWS': '/reviews',
 };
 
-const MAP_EMBED_SRC =
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.0558055526335!2d79.85803897585825!3d6.883918893115073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25bc5b891a4b5%3A0xc60aa90940280873!2s45%2C%203%20Galle%20Rd%2C%20Colombo%2000500!5e0!3m2!1sen!2slk!4v1785130068196!5m2!1sen!2slk';
-
-const MAP_OPEN_HREF = 'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka';
-
 /* ─────────────────────────────────────────
    ICONS
 ───────────────────────────────────────── */
@@ -515,7 +563,7 @@ function useIsMobile(breakpoint = 1024) {
 function BranchCard({
   branch, visible, delay,
 }: {
-  branch: typeof BRANCH_LOCATIONS[number];
+  branch: BranchLocation;
   visible: boolean;
   delay: string;
 }) {
@@ -617,6 +665,10 @@ export default function ContactPage() {
   const [loaded,   setLoaded]   = useState(false);
   const [formData, setFormData] = useState({ email: '', message: '' });
 
+  // ── DB-driven contact data ──
+  const [contactData, setContactData] = useState<ContactData>(CONTACT_DEFAULTS);
+  const [dataLoaded,  setDataLoaded]  = useState(false);
+
   const isMobile = useIsMobile(1024);
 
   const { ref: heroRef,     inView: heroVisible     } = useInView(0.05);
@@ -629,10 +681,47 @@ export default function ContactPage() {
     return () => clearTimeout(t);
   }, []);
 
+  // ── Fetch contact data from DB ──
+  useEffect(() => {
+    fetch('/api/site-data?section=contact')
+      .then(r => r.json())
+      .then(data => {
+        if (data) {
+          setContactData({
+            hero_eyebrow:       data.hero_eyebrow       || CONTACT_DEFAULTS.hero_eyebrow,
+            hero_heading:       data.hero_heading       || CONTACT_DEFAULTS.hero_heading,
+            hero_subtitle:      data.hero_subtitle      || CONTACT_DEFAULTS.hero_subtitle,
+            cta_primary_text:   data.cta_primary_text   || CONTACT_DEFAULTS.cta_primary_text,
+            cta_secondary_text: data.cta_secondary_text || CONTACT_DEFAULTS.cta_secondary_text,
+            phone_number:       data.phone_number       || CONTACT_DEFAULTS.phone_number,
+            email_address:      data.email_address      || CONTACT_DEFAULTS.email_address,
+            stats: Array.isArray(data.stats) && data.stats.length > 0
+              ? data.stats
+              : CONTACT_DEFAULTS.stats,
+            map_embed_src:    data.map_embed_src    || CONTACT_DEFAULTS.map_embed_src,
+            map_address:      data.map_address      || CONTACT_DEFAULTS.map_address,
+            map_open_href:    data.map_open_href    || CONTACT_DEFAULTS.map_open_href,
+            social_instagram: data.social_instagram || '',
+            social_facebook:  data.social_facebook  || '',
+            social_whatsapp:  data.social_whatsapp  || '',
+            branches: Array.isArray(data.branches) && data.branches.length > 0
+              ? data.branches
+              : CONTACT_DEFAULTS.branches,
+          });
+        }
+      })
+      .catch(() => {
+        // Silent fallback — defaults already in state
+      })
+      .finally(() => setDataLoaded(true));
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
   };
+
+  const cleanPhone = contactData.phone_number.replace(/\s+/g, '');
 
   return (
     <>
@@ -726,7 +815,7 @@ export default function ContactPage() {
             >
               <div style={{ width: 'clamp(2rem,5vw,4rem)', height: '1px', background: `linear-gradient(90deg, transparent, ${tokens.color.gold})` }} />
               <span style={{ color: tokens.color.gold, fontSize: 'clamp(0.65rem,1vw,0.8rem)', fontWeight: 600, letterSpacing: '0.3em', textTransform: 'uppercase' }}>
-                Luxury Concierge Experience
+                {contactData.hero_eyebrow}
               </span>
               <div style={{ width: 'clamp(2rem,5vw,4rem)', height: '1px', background: `linear-gradient(90deg, ${tokens.color.gold}, transparent)` }} />
             </div>
@@ -746,7 +835,7 @@ export default function ContactPage() {
                 textShadow:     '0 4px 40px rgba(184,134,11,0.35)',
               }}
             >
-              GET IN TOUCH
+              {contactData.hero_heading}
             </h1>
 
             {/* Gold accent divider */}
@@ -780,9 +869,7 @@ export default function ContactPage() {
                 marginBottom:   'clamp(2rem, 4vh, 3rem)',
               }}
             >
-              Experience personalized luxury tailored specifically for your needs.
-              Our dedicated concierge team in Colombo is here to
-              orchestrate your journey into refined elegance.
+              {contactData.hero_subtitle}
             </p>
 
             {/* CTA buttons */}
@@ -800,11 +887,11 @@ export default function ContactPage() {
             >
               <a href="#contact-form" className="hero-cta-primary">
                 <IconChat />
-                Send an Inquiry
+                {contactData.cta_primary_text}
               </a>
-              <a href="tel:0772336233" className="hero-cta-secondary">
+              <a href={`tel:${cleanPhone}`} className="hero-cta-secondary">
                 <IconPhoneCall />
-                Call Us Now
+                {contactData.cta_secondary_text}
               </a>
             </div>
 
@@ -821,13 +908,9 @@ export default function ContactPage() {
                 animationDelay: '0.7s',
               }}
             >
-              {[
-                { value: '3', label: 'Locations' },
-                { value: '10+', label: 'Years of Excellence' },
-                { value: '5K+', label: 'Happy Clients' },
-              ].map(({ value, label }) => (
+              {contactData.stats.map(({ value, label }, idx) => (
                 <div
-                  key={label}
+                  key={`${label}-${idx}`}
                   style={{
                     background:     'rgba(255,255,255,0.07)',
                     backdropFilter: 'blur(12px)',
@@ -901,7 +984,7 @@ export default function ContactPage() {
                 }}
               >
                 <h2 style={{ color: tokens.color.goldAlpha, fontSize: 'clamp(1.25rem, 2.5vw, 2rem)', fontWeight: 500, margin: 0 }}>
-                  Send an Inquiry
+                  {contactData.cta_primary_text}
                 </h2>
                 <input type="email" placeholder="example@gmail.com" className="input-field"
                   value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
@@ -935,7 +1018,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p style={{ color: tokens.color.whiteDim69, fontSize: 'clamp(0.7rem,1.1vw,0.875rem)', fontWeight: 500, margin: '0 0 0.2rem', letterSpacing: '0.08em' }}>PHONE</p>
-                      <p style={{ color: tokens.color.white, fontSize: 'clamp(0.875rem,1.4vw,1rem)', fontWeight: 500, margin: 0 }}>0772336233 </p>
+                      <p style={{ color: tokens.color.white, fontSize: 'clamp(0.875rem,1.4vw,1rem)', fontWeight: 500, margin: 0 }}>{contactData.phone_number}</p>
                     </div>
                   </div>
                   <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
@@ -946,7 +1029,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p style={{ color: tokens.color.whiteDim69, fontSize: 'clamp(0.7rem,1.1vw,0.875rem)', fontWeight: 500, margin: '0 0 0.2rem', letterSpacing: '0.08em' }}>EMAIL</p>
-                      <p style={{ color: tokens.color.white, fontSize: 'clamp(0.875rem,1.4vw,1rem)', fontWeight: 500, margin: 0 }}>Example@email.com</p>
+                      <p style={{ color: tokens.color.white, fontSize: 'clamp(0.875rem,1.4vw,1rem)', fontWeight: 500, margin: 0 }}>{contactData.email_address}</p>
                     </div>
                   </div>
                   <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
@@ -955,11 +1038,20 @@ export default function ContactPage() {
                     <p style={{ color: tokens.color.white, fontSize: 'clamp(0.9rem,1.4vw,1.1rem)', fontWeight: 500, margin: '0 0 0.875rem', letterSpacing: '0.04em' }}>FOLLOW US</p>
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
                       {[
-                        { label: 'Instagram', Icon: IconInstagram },
-                        { label: 'Facebook',  Icon: IconFacebook  },
-                        { label: 'WhatsApp',  Icon: IconWhatsApp  },
-                      ].map(({ label, Icon }) => (
-                        <a key={label} href="#" aria-label={label} className="social-icon"><Icon /></a>
+                        { label: 'Instagram', Icon: IconInstagram, href: contactData.social_instagram },
+                        { label: 'Facebook',  Icon: IconFacebook,  href: contactData.social_facebook  },
+                        { label: 'WhatsApp',  Icon: IconWhatsApp,  href: contactData.social_whatsapp  },
+                      ].map(({ label, Icon, href }) => (
+                        <a
+                          key={label}
+                          href={href && href.trim() !== '' ? href : '#'}
+                          target={href && href.trim() !== '' ? '_blank' : undefined}
+                          rel={href && href.trim() !== '' ? 'noopener noreferrer' : undefined}
+                          aria-label={label}
+                          className="social-icon"
+                        >
+                          <Icon />
+                        </a>
                       ))}
                     </div>
                   </div>
@@ -974,8 +1066,8 @@ export default function ContactPage() {
                     opacity: contactVisible ? 1 : 0, animationDelay: '0.35s',
                   }}
                 >
-                  <iframe className="map-iframe" src={MAP_EMBED_SRC} allowFullScreen loading="lazy"
-                    referrerPolicy="strict-origin-when-cross-origin" title="SAYO Beauty — Galle Rd, Colombo 03" />
+                  <iframe className="map-iframe" src={contactData.map_embed_src} allowFullScreen loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin" title="SAYO Beauty — Location" />
                   <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(4,4,5,0.96) 0%, rgba(4,4,5,0.75) 55%, transparent 100%)', padding: 'clamp(1rem, 2.5vw, 1.75rem)', display: 'flex', flexDirection: 'column', gap: '0.625rem', pointerEvents: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', pointerEvents: 'auto' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: tokens.radius.icon, background: tokens.color.iconBg, backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: tokens.color.gold }}>
@@ -984,9 +1076,9 @@ export default function ContactPage() {
                       <p style={{ color: tokens.color.white, fontSize: 'clamp(0.7rem,1.1vw,0.875rem)', fontWeight: 600, margin: 0, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Address</p>
                     </div>
                     <p style={{ color: tokens.color.white, fontSize: 'clamp(0.8rem,1.3vw,1rem)', fontWeight: 500, margin: 0, lineHeight: 1.5, pointerEvents: 'auto' }}>
-                      No. 45, Galle Road, Colombo 03, Sri Lanka
+                      {contactData.map_address}
                     </p>
-                    <a href={MAP_OPEN_HREF} target="_blank" rel="noopener noreferrer" className="view-map-btn"
+                    <a href={contactData.map_open_href} target="_blank" rel="noopener noreferrer" className="view-map-btn"
                       style={{ alignSelf: 'flex-start', background: tokens.color.goldCard, borderRadius: tokens.radius.card, padding: '0.55rem 1.5rem', color: tokens.color.white, fontSize: 'clamp(0.75rem,1.1vw,0.9rem)', fontWeight: 500, fontFamily: tokens.font.family, letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', pointerEvents: 'auto', border: 'none', cursor: 'pointer' }}>
                       <IconMapPin /> VIEW ON MAP
                     </a>
@@ -1009,8 +1101,8 @@ export default function ContactPage() {
                 </p>
               </div>
               <div className="branches-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(0.875rem, 1.5vw, 1.25rem)' }}>
-                {BRANCH_LOCATIONS.map((branch, i) => (
-                  <BranchCard key={branch.name} branch={branch} visible={branchesVisible} delay={`${0.1 + i * 0.12}s`} />
+                {contactData.branches.map((branch, i) => (
+                  <BranchCard key={`${branch.name}-${i}`} branch={branch} visible={branchesVisible} delay={`${0.1 + i * 0.12}s`} />
                 ))}
               </div>
             </div>
@@ -1026,9 +1118,20 @@ export default function ContactPage() {
                 <h2 style={{ color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 }}>SAYO</h2>
                 <p style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.tagline, lineHeight: 1.6, margin: 0, maxWidth: '260px' }}>We are experienced in making you more beautiful</p>
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                  {[{ label: 'WhatsApp', Icon: IconWhatsApp }, { label: 'Facebook', Icon: IconFacebook }, { label: 'Instagram', Icon: IconInstagram }].map(({ label, Icon }, i) => (
-                    <a key={label} href="#" aria-label={label} className="social-icon footer-reveal-bounce"
-                      style={{ color: tokens.color.white, opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'scale(1)' : 'scale(0.5)', transitionDelay: `${0.4 + i * 0.1}s` }}>
+                  {[
+                    { label: 'WhatsApp',  Icon: IconWhatsApp,  href: contactData.social_whatsapp  },
+                    { label: 'Facebook',  Icon: IconFacebook,  href: contactData.social_facebook  },
+                    { label: 'Instagram', Icon: IconInstagram, href: contactData.social_instagram },
+                  ].map(({ label, Icon, href }, i) => (
+                    <a
+                      key={label}
+                      href={href && href.trim() !== '' ? href : '#'}
+                      target={href && href.trim() !== '' ? '_blank' : undefined}
+                      rel={href && href.trim() !== '' ? 'noopener noreferrer' : undefined}
+                      aria-label={label}
+                      className="social-icon footer-reveal-bounce"
+                      style={{ color: tokens.color.white, opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'scale(1)' : 'scale(0.5)', transitionDelay: `${0.4 + i * 0.1}s` }}
+                    >
                       <Icon />
                     </a>
                   ))}
@@ -1061,11 +1164,11 @@ export default function ContactPage() {
               <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(40px)', transitionDelay: '0.35s' }}>
                 <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Contact Us</p>
                 {[
-                  { Icon: IconPhoneFooter,  text: '+94 77 233 6233' },
-                  { Icon: IconMailFooter,   text: 'Example@email.com' },
-                  { Icon: IconMapPinFooter, text: 'No. 45, Galle Road, Colombo 03, Sri Lanka' },
+                  { Icon: IconPhoneFooter,  text: contactData.phone_number  },
+                  { Icon: IconMailFooter,   text: contactData.email_address },
+                  { Icon: IconMapPinFooter, text: contactData.map_address   },
                 ].map(({ Icon, text }, i) => (
-                  <div key={text} className="footer-reveal-fast" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.45 + i * 0.08}s` }}>
+                  <div key={`${text}-${i}`} className="footer-reveal-fast" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.45 + i * 0.08}s` }}>
                     <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><Icon /></span>
                     <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{text}</p>
                   </div>
