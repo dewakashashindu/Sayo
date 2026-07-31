@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { localPrisma, cloudPrisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 
 /* ─────────────────────────────────────────
    DEFAULTS
