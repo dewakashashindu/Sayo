@@ -128,3 +128,22 @@ model ContactConfig {
   updated_at         DateTime @updatedAt
   updated_by         String   @default("admin") @db.VarChar(100)
 }
+
+model Tbl_Feedback {
+  id          Int      @id @default(autoincrement())
+  cusName     String   @db.VarChar(200)
+  cusEmail    String   @db.VarChar(200)
+  cusLocation String   @db.VarChar(100)
+  cusService  String   @db.VarChar(200)
+  cusRating   Int      @default(0)
+  cusComment  String   @db.Text
+  cusConsent  Boolean  @default(false)
+  isPublished Boolean  @default(false)   
+  submittedAt DateTime @default(now())
+
+  @@index([cusEmail])
+  @@index([submittedAt])
+  @@index([cusLocation])
+  @@index([cusRating])
+  @@index([isPublished])
+}

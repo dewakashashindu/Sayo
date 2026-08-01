@@ -231,7 +231,9 @@ const globalCss = `
   .quick-link::before { content:'›';position:absolute;left:-4px;opacity:0;transition:opacity 0.25s,left 0.25s;color:#B8860B; }
   .quick-link:hover::before { opacity:1;left:0; }
 
-  .gender-tabs-wrap,.category-tabs-wrap{display:flex;flex-wrap:wrap;justify-content:center;}
+  .gender-tabs-wrap{display:flex;flex-wrap:wrap;justify-content:center;}
+  .category-tabs-wrap{display:flex;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;}
+  .category-tabs-wrap::-webkit-scrollbar{display:none;}
   @media(max-width:768px){.gender-tabs-wrap{gap:0.75rem!important;}.category-tabs-wrap{gap:0.6rem!important;}}
 `;
 
@@ -308,7 +310,7 @@ export default function ServicesPage() {
   const [gender,   setGender]   = useState<GenderKey>('her');
 
   // category is now dynamic — string, not fixed union
-  const [category, setCategory] = useState<string>('');
+  const [category, setCategory] = useState<string>('NAIL');
 
   // ── DB data state ──
   const [navData,      setNavData]      = useState<NavData>(NAV_DEFAULTS);
@@ -346,8 +348,10 @@ export default function ServicesPage() {
               ? data.services.price_list
               : SERVICES_DEFAULTS.price_list,
           });
-          // Auto-select first category from DB (fixes hardcoded DEFAULT_CATEGORY issue)
-          if (cats.length > 0) setCategory(cats[0].key);
+          // Auto-select NAIL by default, fallback to first category
+          const nailCat = cats.find((c: ServiceCategory) => c.key === 'NAIL');
+          if (nailCat) setCategory('NAIL');
+          else if (cats.length > 0) setCategory(cats[0].key);
         }
       })
       .catch(() => {});
@@ -359,7 +363,10 @@ export default function ServicesPage() {
   useEffect(() => {
     if (servicesData.categories.length === 0) return;
     const exists = servicesData.categories.some(c => c.key === category);
-    if (!exists) setCategory(servicesData.categories[0].key);
+    if (!exists) {
+      const nailCat = servicesData.categories.find(c => c.key === 'NAIL');
+      setCategory(nailCat ? 'NAIL' : servicesData.categories[0].key);
+    }
   }, [servicesData.categories, category]);
 
   // ── GSAP Draggable ──
@@ -526,7 +533,7 @@ export default function ServicesPage() {
               {servicesData.categories.map(cat => {
                 const isActive = category === cat.key;
                 return (
-                  <button key={cat.key} onClick={() => handleTabClick(cat.key)} className={`category-tab ${isActive ? 'category-tab-active' : 'category-tab-inactive'}`} style={{ minWidth: 'clamp(110px,14vw,193px)', height: 'clamp(52px,6.5vh,66px)', borderRadius: tokens.radius.tab, fontSize: tokens.font.tabLabel, fontWeight: 600, flex: '1 1 auto' }}>
+                  <button key={cat.key} onClick={() => handleTabClick(cat.key)} className={`category-tab ${isActive ? 'category-tab-active' : 'category-tab-inactive'}`} style={{ minWidth: 'clamp(110px,14vw,160px)', height: 'clamp(52px,6.5vh,66px)', borderRadius: tokens.radius.tab, fontSize: tokens.font.tabLabel, fontWeight: 600, flexShrink: 0 }}>
                     {cat.label}
                   </button>
                 );

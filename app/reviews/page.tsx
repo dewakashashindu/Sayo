@@ -1,12 +1,12 @@
-//review page
+// app/reviews/page.tsx  (or pages/reviews.tsx depending on your structure)
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import sayoLogo from '../../public/sayologo.png';
 
 /* ─────────────────────────────────────────
-   DESIGN TOKENS (identical to services page)
+   DESIGN TOKENS
 ───────────────────────────────────────── */
 const tokens = {
   color: {
@@ -49,142 +49,79 @@ const tokens = {
 } as const;
 
 /* ─────────────────────────────────────────
-   DATA
-───────────────────────────────────────── */
-const NAV_ITEMS = ['HOME', 'OUR STORY', 'SERVICES', 'PRODUCTS', 'REVIEWS'] as const;
-const NAV_HREFS: Record<string, string> = {
-  'HOME':      '/',
-  'OUR STORY': '/about',
-  'SERVICES':  '/services',
-  'PRODUCTS':  '/products',
-  'REVIEWS':   '/reviews',
-};
-const ACTIVE_NAV = 'REVIEWS';
-
-const QUICK_LINKS = ['Home', 'Services', 'Products', 'Reviews'] as const;
-const LOCATIONS   = ['Colombo', 'Negombo', 'Kiribathgoda'] as const;
-
-/* ─────────────────────────────────────────
-   REVIEW DATA
+   TYPES
 ───────────────────────────────────────── */
 type Review = {
-  id: number;
-  name: string;
-  avatar: string;
-  rating: number;
-  date: string;
-  service: string;
-  comment: string;
-  location: string;
+  id:          number;
+  cusName:     string;
+  cusLocation: string;
+  cusService:  string;
+  cusRating:   number;
+  cusComment:  string;
+  submittedAt: string;
 };
 
-const REVIEWS: Review[] = [
-  {
-    id: 1,
-    name: 'Anika Perera',
-    avatar: 'AP',
-    rating: 5,
-    date: '2024-12-15',
-    service: 'Bridal Package',
-    comment:
-      'Absolutely stunning experience! The team made me feel like royalty on my wedding day. Every detail was perfect — from the hair to the makeup. I received so many compliments. SAYO truly delivers luxury.',
-    location: 'Colombo',
-  },
-  {
-    id: 2,
-    name: 'Dilshan Fernando',
-    avatar: 'DF',
-    rating: 5,
-    date: '2024-12-08',
-    service: 'Hair & Grooming',
-    comment:
-      'Came in for a haircut and beard trim. The stylist really listened to what I wanted and delivered beyond expectations. The atmosphere is incredibly relaxing. Will definitely be returning.',
-    location: 'Negombo',
-  },
-  {
-    id: 3,
-    name: 'Shalini Jayawardena',
-    avatar: 'SJ',
-    rating: 5,
-    date: '2024-11-29',
-    service: 'Gold Facial',
-    comment:
-      'My skin has never felt this smooth! The gold facial treatment was pure indulgence. The staff were professional and knowledgeable. A truly premium experience worth every rupee.',
-    location: 'Colombo',
-  },
-  {
-    id: 4,
-    name: 'Rohan Wickramasinghe',
-    avatar: 'RW',
-    rating: 4,
-    date: '2024-11-20',
-    service: 'Deep Tissue Massage',
-    comment:
-      'Great massage therapy session. The therapist was skilled and addressed all my problem areas. The ambiance was calming with beautiful music. Slight wait time but overall excellent service.',
-    location: 'Kiribathgoda',
-  },
-  {
-    id: 5,
-    name: 'Priya Kumari',
-    avatar: 'PK',
-    rating: 5,
-    date: '2024-11-10',
-    service: 'Gel Manicure & Pedicure',
-    comment:
-      'The nail art they created was exactly what I had in mind! Super talented nail technicians. The salon is spotless and the products they use are top quality. My nails lasted over three weeks.',
-    location: 'Colombo',
-  },
-  {
-    id: 6,
-    name: 'Kasun Bandara',
-    avatar: 'KB',
-    rating: 5,
-    date: '2024-10-30',
-    service: 'Groom Package',
-    comment:
-      'Booked the full groom package for my wedding. From the moment I walked in I felt taken care of. The team is professional, friendly, and incredibly talented. Highly recommend SAYO to every groom.',
-    location: 'Negombo',
-  },
-  {
-    id: 7,
-    name: 'Nadeesha Silva',
-    avatar: 'NS',
-    rating: 4,
-    date: '2024-10-18',
-    service: 'Aromatherapy Massage',
-    comment:
-      'The aromatherapy session was deeply relaxing. Beautiful selection of essential oils and a very soothing environment. I walked out feeling completely rejuvenated. Will book again soon.',
-    location: 'Colombo',
-  },
-  {
-    id: 8,
-    name: 'Tharushi Mendis',
-    avatar: 'TM',
-    rating: 5,
-    date: '2024-10-05',
-    service: 'Full Body Wax',
-    comment:
-      'Professional, hygienic, and efficient. The waxing specialists made the process very comfortable. The results were smooth and long-lasting. Excellent value for the quality delivered.',
-    location: 'Kiribathgoda',
-  },
-  {
-    id: 9,
-    name: 'Chamara Rathnayake',
-    avatar: 'CR',
-    rating: 5,
-    date: '2024-09-22',
-    service: 'Skin Brightening',
-    comment:
-      'Noticed a visible difference after just one session! The skincare specialists are very knowledgeable and recommended the perfect treatment for my skin type. My confidence has skyrocketed.',
-    location: 'Colombo',
-  },
-];
+type FooterData = {
+  brand_name:       string;
+  brand_tagline:    string;
+  contact_phone:    string;
+  contact_email:    string;
+  contact_address:  string;
+  copyright_text:   string;
+  locations:        string[];
+  quick_links:      { label: string; href: string }[];
+  social_whatsapp:  string;
+  social_facebook:  string;
+  social_instagram: string;
+};
 
-const FILTER_OPTIONS = ['All', 'Colombo', 'Negombo', 'Kiribathgoda'] as const;
-const SORT_OPTIONS   = ['Newest', 'Highest Rated', 'Lowest Rated'] as const;
+type NavData = {
+  logo_text:        string;
+  contact_btn_text: string;
+  contact_btn_link: string;
+  nav_items:        { label: string; href: string }[];
+};
 
-type FilterOption = typeof FILTER_OPTIONS[number];
-type SortOption   = typeof SORT_OPTIONS[number];
+/* ─────────────────────────────────────────
+   DEFAULTS
+───────────────────────────────────────── */
+const NAV_DEFAULTS: NavData = {
+  logo_text:        'SAYO',
+  contact_btn_text: 'CONTACT US',
+  contact_btn_link: '/contact',
+  nav_items: [
+    { label: 'HOME',      href: '/'         },
+    { label: 'OUR STORY', href: '/about'    },
+    { label: 'SERVICES',  href: '/services' },
+    { label: 'PRODUCTS',  href: '/products' },
+    { label: 'REVIEWS',   href: '/reviews'  },
+  ],
+};
+
+const FOOTER_DEFAULTS: FooterData = {
+  brand_name:      'SAYO',
+  brand_tagline:   'We are experienced in making you more beautiful',
+  contact_phone:   '+94 77 233 6233',
+  contact_email:   'hello@sayobeauty.com',
+  contact_address: 'No. 45, Galle Road, Colombo 03, Sri Lanka',
+  copyright_text:  '© 2025 SAYO Beauty. All rights reserved.',
+  locations:       ['Colombo', 'Negombo', 'Kiribathgoda'],
+  quick_links: [
+    { label: 'Home',      href: '/'         },
+    { label: 'Our Story', href: '/about'    },
+    { label: 'Services',  href: '/services' },
+    { label: 'Products',  href: '/products' },
+    { label: 'Reviews',   href: '/reviews'  },
+  ],
+  social_whatsapp:  '',
+  social_facebook:  '',
+  social_instagram: '',
+};
+
+const ACTIVE_NAV = 'REVIEWS';
+
+const SORT_OPTIONS = ['Newest', 'Highest Rated', 'Lowest Rated'] as const;
+type SortOption = typeof SORT_OPTIONS[number];
 
 /* ─────────────────────────────────────────
    GLOBAL CSS
@@ -209,11 +146,7 @@ const globalCss = `
   }
   @keyframes floatY {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-8px); }
-  }
-  @keyframes shimmer {
-    0%   { background-position: -400px 0; }
-    100% { background-position: 400px 0; }
+    50%       { transform: translateY(-8px); }
   }
   @keyframes cardReveal {
     from { opacity: 0; transform: translateY(24px) scale(0.98); }
@@ -222,6 +155,13 @@ const globalCss = `
   @keyframes pulseGold {
     0%, 100% { box-shadow: 0 0 0 0 rgba(184,134,11,0.4); }
     50%       { box-shadow: 0 0 0 8px rgba(184,134,11,0); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position:  600px 0; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   .nav-animate  { animation: fadeInDown 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
@@ -243,8 +183,7 @@ const globalCss = `
   .contact-btn-wrap { position: relative; overflow: hidden; }
   .contact-btn-wrap::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: white;
     transform: scaleX(0);
     transform-origin: left;
@@ -254,18 +193,15 @@ const globalCss = `
   .contact-btn-wrap:hover::before { transform: scaleX(1); }
   .contact-btn-wrap:hover { color: #000 !important; }
 
-  /* Review cards */
+  /* ── Review cards ── */
   .review-card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.10);
     border-radius: 1.25rem;
     padding: clamp(1.25rem, 2.5vw, 1.875rem);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    display: flex; flex-direction: column; gap: 1rem;
     transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
-                border-color 0.3s ease,
-                box-shadow 0.35s ease;
+                border-color 0.3s ease, box-shadow 0.35s ease;
     cursor: default;
     animation: cardReveal 0.6s cubic-bezier(0.16,1,0.3,1) both;
   }
@@ -275,23 +211,40 @@ const globalCss = `
     box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(184,134,11,0.2);
   }
 
-  /* Filter / sort pills */
+  /* ── Skeleton shimmer ── */
+  .skeleton {
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0.04) 25%,
+      rgba(255,255,255,0.09) 50%,
+      rgba(255,255,255,0.04) 75%
+    );
+    background-size: 600px 100%;
+    animation: shimmer 1.6s infinite linear;
+    border-radius: 0.5rem;
+  }
+  .skeleton-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 1.25rem;
+    padding: clamp(1.25rem, 2.5vw, 1.875rem);
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+
+  /* ── Filter pills ── */
   .filter-pill {
-    cursor: pointer;
-    border: none;
-    outline: none;
+    cursor: pointer; border: none; outline: none;
     font-family: Inter, sans-serif;
     font-size: clamp(0.75rem, 1.1vw, 0.875rem);
     font-weight: 500;
     padding: 0.5rem 1.25rem;
     border-radius: 9999px;
-    transition: background 0.25s, color 0.25s, transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+    transition: background 0.25s, color 0.25s,
+                transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
     white-space: nowrap;
   }
   .filter-pill:hover { transform: translateY(-2px); }
   .filter-pill-active {
-    background: #B8860B;
-    color: #fff;
+    background: #B8860B; color: #fff;
     box-shadow: 0 6px 20px rgba(184,134,11,0.4);
   }
   .filter-pill-inactive {
@@ -305,7 +258,7 @@ const globalCss = `
     color: #fff;
   }
 
-  /* Sort select */
+  /* ── Sort select ── */
   .sort-select {
     background: rgba(255,255,255,0.06);
     border: 1.5px solid rgba(255,255,255,0.15);
@@ -314,11 +267,8 @@ const globalCss = `
     padding: 0.5rem 2rem 0.5rem 1.25rem;
     font-family: Inter, sans-serif;
     font-size: clamp(0.75rem, 1.1vw, 0.875rem);
-    font-weight: 500;
-    cursor: pointer;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
+    font-weight: 500; cursor: pointer; outline: none;
+    appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B8860B' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
@@ -328,22 +278,17 @@ const globalCss = `
     border-color: rgba(184,134,11,0.5);
     background-color: rgba(184,134,11,0.08);
   }
-  .sort-select option {
-    background: #1a1a1a;
-    color: #fff;
-  }
+  .sort-select option { background: #1a1a1a; color: #fff; }
 
-  /* Star */
+  /* ── Stars ── */
   .star-filled { color: #B8860B; }
   .star-empty  { color: rgba(255,255,255,0.2); }
 
-  /* Stats bar */
+  /* ── Stat bar ── */
   .stat-bar-bg {
-    flex: 1;
-    height: 6px;
+    flex: 1; height: 6px;
     background: rgba(255,255,255,0.1);
-    border-radius: 999px;
-    overflow: hidden;
+    border-radius: 999px; overflow: hidden;
   }
   .stat-bar-fill {
     height: 100%;
@@ -352,81 +297,62 @@ const globalCss = `
     transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
   }
 
-  /* Avatar */
+  /* ── Avatar ── */
   .avatar {
-    width: 44px; height: 44px;
-    border-radius: 9999px;
+    width: 44px; height: 44px; border-radius: 9999px;
     background: linear-gradient(135deg, rgba(184,134,11,0.6), rgba(184,134,11,0.2));
     border: 1.5px solid rgba(184,134,11,0.5);
     display: flex; align-items: center; justify-content: center;
     font-size: 0.8rem; font-weight: 700;
-    color: #B8860B;
-    flex-shrink: 0;
-    letter-spacing: 0.05em;
+    color: #B8860B; flex-shrink: 0; letter-spacing: 0.05em;
   }
 
-  /* Service badge */
+  /* ── Badges ── */
   .service-badge {
     display: inline-block;
     background: rgba(184,134,11,0.15);
     border: 1px solid rgba(184,134,11,0.35);
-    color: #B8860B;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
+    color: #B8860B; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.25rem 0.75rem; border-radius: 9999px;
   }
-
-  /* Location badge */
   .location-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    display: inline-flex; align-items: center; gap: 4px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.1);
     color: rgba(255,255,255,0.55);
-    font-size: 0.72rem;
-    font-weight: 500;
-    padding: 0.25rem 0.65rem;
-    border-radius: 9999px;
+    font-size: 0.72rem; font-weight: 500;
+    padding: 0.25rem 0.65rem; border-radius: 9999px;
   }
 
-  /* Review grid */
-  .reviews-grid {
-    display: grid;
-    gap: clamp(1rem, 2vw, 1.5rem);
-    grid-template-columns: 1fr;
-  }
-  @media (min-width: 640px) {
-    .reviews-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (min-width: 1100px) {
-    .reviews-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-
-  /* Summary card */
+  /* ── Summary card ── */
   .summary-card {
     background: rgba(184,134,11,0.08);
     border: 1px solid rgba(184,134,11,0.25);
     border-radius: 1.25rem;
     padding: clamp(1.5rem, 3vw, 2.25rem);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.5rem;
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center; gap: 0.5rem;
     animation: pulseGold 3s ease infinite;
   }
 
-  /* Footer styles (mirrored) */
+  /* ── Reviews grid ── */
+  .reviews-grid {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px)  { .reviews-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .reviews-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  /* ── Footer ── */
   .social-icon {
     display: inline-flex; align-items: center; justify-content: center;
     width: 42px; height: 42px; border-radius: 50%;
     background: rgba(255,255,255,0.08);
     border: 1.5px solid rgba(255,255,255,0.15);
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s, border-color 0.3s;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
+                background 0.3s, border-color 0.3s;
     color: white; text-decoration: none;
   }
   .social-icon:hover {
@@ -434,18 +360,23 @@ const globalCss = `
     background: #B8860B; border-color: #B8860B;
   }
 
-  .footer-grid { display: flex; flex-direction: column; flex-wrap: wrap; gap: 2.5rem; }
+  .footer-grid {
+    display: flex; flex-direction: column; flex-wrap: wrap; gap: 2.5rem;
+  }
   @media (min-width: 1024px) {
-    .footer-grid { flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; }
+    .footer-grid {
+      flex-direction: row; flex-wrap: nowrap;
+      justify-content: space-between; align-items: flex-start;
+    }
   }
   @media (min-width: 640px) and (max-width: 1023px) {
     .footer-grid { flex-direction: row; flex-wrap: wrap; justify-content: space-between; }
   }
 
-  .footer-reveal       { transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
-  .footer-reveal-fast  { transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1); }
-  .footer-reveal-bounce{ transition: opacity 0.5s cubic-bezier(0.34,1.56,0.64,1), transform 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-  .footer-reveal-simple{ transition: opacity 1s ease; }
+  .footer-reveal        { transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .footer-reveal-fast   { transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+  .footer-reveal-bounce { transition: opacity 0.5s cubic-bezier(0.34,1.56,0.64,1), transform 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  .footer-reveal-simple { transition: opacity 1s ease; }
 
   .quick-link { position: relative; transition: padding-left 0.25s, color 0.25s; }
   .quick-link:hover { padding-left: 8px; color: #B8860B !important; }
@@ -456,10 +387,18 @@ const globalCss = `
   .quick-link:hover::before { opacity: 1; left: 0; }
 
   .empty-state {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 1rem;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem;
     padding: 4rem 2rem; text-align: center;
     opacity: 0; animation: fadeIn 0.6s ease 0.2s both;
+  }
+
+  /* ── Spinner ── */
+  .reviews-spinner {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 3px solid rgba(184,134,11,0.2);
+    border-top-color: #B8860B;
+    animation: spin 0.8s linear infinite;
   }
 `;
 
@@ -473,14 +412,10 @@ const S = {
     padding: 'clamp(1rem, 3vw, 3rem) clamp(1rem, 3vw, 3.125rem)',
   },
   navInner: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    background: tokens.color.navBg,
-    borderRadius: tokens.radius.nav,
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    background: tokens.color.navBg, borderRadius: tokens.radius.nav,
     padding: 'clamp(0.75rem, 2vw, 1.5rem) clamp(1rem, 2vw, 2rem)',
-    backdropFilter: 'blur(8px)',
-    minHeight: '3.5rem',
+    backdropFilter: 'blur(8px)', minHeight: '3.5rem',
   } as React.CSSProperties,
   logoWrap: {
     display: 'flex', alignItems: 'center',
@@ -489,57 +424,41 @@ const S = {
   logoText: {
     color: tokens.color.white,
     fontSize: tokens.font.logoText,
-    fontWeight: 600,
-    letterSpacing: '0.15em',
+    fontWeight: 600, letterSpacing: '0.15em',
   } as React.CSSProperties,
   navLinks: {
     display: 'flex', alignItems: 'center',
     gap: 'clamp(1.25rem, 2.5vw, 2.5rem)',
   } as React.CSSProperties,
   navLink: {
-    fontSize: tokens.font.nav,
-    fontWeight: 500,
-    textDecoration: 'none',
-    transition: 'color 0.2s',
+    fontSize: tokens.font.nav, fontWeight: 500,
+    textDecoration: 'none', transition: 'color 0.2s',
     whiteSpace: 'nowrap' as const,
   } as React.CSSProperties,
   contactBtn: {
     color: tokens.color.white,
-    fontSize: tokens.font.nav,
-    fontWeight: 500,
+    fontSize: tokens.font.nav, fontWeight: 500,
     textDecoration: 'none',
     border: `3px solid ${tokens.color.white}`,
     borderRadius: tokens.radius.nav,
     padding: 'clamp(0.375rem, 0.5vw, 0.5rem) clamp(1rem, 1.5vw, 1.75rem)',
-    transition: 'all 0.3s',
-    whiteSpace: 'nowrap' as const,
-    position: 'relative' as const,
-    zIndex: 1,
+    transition: 'all 0.3s', whiteSpace: 'nowrap' as const,
+    position: 'relative' as const, zIndex: 1,
   } as React.CSSProperties,
   mobileMenu: {
-    marginTop: '0.5rem',
-    background: 'rgba(0,0,0,0.92)',
-    borderRadius: tokens.radius.nav,
-    padding: '1rem 1.5rem',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '1rem',
+    marginTop: '0.5rem', background: 'rgba(0,0,0,0.92)',
+    borderRadius: tokens.radius.nav, padding: '1rem 1.5rem',
+    display: 'flex', flexDirection: 'column' as const, gap: '1rem',
   } as React.CSSProperties,
   mobileNavLink: {
     color: tokens.color.white,
-    fontSize: '1rem',
-    fontWeight: 500,
-    textDecoration: 'none',
+    fontSize: '1rem', fontWeight: 500, textDecoration: 'none',
   } as React.CSSProperties,
   mobileContact: {
-    color: tokens.color.white,
-    fontSize: '1rem',
-    textAlign: 'center' as const,
-    padding: '0.625rem 0',
-    borderRadius: '0.75rem',
-    border: `2px solid ${tokens.color.white}`,
-    textDecoration: 'none',
-    transition: 'all 0.2s',
+    color: tokens.color.white, fontSize: '1rem',
+    textAlign: 'center' as const, padding: '0.625rem 0',
+    borderRadius: '0.75rem', border: `2px solid ${tokens.color.white}`,
+    textDecoration: 'none', transition: 'all 0.2s',
   } as React.CSSProperties,
 };
 
@@ -549,10 +468,8 @@ const S = {
 function LogoIcon({ className = '', size = 48 }: { className?: string; size?: number }) {
   return (
     <Image
-      src={sayoLogo}
-      alt="SAYO Logo"
-      width={size}
-      height={size}
+      src={sayoLogo} alt="SAYO Logo"
+      width={size} height={size}
       className={className}
       style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto', objectFit: 'contain' }}
       priority
@@ -669,25 +586,16 @@ function useIsMobile(breakpoint = 1024) {
 ───────────────────────────────────────── */
 function Divider() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '0 clamp(1rem, 4vw, 3.5rem)' }}>
-      <div
-        style={{
-          width: '100%',
-          maxWidth: tokens.layout.inner,
-          height: '1px',
-          background: 'rgba(255,255,255,0.5)',
-        }}
-      />
+    <div style={{ display:'flex', justifyContent:'center', padding:'0 clamp(1rem,4vw,3.5rem)' }}>
+      <div style={{ width:'100%', maxWidth:tokens.layout.inner, height:'1px', background:'rgba(255,255,255,0.5)' }} />
     </div>
   );
 }
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div style={{ display: 'flex', gap: '3px' }}>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <StarIcon key={n} filled={n <= rating} />
-      ))}
+    <div style={{ display:'flex', gap:'3px' }}>
+      {[1,2,3,4,5].map(n => <StarIcon key={n} filled={n <= rating} />)}
     </div>
   );
 }
@@ -698,66 +606,99 @@ function formatDate(dateStr: string) {
   });
 }
 
+/* Get initials from name */
+function getInitials(name: string) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+/* ─────────────────────────────────────────
+   SKELETON CARDS (loading state)
+───────────────────────────────────────── */
+function SkeletonCard() {
+  return (
+    <div className="skeleton-card">
+      <div style={{ display:'flex', alignItems:'flex-start', gap:'0.875rem' }}>
+        <div className="skeleton" style={{ width:44, height:44, borderRadius:'50%', flexShrink:0 }} />
+        <div style={{ flex:1, display:'flex', flexDirection:'column', gap:'0.4rem' }}>
+          <div className="skeleton" style={{ height:14, width:'55%' }} />
+          <div className="skeleton" style={{ height:11, width:'35%' }} />
+        </div>
+        <div className="skeleton" style={{ height:14, width:80, flexShrink:0 }} />
+      </div>
+      <div style={{ display:'flex', gap:'0.5rem' }}>
+        <div className="skeleton" style={{ height:22, width:90, borderRadius:999 }} />
+        <div className="skeleton" style={{ height:22, width:80, borderRadius:999 }} />
+      </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem' }}>
+        <div className="skeleton" style={{ height:12, width:'100%' }} />
+        <div className="skeleton" style={{ height:12, width:'90%' }} />
+        <div className="skeleton" style={{ height:12, width:'75%' }} />
+      </div>
+      <div className="skeleton" style={{ height:2, width:'60%', borderRadius:999 }} />
+    </div>
+  );
+}
+
+function SkeletonSummary() {
+  return (
+    <div style={{ display:'flex', gap:'clamp(1.5rem,3vw,3rem)', flexWrap:'wrap', alignItems:'center', justifyContent:'center', maxWidth:tokens.layout.inner, margin:'0 auto' }}>
+      <div style={{ background:'rgba(184,134,11,0.08)', border:'1px solid rgba(184,134,11,0.25)', borderRadius:'1.25rem', padding:'clamp(1.5rem,3vw,2.25rem)', minWidth:160, display:'flex', flexDirection:'column', alignItems:'center', gap:'0.75rem' }}>
+        <div className="skeleton" style={{ height:64, width:80, borderRadius:'0.5rem' }} />
+        <div className="skeleton" style={{ height:16, width:90 }} />
+        <div className="skeleton" style={{ height:11, width:70 }} />
+      </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:'0.55rem', flex:'1 1 260px', maxWidth:380 }}>
+        {[5,4,3,2,1].map(n => (
+          <div key={n} style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+            <div className="skeleton" style={{ height:12, width:12, flexShrink:0 }} />
+            <div className="skeleton" style={{ height:12, width:16, flexShrink:0 }} />
+            <div className="skeleton stat-bar-bg" style={{ height:6 }} />
+            <div className="skeleton" style={{ height:12, width:24, flexShrink:0 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─────────────────────────────────────────
    REVIEW CARD
 ───────────────────────────────────────── */
 function ReviewCard({ review, delay }: { review: Review; delay: number }) {
   return (
-    <div className="review-card" style={{ animationDelay: `${delay}s` }}>
+    <div className="review-card" style={{ animationDelay:`${delay}s` }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem' }}>
-        <div className="avatar">{review.avatar}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{
-            color: tokens.color.white,
-            fontSize: 'clamp(0.875rem, 1.3vw, 1rem)',
-            fontWeight: 600,
-            margin: 0,
-            lineHeight: 1.3,
-          }}>
-            {review.name}
+      <div style={{ display:'flex', alignItems:'flex-start', gap:'0.875rem' }}>
+        <div className="avatar">{getInitials(review.cusName)}</div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <p style={{ color:tokens.color.white, fontSize:'clamp(0.875rem,1.3vw,1rem)', fontWeight:600, margin:0, lineHeight:1.3 }}>
+            {review.cusName}
           </p>
-          <p style={{
-            color: tokens.color.whiteFaint,
-            fontSize: '0.72rem',
-            margin: '0.2rem 0 0',
-            fontWeight: 400,
-          }}>
-            {formatDate(review.date)}
+          <p style={{ color:tokens.color.whiteFaint, fontSize:'0.72rem', margin:'0.2rem 0 0', fontWeight:400 }}>
+            {formatDate(review.submittedAt)}
           </p>
         </div>
-        <div style={{ flexShrink: 0 }}>
-          <Stars rating={review.rating} />
+        <div style={{ flexShrink:0 }}>
+          <Stars rating={review.cusRating} />
         </div>
       </div>
 
       {/* Badges */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <span className="service-badge">{review.service}</span>
+      <div style={{ display:'flex', gap:'0.5rem', flexWrap:'wrap' }}>
+        <span className="service-badge">{review.cusService}</span>
         <span className="location-badge">
           <MapPinIcon size={10} />
-          {review.location}
+          {review.cusLocation}
         </span>
       </div>
 
       {/* Comment */}
-      <p style={{
-        color: tokens.color.whiteDim,
-        fontSize: 'clamp(0.825rem, 1.1vw, 0.9rem)',
-        lineHeight: 1.75,
-        margin: 0,
-        flexGrow: 1,
-      }}>
-        &ldquo;{review.comment}&rdquo;
+      <p style={{ color:tokens.color.whiteDim, fontSize:'clamp(0.825rem,1.1vw,0.9rem)', lineHeight:1.75, margin:0, flexGrow:1 }}>
+        &ldquo;{review.cusComment}&rdquo;
       </p>
 
-      {/* Gold accent bar */}
-      <div style={{
-        height: '2px',
-        background: 'linear-gradient(90deg, rgba(184,134,11,0.6), transparent)',
-        borderRadius: '999px',
-        marginTop: '0.25rem',
-      }} />
+      {/* Gold accent */}
+      <div style={{ height:'2px', background:'linear-gradient(90deg,rgba(184,134,11,0.6),transparent)', borderRadius:'999px', marginTop:'0.25rem' }} />
     </div>
   );
 }
@@ -767,81 +708,44 @@ function ReviewCard({ review, delay }: { review: Review; delay: number }) {
 ───────────────────────────────────────── */
 function RatingSummary({ reviews, visible }: { reviews: Review[]; visible: boolean }) {
   const avg = reviews.length
-    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    ? reviews.reduce((s,r) => s + r.cusRating, 0) / reviews.length
     : 0;
 
-  const counts = [5, 4, 3, 2, 1].map(star => ({
+  const counts = [5,4,3,2,1].map(star => ({
     star,
-    count: reviews.filter(r => r.rating === star).length,
+    count: reviews.filter(r => r.cusRating === star).length,
   }));
 
   return (
-    <div style={{
-      display: 'flex',
-      gap: 'clamp(1.5rem, 3vw, 3rem)',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-      justifyContent: 'center',
-      maxWidth: tokens.layout.inner,
-      margin: '0 auto',
-    }}>
+    <div style={{ display:'flex', gap:'clamp(1.5rem,3vw,3rem)', flexWrap:'wrap', alignItems:'center', justifyContent:'center', maxWidth:tokens.layout.inner, margin:'0 auto' }}>
       {/* Big number */}
-      <div className="summary-card" style={{ minWidth: '160px' }}>
-        <p style={{
-          color: tokens.color.gold,
-          fontSize: 'clamp(3rem, 6vw, 4.5rem)',
-          fontWeight: 700,
-          lineHeight: 1,
-          margin: 0,
-        }}>
+      <div className="summary-card" style={{ minWidth:'160px' }}>
+        <p style={{ color:tokens.color.gold, fontSize:'clamp(3rem,6vw,4.5rem)', fontWeight:700, lineHeight:1, margin:0 }}>
           {avg.toFixed(1)}
         </p>
         <Stars rating={Math.round(avg)} />
-        <p style={{
-          color: tokens.color.whiteFaint,
-          fontSize: '0.8rem',
-          margin: '0.25rem 0 0',
-        }}>
+        <p style={{ color:tokens.color.whiteFaint, fontSize:'0.8rem', margin:'0.25rem 0 0' }}>
           {reviews.length} review{reviews.length !== 1 ? 's' : ''}
         </p>
       </div>
 
       {/* Bar breakdown */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.55rem',
-        flex: '1 1 260px',
-        maxWidth: '380px',
-      }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:'0.55rem', flex:'1 1 260px', maxWidth:'380px' }}>
         {counts.map(({ star, count }, i) => {
           const pct = reviews.length ? (count / reviews.length) * 100 : 0;
           return (
-            <div key={star} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <span style={{
-                color: tokens.color.whiteDim,
-                fontSize: '0.78rem',
-                fontWeight: 500,
-                width: '12px',
-                textAlign: 'right',
-                flexShrink: 0,
-              }}>
+            <div key={star} style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+              <span style={{ color:tokens.color.whiteDim, fontSize:'0.78rem', fontWeight:500, width:'12px', textAlign:'right', flexShrink:0 }}>
                 {star}
               </span>
               <StarIcon filled />
               <div className="stat-bar-bg">
                 <div
                   className="stat-bar-fill"
-                  style={{ width: visible ? `${pct}%` : '0%', transitionDelay: `${0.3 + i * 0.1}s` }}
+                  style={{ width:visible ? `${pct}%` : '0%', transitionDelay:`${0.3 + i * 0.1}s` }}
                 />
               </div>
-              <span style={{
-                color: tokens.color.whiteFaint,
-                fontSize: '0.72rem',
-                width: '28px',
-                textAlign: 'right',
-                flexShrink: 0,
-              }}>
+              <span style={{ color:tokens.color.whiteFaint, fontSize:'0.72rem', width:'28px', textAlign:'right', flexShrink:0 }}>
                 {count}
               </span>
             </div>
@@ -858,8 +762,17 @@ function RatingSummary({ reviews, visible }: { reviews: Review[]; visible: boole
 export default function ReviewsPage() {
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [loaded,    setLoaded]    = useState(false);
-  const [filter,    setFilter]    = useState<FilterOption>('All');
-  const [sort,      setSort]      = useState<SortOption>('Newest');
+
+  /* ── Data state ── */
+  const [allReviews,  setAllReviews]  = useState<Review[]>([]);
+  const [navData,     setNavData]     = useState<NavData>(NAV_DEFAULTS);
+  const [footerData,  setFooterData]  = useState<FooterData>(FOOTER_DEFAULTS);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError,   setDataError]   = useState('');
+
+  /* ── Filter / sort ── */
+  const [locationFilter, setLocationFilter] = useState('All');
+  const [sort,           setSort]           = useState<SortOption>('Newest');
 
   const isMobile = useIsMobile(1024);
 
@@ -869,88 +782,108 @@ export default function ReviewsPage() {
   const { ref: gridRef,    inView: gridVisible    } = useInView(0.05);
   const { ref: footerRef,  inView: footerVisible  } = useInView(0.1);
 
+  /* ── Initial load ── */
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  /* ── Derived list ── */
-  const filtered = REVIEWS.filter(r =>
-    filter === 'All' || r.location === filter
+  /* ── Fetch published reviews + nav/footer from DB ── */
+  const fetchData = useCallback(async () => {
+    setDataLoading(true);
+    setDataError('');
+    try {
+      // Fetch site config (nav + footer) and all published reviews in parallel
+      const [siteRes, reviewsRes] = await Promise.all([
+        fetch('/api/site-data'),
+        // Fetch all published reviews — isPublished filter applied server-side
+        fetch('/api/site-data?section=feedback&isPublished=1&limit=500&page=1'),
+      ]);
+
+      // ── Site config ──
+      if (siteRes.ok) {
+        const site = await siteRes.json();
+        if (site?.nav)    setNavData({ ...NAV_DEFAULTS, ...site.nav });
+        if (site?.footer) setFooterData({ ...FOOTER_DEFAULTS, ...site.footer });
+      }
+
+      // ── Published reviews ──
+      if (!reviewsRes.ok) throw new Error('Failed to load reviews');
+      const reviewsJson = await reviewsRes.json();
+      setAllReviews(reviewsJson.data ?? []);
+
+    } catch {
+      setDataError('Could not load reviews. Please refresh the page.');
+    } finally {
+      setDataLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  /* ── Derive location options from loaded data ── */
+  const locationOptions = [
+    'All',
+    ...Array.from(new Set(allReviews.map(r => r.cusLocation))).sort(),
+  ];
+
+  /* ── Filter + sort (client-side, fast since data already fetched) ── */
+  const filtered = allReviews.filter(r =>
+    locationFilter === 'All' || r.cusLocation === locationFilter
   );
 
   const sorted = [...filtered].sort((a, b) => {
-    if (sort === 'Newest')        return new Date(b.date).getTime() - new Date(a.date).getTime();
-    if (sort === 'Highest Rated') return b.rating - a.rating;
-    if (sort === 'Lowest Rated')  return a.rating - b.rating;
+    if (sort === 'Newest')        return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
+    if (sort === 'Highest Rated') return b.cusRating - a.cusRating;
+    if (sort === 'Lowest Rated')  return a.cusRating - b.cusRating;
     return 0;
   });
 
+  /* ─────────────────────────────────────────
+     RENDER
+  ───────────────────────────────────────── */
   return (
     <>
       <style>{globalCss}</style>
 
-      <main style={{
-        minHeight: '100vh',
-        backgroundColor: 'transparent',
-        fontFamily: tokens.font.family,
-        color: tokens.color.white,
-      }}>
+      <main style={{ minHeight:'100vh', backgroundColor:'transparent', fontFamily:tokens.font.family, color:tokens.color.white }}>
 
         {/* ── Background ── */}
-        <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
+        <div style={{ position:'fixed', inset:0, zIndex:0 }}>
           <Image
-            src="/services-bg.jpg"
-            alt="Reviews background"
+            src="/services-bg.jpg" alt="Reviews background"
             fill priority sizes="100vw"
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            style={{ objectFit:'cover', objectPosition:'center' }}
           />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(270deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%)',
-          }} />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(0deg, rgba(4,4,5,0.6) 0%, transparent 30%)',
-          }} />
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(270deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.85) 100%)' }} />
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(0deg,rgba(4,4,5,0.6) 0%,transparent 30%)' }} />
         </div>
 
-        <div style={{ position: 'relative', zIndex: 10 }}>
+        <div style={{ position:'relative', zIndex:10 }}>
 
           {/* ══════════════ NAVBAR ══════════════ */}
-          <nav
-            className={loaded ? 'nav-animate' : ''}
-            style={{ ...S.nav, opacity: loaded ? undefined : 0 }}
-          >
+          <nav className={loaded ? 'nav-animate' : ''} style={{ ...S.nav, opacity:loaded ? undefined : 0 }}>
             <div style={S.navInner}>
               {/* Logo */}
               <div style={S.logoWrap}>
                 <LogoIcon className="logo-float" />
-                <span style={S.logoText}>SAYO</span>
+                <span style={S.logoText}>{navData.logo_text}</span>
               </div>
 
               {/* Desktop links */}
               {!isMobile && (
                 <div style={S.navLinks}>
-                  {NAV_ITEMS.map((item) => {
-                    const isActive = item === ACTIVE_NAV;
+                  {navData.nav_items.map(item => {
+                    const isActive = item.label === ACTIVE_NAV;
                     return (
                       <a
-                        key={item}
-                        href={NAV_HREFS[item]}
+                        key={item.label} href={item.href}
                         className="nav-link-wrap"
-                        style={{
-                          ...S.navLink,
-                          color: isActive ? tokens.color.gold : tokens.color.white,
-                        }}
-                        onMouseEnter={e => {
-                          if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.gold;
-                        }}
-                        onMouseLeave={e => {
-                          if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.white;
-                        }}
+                        style={{ ...S.navLink, color:isActive ? tokens.color.gold : tokens.color.white }}
+                        onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }}
+                        onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}
                       >
-                        {isActive ? `[ ${item} ]` : item}
+                        {isActive ? `[ ${item.label} ]` : item.label}
                       </a>
                     );
                   })}
@@ -959,33 +892,22 @@ export default function ReviewsPage() {
 
               {/* Contact button */}
               {!isMobile && (
-                <a href="/contact" className="contact-btn-wrap" style={S.contactBtn}>
-                  CONTACT US
+                <a href={navData.contact_btn_link} className="contact-btn-wrap" style={S.contactBtn}>
+                  {navData.contact_btn_text}
                 </a>
               )}
 
               {/* Hamburger */}
               {isMobile && (
                 <button
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  aria-label="Toggle menu"
-                  style={{
-                    background: 'none', border: 'none',
-                    color: tokens.color.white, cursor: 'pointer',
-                    padding: '0.5rem', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                  }}
+                  onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"
+                  style={{ background:'none', border:'none', color:tokens.color.white, cursor:'pointer', padding:'0.5rem', display:'flex', alignItems:'center', justifyContent:'center' }}
                 >
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    {menuOpen ? (
-                      <path d="M6 18L18 6M6 6l12 12" />
-                    ) : (
-                      <>
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="3" y1="12" x2="21" y2="12" />
-                        <line x1="3" y1="18" x2="21" y2="18" />
-                      </>
-                    )}
+                    {menuOpen
+                      ? <path d="M6 18L18 6M6 6l12 12" />
+                      : <><line x1="3" y1="6"  x2="21" y2="6"  /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>
+                    }
                   </svg>
                 </button>
               )}
@@ -993,22 +915,14 @@ export default function ReviewsPage() {
 
             {/* Mobile menu */}
             {isMobile && menuOpen && (
-              <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
-                {NAV_ITEMS.map((item) => (
-                  <a
-                    key={item}
-                    href={NAV_HREFS[item]}
-                    style={{
-                      ...S.mobileNavLink,
-                      color: item === ACTIVE_NAV ? tokens.color.gold : tokens.color.white,
-                    }}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {item === ACTIVE_NAV ? `[ ${item} ]` : item}
+              <div style={{ ...S.mobileMenu, animation:'fadeInDown 0.3s ease both' }}>
+                {navData.nav_items.map(item => (
+                  <a key={item.label} href={item.href} style={{ ...S.mobileNavLink, color:item.label === ACTIVE_NAV ? tokens.color.gold : tokens.color.white }} onClick={() => setMenuOpen(false)}>
+                    {item.label === ACTIVE_NAV ? `[ ${item.label} ]` : item.label}
                   </a>
                 ))}
-                <a href="/contact" style={S.mobileContact} onClick={() => setMenuOpen(false)}>
-                  CONTACT US
+                <a href={navData.contact_btn_link} style={S.mobileContact} onClick={() => setMenuOpen(false)}>
+                  {navData.contact_btn_text}
                 </a>
               </div>
             )}
@@ -1017,61 +931,26 @@ export default function ReviewsPage() {
           {/* ══════════════ HERO ══════════════ */}
           <div
             ref={heroRef}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              padding: 'clamp(2rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem)',
-              gap: 'clamp(1.25rem, 2.5vw, 2rem)',
-            }}
+            style={{ display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', padding:'clamp(2rem,6vw,5rem) clamp(1.25rem,5vw,4rem)', gap:'clamp(1.25rem,2.5vw,2rem)' }}
           >
             <p
               className={heroVisible ? 'reveal-up' : ''}
-              style={{
-                color: tokens.color.gold,
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                letterSpacing: '0.25em',
-                textTransform: 'uppercase',
-                margin: 0,
-                opacity: heroVisible ? 1 : 0,
-                animationDelay: '0.05s',
-              }}
+              style={{ color:tokens.color.gold, fontSize:'0.8rem', fontWeight:600, letterSpacing:'0.25em', textTransform:'uppercase', margin:0, opacity:heroVisible ? 1 : 0, animationDelay:'0.05s' }}
             >
               Client Stories
             </p>
 
             <h1
               className={heroVisible ? 'reveal-up' : ''}
-              style={{
-                color: tokens.color.white,
-                fontSize: tokens.font.heroTitle,
-                fontWeight: 500,
-                lineHeight: 1.2,
-                maxWidth: '52rem',
-                margin: 0,
-                opacity: heroVisible ? 1 : 0,
-                animationDelay: '0.15s',
-                textShadow: '0 4px 40px rgba(0,0,0,0.4)',
-              }}
+              style={{ color:tokens.color.white, fontSize:tokens.font.heroTitle, fontWeight:500, lineHeight:1.2, maxWidth:'52rem', margin:0, opacity:heroVisible ? 1 : 0, animationDelay:'0.15s', textShadow:'0 4px 40px rgba(0,0,0,0.4)' }}
             >
               What Our Clients{' '}
-              <span style={{ color: tokens.color.gold }}>Say About Us</span>
+              <span style={{ color:tokens.color.gold }}>Say About Us</span>
             </h1>
 
             <p
               className={heroVisible ? 'reveal-up' : ''}
-              style={{
-                color: tokens.color.whiteMuted,
-                fontSize: tokens.font.heroSub,
-                fontWeight: 500,
-                lineHeight: 1.7,
-                maxWidth: '48rem',
-                margin: 0,
-                opacity: heroVisible ? 1 : 0,
-                animationDelay: '0.28s',
-              }}
+              style={{ color:tokens.color.whiteMuted, fontSize:tokens.font.heroSub, fontWeight:500, lineHeight:1.7, maxWidth:'48rem', margin:0, opacity:heroVisible ? 1 : 0, animationDelay:'0.28s' }}
             >
               Real experiences from real clients. Discover why SAYO is
               Sri Lanka&apos;s most trusted luxury beauty destination.
@@ -1083,14 +962,12 @@ export default function ReviewsPage() {
           {/* ══════════════ RATING SUMMARY ══════════════ */}
           <div
             ref={summaryRef}
-            style={{
-              padding: 'clamp(2rem, 4vw, 3.25rem) clamp(1.25rem, 5vw, 4rem)',
-              opacity: summaryVisible ? 1 : 0,
-              transform: summaryVisible ? 'translateY(0)' : 'translateY(24px)',
-              transition: 'opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1)',
-            }}
+            style={{ padding:'clamp(2rem,4vw,3.25rem) clamp(1.25rem,5vw,4rem)', opacity:summaryVisible ? 1 : 0, transform:summaryVisible ? 'translateY(0)' : 'translateY(24px)', transition:'opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1)' }}
           >
-            <RatingSummary reviews={REVIEWS} visible={summaryVisible} />
+            {dataLoading
+              ? <SkeletonSummary />
+              : <RatingSummary reviews={allReviews} visible={summaryVisible} />
+            }
           </div>
 
           <Divider />
@@ -1098,49 +975,34 @@ export default function ReviewsPage() {
           {/* ══════════════ FILTERS ══════════════ */}
           <div
             ref={filterRef}
-            style={{
-              padding: 'clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 5vw, 4rem)',
-              opacity: filterVisible ? 1 : 0,
-              transform: filterVisible ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)',
-            }}
+            style={{ padding:'clamp(1.5rem,3vw,2.5rem) clamp(1.25rem,5vw,4rem)', opacity:filterVisible ? 1 : 0, transform:filterVisible ? 'translateY(0)' : 'translateY(20px)', transition:'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)' }}
           >
-            <div style={{
-              maxWidth: tokens.layout.inner,
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '1rem',
-            }}>
-              {/* Location filter pills */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem' }}>
-                {FILTER_OPTIONS.map((opt) => (
+            <div style={{ maxWidth:tokens.layout.inner, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'1rem' }}>
+
+              {/* Location filter pills — built from real data */}
+              <div style={{ display:'flex', flexWrap:'wrap', gap:'0.625rem' }}>
+                {locationOptions.map(opt => (
                   <button
                     key={opt}
-                    onClick={() => setFilter(opt)}
-                    className={`filter-pill ${filter === opt ? 'filter-pill-active' : 'filter-pill-inactive'}`}
+                    onClick={() => setLocationFilter(opt)}
+                    className={`filter-pill ${locationFilter === opt ? 'filter-pill-active' : 'filter-pill-inactive'}`}
+                    disabled={dataLoading}
                   >
                     {opt === 'All' ? 'All Locations' : opt}
                   </button>
                 ))}
               </div>
 
-              {/* Sort dropdown */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                <span style={{
-                  color: tokens.color.whiteFaint,
-                  fontSize: '0.78rem',
-                  fontWeight: 500,
-                  whiteSpace: 'nowrap',
-                }}>
+              {/* Sort */}
+              <div style={{ display:'flex', alignItems:'center', gap:'0.625rem' }}>
+                <span style={{ color:tokens.color.whiteFaint, fontSize:'0.78rem', fontWeight:500, whiteSpace:'nowrap' }}>
                   Sort by
                 </span>
                 <select
                   className="sort-select"
                   value={sort}
                   onChange={e => setSort(e.target.value as SortOption)}
+                  disabled={dataLoading}
                 >
                   {SORT_OPTIONS.map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
@@ -1150,72 +1012,101 @@ export default function ReviewsPage() {
             </div>
 
             {/* Result count */}
-            <div style={{
-              maxWidth: tokens.layout.inner,
-              margin: '1rem auto 0',
-            }}>
-              <p style={{
-                color: tokens.color.whiteFaint,
-                fontSize: '0.8rem',
-                fontWeight: 500,
-              }}>
-                Showing{' '}
-                <span style={{ color: tokens.color.gold, fontWeight: 600 }}>
-                  {sorted.length}
-                </span>{' '}
-                review{sorted.length !== 1 ? 's' : ''}
-                {filter !== 'All' && (
-                  <> in <span style={{ color: tokens.color.gold }}>{filter}</span></>
-                )}
-              </p>
-            </div>
+            {!dataLoading && (
+              <div style={{ maxWidth:tokens.layout.inner, margin:'1rem auto 0' }}>
+                <p style={{ color:tokens.color.whiteFaint, fontSize:'0.8rem', fontWeight:500 }}>
+                  Showing{' '}
+                  <span style={{ color:tokens.color.gold, fontWeight:600 }}>{sorted.length}</span>{' '}
+                  review{sorted.length !== 1 ? 's' : ''}
+                  {locationFilter !== 'All' && (
+                    <> in <span style={{ color:tokens.color.gold }}>{locationFilter}</span></>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* ══════════════ REVIEWS GRID ══════════════ */}
           <div
             ref={gridRef}
-            style={{
-              padding: '0 clamp(1.25rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem)',
-              opacity: gridVisible ? 1 : 0,
-              transform: gridVisible ? 'translateY(0)' : 'translateY(30px)',
-              transition: 'opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1)',
-            }}
+            style={{ padding:'0 clamp(1.25rem,5vw,4rem) clamp(3rem,6vw,5rem)', opacity:gridVisible ? 1 : 0, transform:gridVisible ? 'translateY(0)' : 'translateY(30px)', transition:'opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1)' }}
           >
-            <div style={{ maxWidth: tokens.layout.inner, margin: '0 auto' }}>
-              {sorted.length === 0 ? (
+            <div style={{ maxWidth:tokens.layout.inner, margin:'0 auto' }}>
+
+              {/* Loading skeleton */}
+              {dataLoading && (
+                <div className="reviews-grid">
+                  {Array.from({ length: 6 }, (_, i) => <SkeletonCard key={i} />)}
+                </div>
+              )}
+
+              {/* Error state */}
+              {!dataLoading && dataError && (
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'1rem', padding:'4rem 2rem', textAlign:'center' }}>
+                  <div style={{ width:64, height:64, borderRadius:'50%', background:'rgba(220,60,60,0.1)', border:'1.5px solid rgba(220,60,60,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e07070" strokeWidth="1.5">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'1rem', fontWeight:500 }}>{dataError}</p>
+                  <button
+                    onClick={fetchData}
+                    className="filter-pill filter-pill-active"
+                    style={{ cursor:'pointer' }}
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
+
+              {/* Empty — no published reviews at all */}
+              {!dataLoading && !dataError && allReviews.length === 0 && (
                 <div className="empty-state">
-                  <div style={{
-                    width: '64px', height: '64px',
-                    borderRadius: '50%',
-                    background: 'rgba(184,134,11,0.12)',
-                    border: '1.5px solid rgba(184,134,11,0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
+                  <div style={{ width:64, height:64, borderRadius:'50%', background:'rgba(184,134,11,0.12)', border:'1.5px solid rgba(184,134,11,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B8860B" strokeWidth="1.5">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                   </div>
-                  <p style={{ color: tokens.color.whiteMuted, fontSize: '1rem', fontWeight: 500 }}>
+                  <p style={{ color:tokens.color.whiteMuted, fontSize:'1rem', fontWeight:500 }}>
+                    No reviews yet — check back soon!
+                  </p>
+                </div>
+              )}
+
+              {/* Empty — filter has no results */}
+              {!dataLoading && !dataError && allReviews.length > 0 && sorted.length === 0 && (
+                <div className="empty-state">
+                  <div style={{ width:64, height:64, borderRadius:'50%', background:'rgba(184,134,11,0.12)', border:'1.5px solid rgba(184,134,11,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B8860B" strokeWidth="1.5">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                  </div>
+                  <p style={{ color:tokens.color.whiteMuted, fontSize:'1rem', fontWeight:500 }}>
                     No reviews found for this location yet.
                   </p>
                   <button
-                    onClick={() => setFilter('All')}
+                    onClick={() => setLocationFilter('All')}
                     className="filter-pill filter-pill-active"
                   >
                     View all reviews
                   </button>
                 </div>
-              ) : (
+              )}
+
+              {/* ── The actual review cards ── */}
+              {!dataLoading && !dataError && sorted.length > 0 && (
                 <div className="reviews-grid">
                   {sorted.map((review, i) => (
                     <ReviewCard
-                      key={`${review.id}-${filter}-${sort}`}
+                      key={`${review.id}-${locationFilter}-${sort}`}
                       review={review}
                       delay={gridVisible ? i * 0.07 : 0}
                     />
                   ))}
                 </div>
               )}
+
             </div>
           </div>
 
@@ -1224,61 +1115,33 @@ export default function ReviewsPage() {
           {/* ══════════════ FOOTER ══════════════ */}
           <footer
             ref={footerRef}
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-              background: tokens.color.bgFooter,
-              padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)',
-              marginTop: 'clamp(2rem, 4vw, 3rem)',
-            }}
+            style={{ position:'relative', overflow:'hidden', background:tokens.color.bgFooter, padding:'clamp(2rem,5vw,3.5rem) clamp(1.5rem,5vw,5.188rem)', marginTop:'clamp(2rem,4vw,3rem)' }}
           >
-            <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
+            <div className="footer-grid" style={{ position:'relative', zIndex:10 }}>
 
-              {/* Brand column */}
+              {/* Brand */}
               <div
                 className="footer-reveal"
-                style={{
-                  flex: '1 1 260px', maxWidth: '320px',
-                  display: 'flex', flexDirection: 'column', gap: '1rem',
-                  opacity: footerVisible ? 1 : 0,
-                  transform: footerVisible ? 'translateX(0)' : 'translateX(-40px)',
-                  transitionDelay: '0s',
-                }}
+                style={{ flex:'1 1 260px', maxWidth:'320px', display:'flex', flexDirection:'column', gap:'1rem', opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'translateX(0)' : 'translateX(-40px)', transitionDelay:'0s' }}
               >
                 <LogoIcon size={56} />
-                <h2 style={{
-                  color: tokens.color.white,
-                  fontSize: tokens.font.brand,
-                  fontWeight: 600,
-                  letterSpacing: '0.15em',
-                  margin: 0,
-                }}>
-                  SAYO
+                <h2 style={{ color:tokens.color.white, fontSize:tokens.font.brand, fontWeight:600, letterSpacing:'0.15em', margin:0 }}>
+                  {footerData.brand_name}
                 </h2>
-                <p style={{
-                  color: tokens.color.whiteMuted,
-                  fontSize: tokens.font.tagline,
-                  lineHeight: 1.6, margin: 0, maxWidth: '260px',
-                }}>
-                  We are experienced in making you more beautiful
+                <p style={{ color:tokens.color.whiteMuted, fontSize:tokens.font.tagline, lineHeight:1.6, margin:0, maxWidth:'260px' }}>
+                  {footerData.brand_tagline}
                 </p>
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                <div style={{ display:'flex', gap:'1rem', marginTop:'0.5rem' }}>
                   {[
-                    { label: 'WhatsApp', Icon: IconWhatsApp },
-                    { label: 'Facebook', Icon: IconFacebook },
-                    { label: 'Instagram', Icon: IconInstagram },
-                  ].map(({ label, Icon }, i) => (
+                    { label:'WhatsApp', Icon:IconWhatsApp,  href:footerData.social_whatsapp  },
+                    { label:'Facebook', Icon:IconFacebook,  href:footerData.social_facebook  },
+                    { label:'Instagram',Icon:IconInstagram, href:footerData.social_instagram },
+                  ].map(({ label, Icon, href }, i) => (
                     <a
                       key={label}
-                      href="#"
-                      aria-label={label}
+                      href={href || '#'} aria-label={label} target="_blank" rel="noopener noreferrer"
                       className="social-icon footer-reveal-bounce"
-                      style={{
-                        color: tokens.color.white,
-                        opacity: footerVisible ? 1 : 0,
-                        transform: footerVisible ? 'scale(1)' : 'scale(0.5)',
-                        transitionDelay: `${0.4 + i * 0.1}s`,
-                      }}
+                      style={{ color:tokens.color.white, opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'scale(1)' : 'scale(0.5)', transitionDelay:`${0.4 + i * 0.1}s` }}
                     >
                       <Icon />
                     </a>
@@ -1289,37 +1152,16 @@ export default function ReviewsPage() {
               {/* Quick Links */}
               <div
                 className="footer-reveal"
-                style={{
-                  flex: '1 1 160px',
-                  display: 'flex', flexDirection: 'column', gap: '0.85rem',
-                  opacity: footerVisible ? 1 : 0,
-                  transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                  transitionDelay: '0.15s',
-                }}
+                style={{ flex:'1 1 160px', display:'flex', flexDirection:'column', gap:'0.85rem', opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay:'0.15s' }}
               >
-                <p style={{
-                  color: tokens.color.gold,
-                  fontSize: tokens.font.label,
-                  fontWeight: 600, letterSpacing: '0.15em',
-                  textTransform: 'uppercase', margin: 0,
-                }}>
-                  Quick Links
-                </p>
-                {QUICK_LINKS.map((link, i) => (
+                <p style={{ color:tokens.color.gold, fontSize:tokens.font.label, fontWeight:600, letterSpacing:'0.15em', textTransform:'uppercase', margin:0 }}>Quick Links</p>
+                {footerData.quick_links.map((link, i) => (
                   <a
-                    key={link}
-                    href="#"
+                    key={link.label} href={link.href}
                     className="quick-link footer-reveal-fast"
-                    style={{
-                      color: tokens.color.whiteDim,
-                      fontSize: '0.875rem', fontWeight: 500,
-                      textDecoration: 'none',
-                      opacity: footerVisible ? 1 : 0,
-                      transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                      transitionDelay: `${0.25 + i * 0.08}s`,
-                    }}
+                    style={{ color:tokens.color.whiteDim, fontSize:'0.875rem', fontWeight:500, textDecoration:'none', opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay:`${0.25 + i * 0.08}s` }}
                   >
-                    {link}
+                    {link.label}
                   </a>
                 ))}
               </div>
@@ -1327,43 +1169,17 @@ export default function ReviewsPage() {
               {/* Locations */}
               <div
                 className="footer-reveal"
-                style={{
-                  flex: '1 1 160px',
-                  display: 'flex', flexDirection: 'column', gap: '0.85rem',
-                  opacity: footerVisible ? 1 : 0,
-                  transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                  transitionDelay: '0.25s',
-                }}
+                style={{ flex:'1 1 160px', display:'flex', flexDirection:'column', gap:'0.85rem', opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay:'0.25s' }}
               >
-                <p style={{
-                  color: tokens.color.gold,
-                  fontSize: tokens.font.label,
-                  fontWeight: 600, letterSpacing: '0.15em',
-                  textTransform: 'uppercase', margin: 0,
-                }}>
-                  Our Locations
-                </p>
-                {LOCATIONS.map((loc, i) => (
+                <p style={{ color:tokens.color.gold, fontSize:tokens.font.label, fontWeight:600, letterSpacing:'0.15em', textTransform:'uppercase', margin:0 }}>Our Locations</p>
+                {footerData.locations.map((loc, i) => (
                   <div
                     key={loc}
                     className="footer-reveal-fast"
-                    style={{
-                      display: 'flex', alignItems: 'flex-start', gap: '8px',
-                      opacity: footerVisible ? 1 : 0,
-                      transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                      transitionDelay: `${0.35 + i * 0.08}s`,
-                    }}
+                    style={{ display:'flex', alignItems:'flex-start', gap:'8px', opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay:`${0.35 + i * 0.08}s` }}
                   >
-                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}>
-                      <IconMapPinFooter />
-                    </span>
-                    <p style={{
-                      color: tokens.color.whiteDim,
-                      fontSize: '0.875rem', fontWeight: 500,
-                      lineHeight: 1.5, margin: 0,
-                    }}>
-                      {loc}
-                    </p>
+                    <span style={{ color:tokens.color.gold, flexShrink:0, marginTop:'2px' }}><IconMapPinFooter /></span>
+                    <p style={{ color:tokens.color.whiteDim, fontSize:'0.875rem', fontWeight:500, lineHeight:1.5, margin:0 }}>{loc}</p>
                   </div>
                 ))}
               </div>
@@ -1371,47 +1187,21 @@ export default function ReviewsPage() {
               {/* Contact */}
               <div
                 className="footer-reveal"
-                style={{
-                  flex: '1 1 160px',
-                  display: 'flex', flexDirection: 'column', gap: '0.85rem',
-                  opacity: footerVisible ? 1 : 0,
-                  transform: footerVisible ? 'translateX(0)' : 'translateX(40px)',
-                  transitionDelay: '0.35s',
-                }}
+                style={{ flex:'1 1 160px', display:'flex', flexDirection:'column', gap:'0.85rem', opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'translateX(0)' : 'translateX(40px)', transitionDelay:'0.35s' }}
               >
-                <p style={{
-                  color: tokens.color.gold,
-                  fontSize: tokens.font.label,
-                  fontWeight: 600, letterSpacing: '0.15em',
-                  textTransform: 'uppercase', margin: 0,
-                }}>
-                  Contact Us
-                </p>
+                <p style={{ color:tokens.color.gold, fontSize:tokens.font.label, fontWeight:600, letterSpacing:'0.15em', textTransform:'uppercase', margin:0 }}>Contact Us</p>
                 {[
-                  { Icon: IconPhoneFooter, text: '+94 77 233 6233' },
-                  { Icon: IconMailFooter,  text: 'Example@email.com' },
-                  { Icon: IconMapPinFooter, text: 'No. 45, Galle Road, Colombo 03, Sri Lanka' },
+                  { Icon:IconPhoneFooter,  text:footerData.contact_phone   },
+                  { Icon:IconMailFooter,   text:footerData.contact_email   },
+                  { Icon:IconMapPinFooter, text:footerData.contact_address },
                 ].map(({ Icon, text }, i) => (
                   <div
                     key={text}
                     className="footer-reveal-fast"
-                    style={{
-                      display: 'flex', alignItems: 'flex-start', gap: '8px',
-                      opacity: footerVisible ? 1 : 0,
-                      transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                      transitionDelay: `${0.45 + i * 0.08}s`,
-                    }}
+                    style={{ display:'flex', alignItems:'flex-start', gap:'8px', opacity:footerVisible ? 1 : 0, transform:footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay:`${0.45 + i * 0.08}s` }}
                   >
-                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}>
-                      <Icon />
-                    </span>
-                    <p style={{
-                      color: tokens.color.whiteDim,
-                      fontSize: '0.875rem', fontWeight: 500,
-                      lineHeight: 1.5, margin: 0,
-                    }}>
-                      {text}
-                    </p>
+                    <span style={{ color:tokens.color.gold, flexShrink:0, marginTop:'2px' }}><Icon /></span>
+                    <p style={{ color:tokens.color.whiteDim, fontSize:'0.875rem', fontWeight:500, lineHeight:1.5, margin:0 }}>{text}</p>
                   </div>
                 ))}
               </div>
@@ -1420,21 +1210,10 @@ export default function ReviewsPage() {
             {/* Copyright */}
             <div
               className="footer-reveal-simple"
-              style={{
-                position: 'relative', zIndex: 10,
-                marginTop: 'clamp(2rem, 4vw, 2.5rem)',
-                paddingTop: 'clamp(1rem, 2vw, 1.5rem)',
-                borderTop: `1px solid ${tokens.color.whiteBorder}`,
-                opacity: footerVisible ? 1 : 0,
-                transitionDelay: '0.7s',
-              }}
+              style={{ position:'relative', zIndex:10, marginTop:'clamp(2rem,4vw,2.5rem)', paddingTop:'clamp(1rem,2vw,1.5rem)', borderTop:`1px solid ${tokens.color.whiteBorder}`, opacity:footerVisible ? 1 : 0, transitionDelay:'0.7s' }}
             >
-              <p style={{
-                color: tokens.color.whiteFaint,
-                fontSize: '0.813rem',
-                textAlign: 'center', margin: 0,
-              }}>
-                © {new Date().getFullYear()} SAYO Beauty. All rights reserved.
+              <p style={{ color:tokens.color.whiteFaint, fontSize:'0.813rem', textAlign:'center', margin:0 }}>
+                {footerData.copyright_text}
               </p>
             </div>
           </footer>

@@ -868,6 +868,9 @@ export default function AboutPage() {
   const [loaded,       setLoaded]       = useState(false);
   const [activeReview, setActiveReview] = useState(0);
 
+  // ── CHANGE 1: showAllStaff state ──
+  const [showAllStaff, setShowAllStaff] = useState(false);
+
   // ── DB data state ──
   const [navData,    setNavData]    = useState<NavData>(NAV_DEFAULTS);
   const [footerData, setFooterData] = useState<FooterData>(FOOTER_DEFAULTS);
@@ -1158,7 +1161,8 @@ export default function AboutPage() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 560px), 1fr))',
               gap:                 '2rem',
             }}>
-              {aboutData.staff.map((member, idx) => (
+              {/* ── CHANGE 2: slice to first 2 unless showAllStaff is true ── */}
+              {(showAllStaff ? aboutData.staff : aboutData.staff.slice(0, 2)).map((member, idx) => (
                 <div
                   key={member.name + idx}
                   className={`staff-card ${teamVisible ? (idx % 2 === 0 ? 'reveal-left' : 'reveal-right') : ''}`}
@@ -1213,34 +1217,38 @@ export default function AboutPage() {
               ))}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(2rem, 4vh, 3rem)' }}>
-              <a
-                href="#"
-                style={{
-                  display:        'inline-block',
-                  border:         `1px solid ${tokens.color.white}`,
-                  borderRadius:   '2rem',
-                  padding:        '0.625rem 3rem',
-                  color:          tokens.color.white,
-                  fontSize:       '1.125rem',
-                  fontWeight:     300,
-                  textDecoration: 'none',
-                  transition:     'all 0.3s',
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.background  = tokens.color.gold;
-                  el.style.borderColor = tokens.color.gold;
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.background  = 'transparent';
-                  el.style.borderColor = tokens.color.white;
-                }}
-              >
-                VIEW ALL
-              </a>
-            </div>
+            {/* ── CHANGE 3: Conditional VIEW ALL button ── */}
+            {!showAllStaff && aboutData.staff.length > 2 && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(2rem, 4vh, 3rem)' }}>
+                <button
+                  onClick={() => setShowAllStaff(true)}
+                  style={{
+                    display:     'inline-block',
+                    border:      `1px solid ${tokens.color.white}`,
+                    borderRadius: '2rem',
+                    padding:     '0.625rem 3rem',
+                    color:       tokens.color.white,
+                    fontSize:    '1.125rem',
+                    fontWeight:  300,
+                    background:  'transparent',
+                    cursor:      'pointer',
+                    transition:  'all 0.3s',
+                  }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background  = tokens.color.gold;
+                    el.style.borderColor = tokens.color.gold;
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background  = 'transparent';
+                    el.style.borderColor = tokens.color.white;
+                  }}
+                >
+                  VIEW ALL
+                </button>
+              </div>
+            )}
           </section>
 
           <Divider />

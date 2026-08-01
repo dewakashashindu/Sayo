@@ -1,7 +1,7 @@
+// app/api/site-data/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { localPrisma, cloudPrisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
-
 export const revalidate = 0;
 
 /* ─────────────────────────────────────────
@@ -12,248 +12,262 @@ const NAV_DEFAULTS = {
   contact_btn_text: 'CONTACT US',
   contact_btn_link: '/contact',
   nav_items: [
-    { label: 'HOME', href: '/' },
-    { label: 'OUR STORY', href: '/about' },
-    { label: 'SERVICES', href: '/services' },
-    { label: 'PRODUCTS', href: '/products' },
-    { label: 'REVIEWS', href: '/reviews' },
+    { label: 'HOME',      href: '/'        },
+    { label: 'OUR STORY', href: '/about'   },
+    { label: 'SERVICES',  href: '/services'},
+    { label: 'PRODUCTS',  href: '/products'},
+    { label: 'REVIEWS',   href: '/reviews' },
   ],
 };
 
 const HOME_DEFAULTS = {
-  hero_eyebrow: 'Experienced hair stylists',
-  hero_heading: 'Enjoy Professional Beauty Services!',
-  hero_body: 'Providing expert skin care advice & beauty services using natural products to cater for any skin.',
+  hero_eyebrow:  'Experienced hair stylists',
+  hero_heading:  'Enjoy Professional Beauty Services!',
+  hero_body:     'Providing expert skin care advice & beauty services using natural products to cater for any skin.',
   hero_cta_text: 'Reserve Experience',
   hero_cta_link: '/contact',
 };
 
 const FOOTER_DEFAULTS = {
-  brand_name: 'SAYO',
-  brand_tagline: 'We are experienced in making you more beautiful',
-  contact_phone: '+94 77 233 6233',
-  contact_email: 'hello@sayobeauty.com',
+  brand_name:      'SAYO',
+  brand_tagline:   'We are experienced in making you more beautiful',
+  contact_phone:   '+94 77 233 6233',
+  contact_email:   'hello@sayobeauty.com',
   contact_address: '123 Galle Road, Colombo, Sri Lanka',
-  copyright_text: '© 2025 SAYO Beauty. All rights reserved.',
-  locations: ['Colombo', 'Negombo', 'Kiribathgoda'],
+  copyright_text:  '© 2025 SAYO Beauty. All rights reserved.',
+  locations:       ['Colombo', 'Negombo', 'Kiribathgoda'],
   quick_links: [
-    { label: 'Home', href: '/' },
-    { label: 'Our Story', href: '/about' },
-    { label: 'Services', href: '/services' },
-    { label: 'Products', href: '/products' },
-    { label: 'Reviews', href: '/reviews' },
+    { label: 'Home',      href: '/'        },
+    { label: 'Our Story', href: '/about'   },
+    { label: 'Services',  href: '/services'},
+    { label: 'Products',  href: '/products'},
+    { label: 'Reviews',   href: '/reviews' },
   ],
-  social_whatsapp: '',
-  social_facebook: '',
+  social_whatsapp:  '',
+  social_facebook:  '',
   social_instagram: '',
 };
 
 const ABOUT_DEFAULTS = {
-  hero_eyebrow: 'OUR STORY',
-  hero_heading: 'We are experience in making you more beautiful',
-  hero_body: 'We will make your skin better and also more glowing skin. And we provide to treatment spa and face with best service our employees,',
-  team_section_title: 'Meet the Visionaries',
+  hero_eyebrow:          'OUR STORY',
+  hero_heading:          'We are experience in making you more beautiful',
+  hero_body:             'We will make your skin better and also more glowing skin. And we provide to treatment spa and face with best service our employees,',
+  team_section_title:    'Meet the Visionaries',
   staff: [
     {
-      name: 'Hiruni Perera',
-      role: 'Lead Stylist & Founder',
-      experience: '12+ Years',
-      bio: 'Train-certified in London and Singapore, Hiruni founded the salon with a vision to revolutionize modern hair styling in Sri Lanka.',
-      specialties: 'Precision Haircuts, Balayage & Highlights, Advanced Hair Treatments',
+      name:         'Hiruni Perera',
+      role:         'Lead Stylist & Founder',
+      experience:   '12+ Years',
+      bio:          'Train-certified in London and Singapore, Hiruni founded the salon with a vision to revolutionize modern hair styling in Sri Lanka.',
+      specialties:  'Precision Haircuts, Balayage & Highlights, Advanced Hair Treatments',
     },
     {
-      name: 'Aruna Ratnayake',
-      role: 'Grooming Specialist',
-      experience: '10+ Years',
-      bio: "Bringing a sharp eye for detail and modern barbering techniques, Aruna specializes in tailored men's styling and beard architecture.",
-      specialties: "Precision Beard Sculpting, Classic & Modern Men's Haircuts, Groom's Styling Package",
+      name:         'Aruna Ratnayake',
+      role:         'Grooming Specialist',
+      experience:   '10+ Years',
+      bio:          "Bringing a sharp eye for detail and modern barbering techniques, Aruna specializes in tailored men's styling and beard architecture.",
+      specialties:  "Precision Beard Sculpting, Classic & Modern Men's Haircuts, Groom's Styling Package",
     },
   ],
   gallery_section_title: 'Transformations & Artistry',
-  gallery_description: 'Explore our latest work, behind-the-scenes moments, and client transformations.',
-  review_section_title: 'What Our Clients Say',
+  gallery_description:   'Explore our latest work, behind-the-scenes moments, and client transformations.',
+  review_section_title:  'What Our Clients Say',
   reviews: [
     { quote: '"Choosing SAYO for my Kandyan bridal dressing was the best decision I made."', author: 'Nimesha D.' },
-    { quote: '"I\'ve tried many salons across Colombo, but SAYO stands apart."', author: 'Sanduni R.' },
-    { quote: '"Aruna\'s attention to detail with my beard and fade was exceptional."', author: 'Kasun P.' },
-    { quote: '"From the moment you walk in, you feel looked after."', author: 'Dilani W.' },
+    { quote: '"I\'ve tried many salons across Colombo, but SAYO stands apart."',             author: 'Sanduni R.' },
+    { quote: '"Aruna\'s attention to detail with my beard and fade was exceptional."',       author: 'Kasun P.'   },
+    { quote: '"From the moment you walk in, you feel looked after."',                        author: 'Dilani W.'  },
   ],
 };
 
 const SERVICES_CATEGORIES_DEFAULT = [
-  { key: 'WAX', label: 'WAX', image: '/cat-wax.jpg' },
-  { key: 'HAIR', label: 'HAIR', image: '/cat-hair.jpg' },
-  { key: 'SKIN', label: 'SKIN', image: '/cat-skin.jpg' },
-  { key: 'NAIL', label: 'NAIL', image: '/cat-nail.jpg' },
-  { key: 'BODY', label: 'BODY', image: '/cat-body.jpg' },
-  { key: 'BRIDAL', label: 'BRIDAL', image: '/cat-bridal.jpg' },
+  { key: 'WAX',    label: 'WAX',    image: 'https://plus.unsplash.com/premium_photo-1664187387039-ba5451b2be6f?w=487&h=582&fit=crop&q=80'  },
+  { key: 'HAIR',   label: 'HAIR',   image: 'https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?w=487&h=582&fit=crop&q=80'         },
+  { key: 'SKIN',   label: 'SKIN',   image: 'https://plus.unsplash.com/premium_photo-1679046948909-ab47e96082e7?w=487&h=582&fit=crop&q=80'   },
+  { key: 'NAIL',   label: 'NAIL',   image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=487&h=582&fit=crop&q=80'          },
+  { key: 'BODY',   label: 'BODY',   image: 'https://images.unsplash.com/photo-1619451427882-6aaaded0cc61?w=487&h=582&fit=crop&q=80'          },
+  { key: 'BRIDAL', label: 'BRIDAL', image: 'https://plus.unsplash.com/premium_photo-1711132425055-1c289c69b950?w=487&h=582&fit=crop&q=80'   },
 ];
 
 const SERVICES_PRICE_LIST_DEFAULT = {
   her: {
     WAX: [
-      { name: 'Full Arms Wax', price1: '2,500.00' },
-      { name: 'Full Legs Wax', price1: '3,500.00' },
-      { name: 'Underarm Wax', price1: '1,200.00' },
-      { name: 'Eyebrow Threading', price1: '800.00' },
-      { name: 'Full Body Wax', price1: '7,500.00', price2: '6,800.00' },
+      { name: 'Full Arms Wax',    price1: '2,500.00' },
+      { name: 'Full Legs Wax',    price1: '3,500.00' },
+      { name: 'Underarm Wax',     price1: '1,200.00' },
+      { name: 'Eyebrow Threading',price1: '800.00'   },
+      { name: 'Full Body Wax',    price1: '7,500.00', price2: '6,800.00' },
     ],
     HAIR: [
       { name: 'Cut & Re-Style (Advance)', price1: '4,200.00', price2: '3,600.00' },
-      { name: 'Fringe Cut', price1: '1,500.00' },
-      { name: 'Trim', price1: '1,500.00' },
-      { name: 'Blow Dry - Short', price1: '2,500.00', price2: '2,200.00' },
-      { name: 'Hair Wash & Blast Dry', price1: '2,100.00', price2: '1,800.00' },
+      { name: 'Fringe Cut',               price1: '1,500.00' },
+      { name: 'Trim',                     price1: '1,500.00' },
+      { name: 'Blow Dry - Short',         price1: '2,500.00', price2: '2,200.00' },
+      { name: 'Hair Wash & Blast Dry',    price1: '2,100.00', price2: '1,800.00' },
     ],
     SKIN: [
-      { name: 'Classic Facial', price1: '3,000.00' },
-      { name: 'Gold Facial', price1: '6,500.00' },
-      { name: 'Skin Brightening', price1: '5,200.00' },
-      { name: 'Acne Treatment', price1: '4,800.00' },
+      { name: 'Classic Facial',    price1: '3,000.00' },
+      { name: 'Gold Facial',       price1: '6,500.00' },
+      { name: 'Skin Brightening',  price1: '5,200.00' },
+      { name: 'Acne Treatment',    price1: '4,800.00' },
       { name: 'Anti-Aging Facial', price1: '7,200.00', price2: '6,500.00' },
     ],
     NAIL: [
-      { name: 'Classic Manicure', price1: '1,800.00' },
-      { name: 'Gel Manicure', price1: '3,200.00' },
-      { name: 'Classic Pedicure', price1: '2,200.00' },
-      { name: 'Gel Pedicure', price1: '3,800.00' },
+      { name: 'Classic Manicure',  price1: '1,800.00' },
+      { name: 'Gel Manicure',      price1: '3,200.00' },
+      { name: 'Classic Pedicure',  price1: '2,200.00' },
+      { name: 'Gel Pedicure',      price1: '3,800.00' },
       { name: 'Nail Art (Per Set)', price1: '1,500.00' },
     ],
     BODY: [
-      { name: 'Full Body Massage', price1: '5,500.00' },
-      { name: 'Body Scrub', price1: '4,200.00' },
-      { name: 'Body Wrap', price1: '6,000.00' },
-      { name: 'Aromatherapy Massage', price1: '6,800.00', price2: '5,900.00' },
-      { name: 'Hot Stone Massage', price1: '7,500.00' },
+      { name: 'Full Body Massage',     price1: '5,500.00' },
+      { name: 'Body Scrub',            price1: '4,200.00' },
+      { name: 'Body Wrap',             price1: '6,000.00' },
+      { name: 'Aromatherapy Massage',  price1: '6,800.00', price2: '5,900.00' },
+      { name: 'Hot Stone Massage',     price1: '7,500.00' },
     ],
     BRIDAL: [
       { name: 'Bridal Package - Full', price1: '45,000.00' },
-      { name: 'Bridal Hair & Makeup', price1: '18,000.00' },
-      { name: 'Pre-Bridal Package', price1: '22,000.00' },
-      { name: 'Trial Makeup', price1: '6,500.00' },
-      { name: 'Bridal Draping', price1: '5,000.00' },
+      { name: 'Bridal Hair & Makeup',  price1: '18,000.00' },
+      { name: 'Pre-Bridal Package',    price1: '22,000.00' },
+      { name: 'Trial Makeup',          price1: '6,500.00'  },
+      { name: 'Bridal Draping',        price1: '5,000.00'  },
     ],
   },
   his: {
     WAX: [
-      { name: 'Half Arms Wax', price1: '2,000.00' },
-      { name: 'Chest Wax', price1: '3,200.00' },
-      { name: 'Back Wax', price1: '3,600.00' },
-      { name: 'Full Legs Wax', price1: '4,000.00' },
-      { name: 'Beard Shaping', price1: '1,000.00' },
+      { name: 'Half Arms Wax',  price1: '2,000.00' },
+      { name: 'Chest Wax',      price1: '3,200.00' },
+      { name: 'Back Wax',       price1: '3,600.00' },
+      { name: 'Full Legs Wax',  price1: '4,000.00' },
+      { name: 'Beard Shaping',  price1: '1,000.00' },
     ],
     HAIR: [
       { name: 'Haircut - Classic', price1: '1,800.00' },
-      { name: 'Beard Trim', price1: '900.00' },
-      { name: 'Hair Wash', price1: '700.00' },
-      { name: 'Head Massage', price1: '1,500.00', price2: '1,200.00' },
-      { name: 'Hair Color', price1: '3,500.00' },
+      { name: 'Beard Trim',        price1: '900.00'   },
+      { name: 'Hair Wash',         price1: '700.00'   },
+      { name: 'Head Massage',      price1: '1,500.00', price2: '1,200.00' },
+      { name: 'Hair Color',        price1: '3,500.00' },
     ],
     SKIN: [
       { name: 'Deep Cleansing Facial', price1: '3,500.00' },
-      { name: 'Skin Polishing', price1: '4,000.00' },
-      { name: 'Beard Care Facial', price1: '3,200.00' },
-      { name: 'Whitening Facial', price1: '4,800.00' },
-      { name: 'Detox Facial', price1: '5,500.00', price2: '4,900.00' },
+      { name: 'Skin Polishing',        price1: '4,000.00' },
+      { name: 'Beard Care Facial',     price1: '3,200.00' },
+      { name: 'Whitening Facial',      price1: '4,800.00' },
+      { name: 'Detox Facial',          price1: '5,500.00', price2: '4,900.00' },
     ],
     NAIL: [
-      { name: 'Basic Manicure', price1: '1,200.00' },
-      { name: 'Basic Pedicure', price1: '1,500.00' },
-      { name: 'Nail Trim & Buff', price1: '800.00' },
-      { name: 'Callus Removal', price1: '1,000.00' },
-      { name: 'Hand Spa', price1: '2,200.00' },
+      { name: 'Basic Manicure',  price1: '1,200.00' },
+      { name: 'Basic Pedicure',  price1: '1,500.00' },
+      { name: 'Nail Trim & Buff',price1: '800.00'   },
+      { name: 'Callus Removal',  price1: '1,000.00' },
+      { name: 'Hand Spa',        price1: '2,200.00' },
     ],
     BODY: [
-      { name: 'Deep Tissue Massage', price1: '6,000.00' },
-      { name: 'Body Scrub', price1: '4,000.00' },
-      { name: 'Sports Massage', price1: '6,500.00' },
-      { name: 'Back Massage', price1: '3,500.00' },
-      { name: 'Head & Shoulder Massage', price1: '2,800.00' },
+      { name: 'Deep Tissue Massage',       price1: '6,000.00' },
+      { name: 'Body Scrub',                price1: '4,000.00' },
+      { name: 'Sports Massage',            price1: '6,500.00' },
+      { name: 'Back Massage',              price1: '3,500.00' },
+      { name: 'Head & Shoulder Massage',   price1: '2,800.00' },
     ],
     BRIDAL: [
-      { name: 'Groom Package', price1: '25,000.00' },
-      { name: 'Groom Hair & Makeup', price1: '10,000.00' },
-      { name: 'Pre-Groom Package', price1: '14,000.00' },
-      { name: 'Groom Facial', price1: '4,500.00' },
-      { name: 'Groom Grooming', price1: '3,500.00' },
+      { name: 'Groom Package',      price1: '25,000.00' },
+      { name: 'Groom Hair & Makeup',price1: '10,000.00' },
+      { name: 'Pre-Groom Package',  price1: '14,000.00' },
+      { name: 'Groom Facial',       price1: '4,500.00'  },
+      { name: 'Groom Grooming',     price1: '3,500.00'  },
     ],
   },
 };
 
 const SERVICES_DEFAULTS = {
-  hero_heading: 'Tailored Treatments for Your Unique Glow',
+  hero_heading:  'Tailored Treatments for Your Unique Glow',
   hero_subtitle: "Experience a symphony of precision and luxury. Our services are tailored to the individual, utilizing the world's most exclusive botanical formulas and advanced styling techniques.",
-  categories: SERVICES_CATEGORIES_DEFAULT,
-  price_list: SERVICES_PRICE_LIST_DEFAULT,
+  categories:    SERVICES_CATEGORIES_DEFAULT,
+  price_list:    SERVICES_PRICE_LIST_DEFAULT,
 };
 
 const CONTACT_DEFAULTS = {
-  hero_eyebrow: 'Luxury Concierge Experience',
-  hero_heading: 'GET IN TOUCH',
-  hero_subtitle: 'Experience personalized luxury tailored specifically for your needs. Our dedicated concierge team in Colombo is here to orchestrate your journey into refined elegance.',
-  cta_primary_text: 'Send an Inquiry',
+  hero_eyebrow:       'Luxury Concierge Experience',
+  hero_heading:       'GET IN TOUCH',
+  hero_subtitle:      'Experience personalized luxury tailored specifically for your needs. Our dedicated concierge team in Colombo is here to orchestrate your journey into refined elegance.',
+  cta_primary_text:   'Send an Inquiry',
   cta_secondary_text: 'Call Us Now',
-  phone_number: '0772336233',
-  email_address: 'info@sayobeauty.com',
+  phone_number:       '0772336233',
+  email_address:      'info@sayobeauty.com',
   stats: [
-    { value: '3', label: 'Locations' },
+    { value: '3',   label: 'Locations'          },
     { value: '10+', label: 'Years of Excellence' },
-    { value: '5K+', label: 'Happy Clients' },
+    { value: '5K+', label: 'Happy Clients'       },
   ],
-  map_embed_src: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.0558055526335!2d79.85803897585825!3d6.883918893115073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25bc5b891a4b5%3A0xc60aa90940280873!2s45%2C%203%20Galle%20Rd%2C%20Colombo%2000500!5e0!3m2!1sen!2slk!4v1785130068196!5m2!1sen!2slk',
-  map_address: 'No. 45, Galle Road, Colombo 03, Sri Lanka',
-  map_open_href: 'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
+  map_embed_src:  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.0558055526335!2d79.85803897585825!3d6.883918893115073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25bc5b891a4b5%3A0xc60aa90940280873!2s45%2C%203%20Galle%20Rd%2C%20Colombo%2000500!5e0!3m2!1sen!2slk!4v1785130068196!5m2!1sen!2slk',
+  map_address:    'No. 45, Galle Road, Colombo 03, Sri Lanka',
+  map_open_href:  'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
   social_instagram: '',
-  social_facebook: '',
-  social_whatsapp: '',
+  social_facebook:  '',
+  social_whatsapp:  '',
   branches: [
     {
-      name: 'Colombo — Head Office',
-      address: 'No. 45, Galle Road, Colombo 03, Sri Lanka',
-      phone: '0772336233',
-      email: 'info@sayobeauty.com',
-      isHead: true,
-      mapHref: 'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
+      name:      'Colombo — Head Office',
+      address:   'No. 45, Galle Road, Colombo 03, Sri Lanka',
+      phone:     '0772336233',
+      email:     'info@sayobeauty.com',
+      isHead:    true,
+      mapHref:   'https://maps.google.com/?q=45+Galle+Rd+Colombo+00500+Sri+Lanka',
     },
     {
-      name: 'Negombo Branch',
-      address: 'No. 12, Poruthota Road, Negombo, Sri Lanka',
-      phone: '0772336233',
-      email: 'negombo@sayobeauty.com',
-      isHead: false,
-      mapHref: 'https://maps.google.com/?q=Poruthota+Road+Negombo+Sri+Lanka',
+      name:      'Negombo Branch',
+      address:   'No. 12, Poruthota Road, Negombo, Sri Lanka',
+      phone:     '0772336233',
+      email:     'negombo@sayobeauty.com',
+      isHead:    false,
+      mapHref:   'https://maps.google.com/?q=Poruthota+Road+Negombo+Sri+Lanka',
     },
     {
-      name: 'Kiribathgoda Branch',
-      address: 'No. 78, Kandy Road, Kiribathgoda, Sri Lanka',
-      phone: '0772336233',
-      email: 'kiribathgoda@sayobeauty.com',
-      isHead: false,
-      mapHref: 'https://maps.google.com/?q=Kandy+Road+Kiribathgoda+Sri+Lanka',
+      name:      'Kiribathgoda Branch',
+      address:   'No. 78, Kandy Road, Kiribathgoda, Sri Lanka',
+      phone:     '0772336233',
+      email:     'kiribathgoda@sayobeauty.com',
+      isHead:    false,
+      mapHref:   'https://maps.google.com/?q=Kandy+Road+Kiribathgoda+Sri+Lanka',
     },
   ],
 };
 
-// Helper function to extract valid result from Promise.allSettled
+/* ─────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────── */
 function getFulfilledResult<T>(results: PromiseSettledResult<T>[]): T | null {
   for (const res of results) {
-    if (res.status === 'fulfilled' && res.value) {
-      return res.value;
-    }
+    if (res.status === 'fulfilled' && res.value) return res.value;
   }
   return null;
 }
 
+// Extracts a readable message from any thrown value (Prisma errors, generic Errors, etc.)
+function getErrorMessage(err: unknown): string {
+  if (!err) return 'Unknown error';
+  if (err instanceof Error) {
+    // Prisma errors often have a `code` property (e.g. P2025 = record not found)
+    const code = (err as { code?: string }).code;
+    return code ? `${err.message} (code: ${code})` : err.message;
+  }
+  try { return JSON.stringify(err); } catch { return String(err); }
+}
+
 /* ─────────────────────────────────────────
-   GET (Fetches primarily from Cloud DB, falls back to Local DB)
+   GET
 ───────────────────────────────────────── */
 export async function GET(req: NextRequest) {
   const section = req.nextUrl.searchParams.get('section');
 
   try {
+
+    /* ── nav ── */
     if (section === 'nav') {
-      const data = (await cloudPrisma.navConfig.findUnique({ where: { id: 1 } })) ??
-                   (await localPrisma.navConfig.findUnique({ where: { id: 1 } }));
+      const data =
+        (await cloudPrisma.navConfig.findUnique({ where: { id: 1 } })) ??
+        (await localPrisma.navConfig.findUnique({ where: { id: 1 } }));
       if (!data) return NextResponse.json(NAV_DEFAULTS);
       return NextResponse.json({
         ...data,
@@ -261,84 +275,196 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    /* ── home ── */
     if (section === 'home') {
-      const data = (await cloudPrisma.homeConfig.findUnique({ where: { id: 1 } })) ??
-                   (await localPrisma.homeConfig.findUnique({ where: { id: 1 } }));
+      const data =
+        (await cloudPrisma.homeConfig.findUnique({ where: { id: 1 } })) ??
+        (await localPrisma.homeConfig.findUnique({ where: { id: 1 } }));
       return NextResponse.json(data ?? HOME_DEFAULTS);
     }
 
+    /* ── footer ── */
     if (section === 'footer') {
-      const data = (await cloudPrisma.footerConfig.findUnique({ where: { id: 1 } })) ??
-                   (await localPrisma.footerConfig.findUnique({ where: { id: 1 } }));
+      const data =
+        (await cloudPrisma.footerConfig.findUnique({ where: { id: 1 } })) ??
+        (await localPrisma.footerConfig.findUnique({ where: { id: 1 } }));
       if (!data) return NextResponse.json(FOOTER_DEFAULTS);
       return NextResponse.json({
         ...data,
-        locations: Array.isArray(data.locations) ? data.locations : FOOTER_DEFAULTS.locations,
+        locations:   Array.isArray(data.locations)   ? data.locations   : FOOTER_DEFAULTS.locations,
         quick_links: Array.isArray(data.quick_links) ? data.quick_links : FOOTER_DEFAULTS.quick_links,
       });
     }
 
+    /* ── about ── */
     if (section === 'about') {
-      const data = (await cloudPrisma.aboutConfig.findUnique({ where: { id: 1 } })) ??
-                   (await localPrisma.aboutConfig.findUnique({ where: { id: 1 } }));
+      const data =
+        (await cloudPrisma.aboutConfig.findUnique({ where: { id: 1 } })) ??
+        (await localPrisma.aboutConfig.findUnique({ where: { id: 1 } }));
       if (!data) return NextResponse.json(ABOUT_DEFAULTS);
       return NextResponse.json({
         ...data,
-        staff: Array.isArray(data.staff) && (data.staff as unknown[]).length > 0 ? data.staff : ABOUT_DEFAULTS.staff,
+        staff:   Array.isArray(data.staff)   && (data.staff   as unknown[]).length > 0 ? data.staff   : ABOUT_DEFAULTS.staff,
         reviews: Array.isArray(data.reviews) && (data.reviews as unknown[]).length > 0 ? data.reviews : ABOUT_DEFAULTS.reviews,
       });
     }
 
+    /* ── services ── */
     if (section === 'services') {
-      const data = (await cloudPrisma.servicesConfig.findUnique({ where: { id: 1 } })) ??
-                   (await localPrisma.servicesConfig.findUnique({ where: { id: 1 } }));
+      const data =
+        (await cloudPrisma.servicesConfig.findUnique({ where: { id: 1 } })) ??
+        (await localPrisma.servicesConfig.findUnique({ where: { id: 1 } }));
       if (!data) return NextResponse.json(SERVICES_DEFAULTS);
+      const rawCats =
+        Array.isArray(data.categories) && (data.categories as unknown[]).length > 0
+          ? data.categories
+          : SERVICES_DEFAULTS.categories;
+      const fixedCats = (rawCats as { key: string; label: string; image?: string }[]).map(cat => {
+        const def = SERVICES_CATEGORIES_DEFAULT.find(d => d.key === cat.key);
+        return { ...cat, image: cat.image && cat.image.startsWith('http') ? cat.image : (def?.image ?? '') };
+      });
       return NextResponse.json({
-        hero_heading: data.hero_heading || SERVICES_DEFAULTS.hero_heading,
+        hero_heading:  data.hero_heading  || SERVICES_DEFAULTS.hero_heading,
         hero_subtitle: data.hero_subtitle || SERVICES_DEFAULTS.hero_subtitle,
-        categories: Array.isArray(data.categories) && (data.categories as unknown[]).length > 0 ? data.categories : SERVICES_DEFAULTS.categories,
-        price_list: data.price_list && typeof data.price_list === 'object' ? data.price_list : SERVICES_DEFAULTS.price_list,
+        categories:    fixedCats,
+        price_list:    data.price_list && typeof data.price_list === 'object'
+          ? data.price_list : SERVICES_DEFAULTS.price_list,
       });
     }
 
+    /* ── contact ── */
     if (section === 'contact') {
-      const data = (await cloudPrisma.contactConfig.findUnique({ where: { id: 1 } })) ??
-                   (await localPrisma.contactConfig.findUnique({ where: { id: 1 } }));
+      const data =
+        (await cloudPrisma.contactConfig.findUnique({ where: { id: 1 } })) ??
+        (await localPrisma.contactConfig.findUnique({ where: { id: 1 } }));
       if (!data) return NextResponse.json(CONTACT_DEFAULTS);
       return NextResponse.json({
         ...data,
-        stats: Array.isArray(data.stats) && (data.stats as unknown[]).length > 0 ? data.stats : CONTACT_DEFAULTS.stats,
+        stats:    Array.isArray(data.stats)    && (data.stats    as unknown[]).length > 0 ? data.stats    : CONTACT_DEFAULTS.stats,
         branches: Array.isArray(data.branches) && (data.branches as unknown[]).length > 0 ? data.branches : CONTACT_DEFAULTS.branches,
       });
     }
 
-    // All sections fallback fetch
+    /* ─────────────────────────────────────────
+       ── feedback list ──
+       IMPORTANT: This reads from CLOUD as the source of truth.
+       PATCH/DELETE below are written to match this same priority,
+       so the ids you see here are the ones that matter.
+    ───────────────────────────────────────── */
+    if (section === 'feedback') {
+      const location         = req.nextUrl.searchParams.get('location');
+      const rating           = req.nextUrl.searchParams.get('rating');
+      const isPublishedParam = req.nextUrl.searchParams.get('isPublished');
+      const page              = Math.max(1, parseInt(req.nextUrl.searchParams.get('page')  ?? '1',  10));
+      const limit              = Math.min(500, parseInt(req.nextUrl.searchParams.get('limit') ?? '20', 10));
+      const skip                = (page - 1) * limit;
+
+      const where: {
+        cusLocation?: string;
+        cusRating?:   number;
+        isPublished?: boolean;
+      } = {};
+
+      if (location) where.cusLocation = location;
+      if (rating)    where.cusRating  = parseInt(rating, 10);
+      if (isPublishedParam !== null) {
+        where.isPublished = isPublishedParam === '1' || isPublishedParam === 'true';
+      }
+
+      let rows: unknown[] = [];
+      let total: number   = 0;
+      let source: 'cloud' | 'local' = 'cloud';
+
+      try {
+        [rows, total] = await Promise.all([
+          cloudPrisma.tbl_Feedback.findMany({ where, orderBy: { submittedAt: 'desc' }, skip, take: limit }),
+          cloudPrisma.tbl_Feedback.count({ where }),
+        ]);
+      } catch (err) {
+        console.warn('[feedback GET] cloud query failed, falling back to local:', getErrorMessage(err));
+        source = 'local';
+        [rows, total] = await Promise.all([
+          localPrisma.tbl_Feedback.findMany({ where, orderBy: { submittedAt: 'desc' }, skip, take: limit }),
+          localPrisma.tbl_Feedback.count({ where }),
+        ]);
+      }
+
+      return NextResponse.json({
+        data:       rows,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        source, // 'cloud' | 'local' — tells the frontend which DB these ids belong to
+      });
+    }
+
+    /* ── all sections fallback ── */
     const [nav, home, footer, about, services, contact] = await Promise.all([
-      cloudPrisma.navConfig.findUnique({ where: { id: 1 } }).catch(() => localPrisma.navConfig.findUnique({ where: { id: 1 } })),
-      cloudPrisma.homeConfig.findUnique({ where: { id: 1 } }).catch(() => localPrisma.homeConfig.findUnique({ where: { id: 1 } })),
-      cloudPrisma.footerConfig.findUnique({ where: { id: 1 } }).catch(() => localPrisma.footerConfig.findUnique({ where: { id: 1 } })),
-      cloudPrisma.aboutConfig.findUnique({ where: { id: 1 } }).catch(() => localPrisma.aboutConfig.findUnique({ where: { id: 1 } })),
+      cloudPrisma.navConfig.findUnique({      where: { id: 1 } }).catch(() => localPrisma.navConfig.findUnique({      where: { id: 1 } })),
+      cloudPrisma.homeConfig.findUnique({     where: { id: 1 } }).catch(() => localPrisma.homeConfig.findUnique({     where: { id: 1 } })),
+      cloudPrisma.footerConfig.findUnique({   where: { id: 1 } }).catch(() => localPrisma.footerConfig.findUnique({   where: { id: 1 } })),
+      cloudPrisma.aboutConfig.findUnique({    where: { id: 1 } }).catch(() => localPrisma.aboutConfig.findUnique({    where: { id: 1 } })),
       cloudPrisma.servicesConfig.findUnique({ where: { id: 1 } }).catch(() => localPrisma.servicesConfig.findUnique({ where: { id: 1 } })),
-      cloudPrisma.contactConfig.findUnique({ where: { id: 1 } }).catch(() => localPrisma.contactConfig.findUnique({ where: { id: 1 } })),
+      cloudPrisma.contactConfig.findUnique({  where: { id: 1 } }).catch(() => localPrisma.contactConfig.findUnique({  where: { id: 1 } })),
     ]);
 
     return NextResponse.json({
-      nav: nav ? { ...nav, nav_items: Array.isArray(nav.nav_items) ? nav.nav_items : NAV_DEFAULTS.nav_items } : NAV_DEFAULTS,
+      nav: nav
+        ? { ...nav, nav_items: Array.isArray(nav.nav_items) ? nav.nav_items : NAV_DEFAULTS.nav_items }
+        : NAV_DEFAULTS,
       home: home ?? HOME_DEFAULTS,
-      footer: footer ? { ...footer, locations: Array.isArray(footer.locations) ? footer.locations : FOOTER_DEFAULTS.locations, quick_links: Array.isArray(footer.quick_links) ? footer.quick_links : FOOTER_DEFAULTS.quick_links } : FOOTER_DEFAULTS,
-      about: about ? { ...about, staff: Array.isArray(about.staff) && (about.staff as unknown[]).length > 0 ? about.staff : ABOUT_DEFAULTS.staff, reviews: Array.isArray(about.reviews) && (about.reviews as unknown[]).length > 0 ? about.reviews : ABOUT_DEFAULTS.reviews } : ABOUT_DEFAULTS,
-      services: services ? { hero_heading: services.hero_heading || SERVICES_DEFAULTS.hero_heading, hero_subtitle: services.hero_subtitle || SERVICES_DEFAULTS.hero_subtitle, categories: Array.isArray(services.categories) && (services.categories as unknown[]).length > 0 ? services.categories : SERVICES_DEFAULTS.categories, price_list: services.price_list && typeof services.price_list === 'object' ? services.price_list : SERVICES_DEFAULTS.price_list } : SERVICES_DEFAULTS,
-      contact: contact ? { ...contact, stats: Array.isArray(contact.stats) && (contact.stats as unknown[]).length > 0 ? contact.stats : CONTACT_DEFAULTS.stats, branches: Array.isArray(contact.branches) && (contact.branches as unknown[]).length > 0 ? contact.branches : CONTACT_DEFAULTS.branches } : CONTACT_DEFAULTS,
+      footer: footer
+        ? {
+            ...footer,
+            locations:   Array.isArray(footer.locations)   ? footer.locations   : FOOTER_DEFAULTS.locations,
+            quick_links: Array.isArray(footer.quick_links) ? footer.quick_links : FOOTER_DEFAULTS.quick_links,
+          }
+        : FOOTER_DEFAULTS,
+      about: about
+        ? {
+            ...about,
+            staff:   Array.isArray(about.staff)   && (about.staff   as unknown[]).length > 0 ? about.staff   : ABOUT_DEFAULTS.staff,
+            reviews: Array.isArray(about.reviews) && (about.reviews as unknown[]).length > 0 ? about.reviews : ABOUT_DEFAULTS.reviews,
+          }
+        : ABOUT_DEFAULTS,
+      services: (() => {
+        if (!services) return SERVICES_DEFAULTS;
+        const rawCats =
+          Array.isArray(services.categories) && (services.categories as unknown[]).length > 0
+            ? services.categories : SERVICES_DEFAULTS.categories;
+        const fixedCats = (rawCats as { key: string; label: string; image?: string }[]).map(cat => {
+          const def = SERVICES_CATEGORIES_DEFAULT.find(d => d.key === cat.key);
+          return { ...cat, image: cat.image && cat.image.startsWith('http') ? cat.image : (def?.image ?? '') };
+        });
+        return {
+          hero_heading:  services.hero_heading  || SERVICES_DEFAULTS.hero_heading,
+          hero_subtitle: services.hero_subtitle || SERVICES_DEFAULTS.hero_subtitle,
+          categories:    fixedCats,
+          price_list:    services.price_list && typeof services.price_list === 'object'
+            ? services.price_list : SERVICES_DEFAULTS.price_list,
+        };
+      })(),
+      contact: contact
+        ? {
+            ...contact,
+            stats:    Array.isArray(contact.stats)    && (contact.stats    as unknown[]).length > 0 ? contact.stats    : CONTACT_DEFAULTS.stats,
+            branches: Array.isArray(contact.branches) && (contact.branches as unknown[]).length > 0 ? contact.branches : CONTACT_DEFAULTS.branches,
+          }
+        : CONTACT_DEFAULTS,
     });
 
   } catch (err) {
     console.error('[site-data GET]', err);
-    return NextResponse.json({ nav: NAV_DEFAULTS, home: HOME_DEFAULTS, footer: FOOTER_DEFAULTS, about: ABOUT_DEFAULTS, services: SERVICES_DEFAULTS, contact: CONTACT_DEFAULTS });
+    return NextResponse.json({
+      nav: NAV_DEFAULTS, home: HOME_DEFAULTS, footer: FOOTER_DEFAULTS,
+      about: ABOUT_DEFAULTS, services: SERVICES_DEFAULTS, contact: CONTACT_DEFAULTS,
+    });
   }
 }
 
 /* ─────────────────────────────────────────
-   POST (Dual-Writes to both Local and Cloud DB)
+   POST
 ───────────────────────────────────────── */
 export async function POST(req: NextRequest) {
   const section = req.nextUrl.searchParams.get('section');
@@ -346,232 +472,288 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // ── nav ──
+    /* ── nav ── */
     if (section === 'nav') {
-      const navPayload = {
-        where: { id: 1 },
+      const payload = {
+        where:  { id: 1 },
         update: {
-          logo_text: body.logo_text ?? NAV_DEFAULTS.logo_text,
+          logo_text:        body.logo_text        ?? NAV_DEFAULTS.logo_text,
           contact_btn_text: body.contact_btn_text ?? NAV_DEFAULTS.contact_btn_text,
           contact_btn_link: body.contact_btn_link ?? NAV_DEFAULTS.contact_btn_link,
-          nav_items: body.nav_items ?? NAV_DEFAULTS.nav_items,
+          nav_items:        body.nav_items        ?? NAV_DEFAULTS.nav_items,
           updated_by: 'admin',
         },
         create: {
           id: 1,
-          logo_text: body.logo_text ?? NAV_DEFAULTS.logo_text,
+          logo_text:        body.logo_text        ?? NAV_DEFAULTS.logo_text,
           contact_btn_text: body.contact_btn_text ?? NAV_DEFAULTS.contact_btn_text,
           contact_btn_link: body.contact_btn_link ?? NAV_DEFAULTS.contact_btn_link,
-          nav_items: body.nav_items ?? NAV_DEFAULTS.nav_items,
+          nav_items:        body.nav_items        ?? NAV_DEFAULTS.nav_items,
           updated_by: 'admin',
         },
       };
-
       const results = await Promise.allSettled([
-        localPrisma.navConfig.upsert(navPayload),
-        cloudPrisma.navConfig.upsert(navPayload),
+        localPrisma.navConfig.upsert(payload),
+        cloudPrisma.navConfig.upsert(payload),
       ]);
-
-      const data = getFulfilledResult(results);
-      return NextResponse.json(data ?? { success: true });
+      return NextResponse.json(getFulfilledResult(results) ?? { success: true });
     }
 
-    // ── home ──
+    /* ── home ── */
     if (section === 'home') {
-      const homePayload = {
-        where: { id: 1 },
+      const payload = {
+        where:  { id: 1 },
         update: {
-          hero_eyebrow: body.hero_eyebrow ?? HOME_DEFAULTS.hero_eyebrow,
-          hero_heading: body.hero_heading ?? HOME_DEFAULTS.hero_heading,
-          hero_body: body.hero_body ?? HOME_DEFAULTS.hero_body,
+          hero_eyebrow:  body.hero_eyebrow  ?? HOME_DEFAULTS.hero_eyebrow,
+          hero_heading:  body.hero_heading  ?? HOME_DEFAULTS.hero_heading,
+          hero_body:     body.hero_body     ?? HOME_DEFAULTS.hero_body,
           hero_cta_text: body.hero_cta_text ?? HOME_DEFAULTS.hero_cta_text,
           hero_cta_link: body.hero_cta_link ?? HOME_DEFAULTS.hero_cta_link,
           updated_by: 'admin',
         },
         create: {
           id: 1,
-          hero_eyebrow: body.hero_eyebrow ?? HOME_DEFAULTS.hero_eyebrow,
-          hero_heading: body.hero_heading ?? HOME_DEFAULTS.hero_heading,
-          hero_body: body.hero_body ?? HOME_DEFAULTS.hero_body,
+          hero_eyebrow:  body.hero_eyebrow  ?? HOME_DEFAULTS.hero_eyebrow,
+          hero_heading:  body.hero_heading  ?? HOME_DEFAULTS.hero_heading,
+          hero_body:     body.hero_body     ?? HOME_DEFAULTS.hero_body,
           hero_cta_text: body.hero_cta_text ?? HOME_DEFAULTS.hero_cta_text,
           hero_cta_link: body.hero_cta_link ?? HOME_DEFAULTS.hero_cta_link,
           updated_by: 'admin',
         },
       };
-
       const results = await Promise.allSettled([
-        localPrisma.homeConfig.upsert(homePayload),
-        cloudPrisma.homeConfig.upsert(homePayload),
+        localPrisma.homeConfig.upsert(payload),
+        cloudPrisma.homeConfig.upsert(payload),
       ]);
-
-      const data = getFulfilledResult(results);
-      return NextResponse.json(data ?? { success: true });
+      return NextResponse.json(getFulfilledResult(results) ?? { success: true });
     }
 
-    // ── footer ──
+    /* ── footer ── */
     if (section === 'footer') {
-      const footerPayload = {
-        where: { id: 1 },
+      const payload = {
+        where:  { id: 1 },
         update: {
-          brand_name: body.brand_name ?? FOOTER_DEFAULTS.brand_name,
-          brand_tagline: body.brand_tagline ?? FOOTER_DEFAULTS.brand_tagline,
-          contact_phone: body.contact_phone ?? FOOTER_DEFAULTS.contact_phone,
-          contact_email: body.contact_email ?? FOOTER_DEFAULTS.contact_email,
-          contact_address: body.contact_address ?? FOOTER_DEFAULTS.contact_address,
-          copyright_text: body.copyright_text ?? FOOTER_DEFAULTS.copyright_text,
-          locations: body.locations ?? FOOTER_DEFAULTS.locations,
-          quick_links: body.quick_links ?? FOOTER_DEFAULTS.quick_links,
-          social_whatsapp: body.social_whatsapp ?? '',
-          social_facebook: body.social_facebook ?? '',
+          brand_name:       body.brand_name       ?? FOOTER_DEFAULTS.brand_name,
+          brand_tagline:    body.brand_tagline    ?? FOOTER_DEFAULTS.brand_tagline,
+          contact_phone:    body.contact_phone    ?? FOOTER_DEFAULTS.contact_phone,
+          contact_email:    body.contact_email    ?? FOOTER_DEFAULTS.contact_email,
+          contact_address:  body.contact_address  ?? FOOTER_DEFAULTS.contact_address,
+          copyright_text:   body.copyright_text   ?? FOOTER_DEFAULTS.copyright_text,
+          locations:        body.locations        ?? FOOTER_DEFAULTS.locations,
+          quick_links:      body.quick_links      ?? FOOTER_DEFAULTS.quick_links,
+          social_whatsapp:  body.social_whatsapp  ?? '',
+          social_facebook:  body.social_facebook  ?? '',
           social_instagram: body.social_instagram ?? '',
           updated_by: 'admin',
         },
         create: {
           id: 1,
-          brand_name: body.brand_name ?? FOOTER_DEFAULTS.brand_name,
-          brand_tagline: body.brand_tagline ?? FOOTER_DEFAULTS.brand_tagline,
-          contact_phone: body.contact_phone ?? FOOTER_DEFAULTS.contact_phone,
-          contact_email: body.contact_email ?? FOOTER_DEFAULTS.contact_email,
-          contact_address: body.contact_address ?? FOOTER_DEFAULTS.contact_address,
-          copyright_text: body.copyright_text ?? FOOTER_DEFAULTS.copyright_text,
-          locations: body.locations ?? FOOTER_DEFAULTS.locations,
-          quick_links: body.quick_links ?? FOOTER_DEFAULTS.quick_links,
-          social_whatsapp: body.social_whatsapp ?? '',
-          social_facebook: body.social_facebook ?? '',
+          brand_name:       body.brand_name       ?? FOOTER_DEFAULTS.brand_name,
+          brand_tagline:    body.brand_tagline    ?? FOOTER_DEFAULTS.brand_tagline,
+          contact_phone:    body.contact_phone    ?? FOOTER_DEFAULTS.contact_phone,
+          contact_email:    body.contact_email    ?? FOOTER_DEFAULTS.contact_email,
+          contact_address:  body.contact_address  ?? FOOTER_DEFAULTS.contact_address,
+          copyright_text:   body.copyright_text   ?? FOOTER_DEFAULTS.copyright_text,
+          locations:        body.locations        ?? FOOTER_DEFAULTS.locations,
+          quick_links:      body.quick_links      ?? FOOTER_DEFAULTS.quick_links,
+          social_whatsapp:  body.social_whatsapp  ?? '',
+          social_facebook:  body.social_facebook  ?? '',
           social_instagram: body.social_instagram ?? '',
           updated_by: 'admin',
         },
       };
-
       const results = await Promise.allSettled([
-        localPrisma.footerConfig.upsert(footerPayload),
-        cloudPrisma.footerConfig.upsert(footerPayload),
+        localPrisma.footerConfig.upsert(payload),
+        cloudPrisma.footerConfig.upsert(payload),
       ]);
-
-      const data = getFulfilledResult(results);
-      return NextResponse.json(data ?? { success: true });
+      return NextResponse.json(getFulfilledResult(results) ?? { success: true });
     }
 
-    // ── about ──
+    /* ── about ── */
     if (section === 'about') {
-      const aboutPayload = {
-        where: { id: 1 },
+      const payload = {
+        where:  { id: 1 },
         update: {
-          hero_eyebrow: body.hero_eyebrow ?? ABOUT_DEFAULTS.hero_eyebrow,
-          hero_heading: body.hero_heading ?? ABOUT_DEFAULTS.hero_heading,
-          hero_body: body.hero_body ?? ABOUT_DEFAULTS.hero_body,
-          team_section_title: body.team_section_title ?? ABOUT_DEFAULTS.team_section_title,
-          staff: body.staff ?? ABOUT_DEFAULTS.staff,
+          hero_eyebrow:          body.hero_eyebrow          ?? ABOUT_DEFAULTS.hero_eyebrow,
+          hero_heading:          body.hero_heading          ?? ABOUT_DEFAULTS.hero_heading,
+          hero_body:             body.hero_body             ?? ABOUT_DEFAULTS.hero_body,
+          team_section_title:    body.team_section_title    ?? ABOUT_DEFAULTS.team_section_title,
+          staff:                 body.staff                 ?? ABOUT_DEFAULTS.staff,
           gallery_section_title: body.gallery_section_title ?? ABOUT_DEFAULTS.gallery_section_title,
-          gallery_description: body.gallery_description ?? ABOUT_DEFAULTS.gallery_description,
-          review_section_title: body.review_section_title ?? ABOUT_DEFAULTS.review_section_title,
-          reviews: body.reviews ?? ABOUT_DEFAULTS.reviews,
+          gallery_description:   body.gallery_description   ?? ABOUT_DEFAULTS.gallery_description,
+          review_section_title:  body.review_section_title  ?? ABOUT_DEFAULTS.review_section_title,
+          reviews:               body.reviews               ?? ABOUT_DEFAULTS.reviews,
           updated_by: 'admin',
         },
         create: {
           id: 1,
-          hero_eyebrow: body.hero_eyebrow ?? ABOUT_DEFAULTS.hero_eyebrow,
-          hero_heading: body.hero_heading ?? ABOUT_DEFAULTS.hero_heading,
-          hero_body: body.hero_body ?? ABOUT_DEFAULTS.hero_body,
-          team_section_title: body.team_section_title ?? ABOUT_DEFAULTS.team_section_title,
-          staff: body.staff ?? ABOUT_DEFAULTS.staff,
+          hero_eyebrow:          body.hero_eyebrow          ?? ABOUT_DEFAULTS.hero_eyebrow,
+          hero_heading:          body.hero_heading          ?? ABOUT_DEFAULTS.hero_heading,
+          hero_body:             body.hero_body             ?? ABOUT_DEFAULTS.hero_body,
+          team_section_title:    body.team_section_title    ?? ABOUT_DEFAULTS.team_section_title,
+          staff:                 body.staff                 ?? ABOUT_DEFAULTS.staff,
           gallery_section_title: body.gallery_section_title ?? ABOUT_DEFAULTS.gallery_section_title,
-          gallery_description: body.gallery_description ?? ABOUT_DEFAULTS.gallery_description,
-          review_section_title: body.review_section_title ?? ABOUT_DEFAULTS.review_section_title,
-          reviews: body.reviews ?? ABOUT_DEFAULTS.reviews,
+          gallery_description:   body.gallery_description   ?? ABOUT_DEFAULTS.gallery_description,
+          review_section_title:  body.review_section_title  ?? ABOUT_DEFAULTS.review_section_title,
+          reviews:               body.reviews               ?? ABOUT_DEFAULTS.reviews,
           updated_by: 'admin',
         },
       };
-
       const results = await Promise.allSettled([
-        localPrisma.aboutConfig.upsert(aboutPayload),
-        cloudPrisma.aboutConfig.upsert(aboutPayload),
+        localPrisma.aboutConfig.upsert(payload),
+        cloudPrisma.aboutConfig.upsert(payload),
       ]);
-
-      const data = getFulfilledResult(results);
-      return NextResponse.json(data ?? { success: true });
+      return NextResponse.json(getFulfilledResult(results) ?? { success: true });
     }
 
-    // ── services ──
+    /* ── services ── */
     if (section === 'services') {
-      const servicesPayload = {
-        where: { id: 1 },
+      const payload = {
+        where:  { id: 1 },
         update: {
-          hero_heading: body.hero_heading ?? SERVICES_DEFAULTS.hero_heading,
+          hero_heading:  body.hero_heading  ?? SERVICES_DEFAULTS.hero_heading,
           hero_subtitle: body.hero_subtitle ?? SERVICES_DEFAULTS.hero_subtitle,
-          categories: body.categories ?? SERVICES_DEFAULTS.categories,
-          price_list: body.price_list ?? SERVICES_DEFAULTS.price_list,
+          categories:    body.categories    ?? SERVICES_DEFAULTS.categories,
+          price_list:    body.price_list    ?? SERVICES_DEFAULTS.price_list,
           updated_by: 'admin',
         },
         create: {
           id: 1,
-          hero_heading: body.hero_heading ?? SERVICES_DEFAULTS.hero_heading,
+          hero_heading:  body.hero_heading  ?? SERVICES_DEFAULTS.hero_heading,
           hero_subtitle: body.hero_subtitle ?? SERVICES_DEFAULTS.hero_subtitle,
-          categories: body.categories ?? SERVICES_DEFAULTS.categories,
-          price_list: body.price_list ?? SERVICES_DEFAULTS.price_list,
+          categories:    body.categories    ?? SERVICES_DEFAULTS.categories,
+          price_list:    body.price_list    ?? SERVICES_DEFAULTS.price_list,
           updated_by: 'admin',
         },
       };
-
       const results = await Promise.allSettled([
-        localPrisma.servicesConfig.upsert(servicesPayload),
-        cloudPrisma.servicesConfig.upsert(servicesPayload),
+        localPrisma.servicesConfig.upsert(payload),
+        cloudPrisma.servicesConfig.upsert(payload),
       ]);
-
-      const data = getFulfilledResult(results);
-      return NextResponse.json(data ?? { success: true });
+      return NextResponse.json(getFulfilledResult(results) ?? { success: true });
     }
 
-    // ── contact ──
+    /* ── contact ── */
     if (section === 'contact') {
-      const contactPayload = {
-        where: { id: 1 },
+      const payload = {
+        where:  { id: 1 },
         update: {
-          hero_eyebrow: body.hero_eyebrow ?? CONTACT_DEFAULTS.hero_eyebrow,
-          hero_heading: body.hero_heading ?? CONTACT_DEFAULTS.hero_heading,
-          hero_subtitle: body.hero_subtitle ?? CONTACT_DEFAULTS.hero_subtitle,
-          cta_primary_text: body.cta_primary_text ?? CONTACT_DEFAULTS.cta_primary_text,
+          hero_eyebrow:       body.hero_eyebrow       ?? CONTACT_DEFAULTS.hero_eyebrow,
+          hero_heading:       body.hero_heading       ?? CONTACT_DEFAULTS.hero_heading,
+          hero_subtitle:      body.hero_subtitle      ?? CONTACT_DEFAULTS.hero_subtitle,
+          cta_primary_text:   body.cta_primary_text   ?? CONTACT_DEFAULTS.cta_primary_text,
           cta_secondary_text: body.cta_secondary_text ?? CONTACT_DEFAULTS.cta_secondary_text,
-          phone_number: body.phone_number ?? CONTACT_DEFAULTS.phone_number,
-          email_address: body.email_address ?? CONTACT_DEFAULTS.email_address,
-          stats: body.stats ?? CONTACT_DEFAULTS.stats,
-          map_embed_src: body.map_embed_src ?? CONTACT_DEFAULTS.map_embed_src,
-          map_address: body.map_address ?? CONTACT_DEFAULTS.map_address,
-          map_open_href: body.map_open_href ?? CONTACT_DEFAULTS.map_open_href,
-          social_instagram: body.social_instagram ?? '',
-          social_facebook: body.social_facebook ?? '',
-          social_whatsapp: body.social_whatsapp ?? '',
-          branches: body.branches ?? CONTACT_DEFAULTS.branches,
+          phone_number:       body.phone_number       ?? CONTACT_DEFAULTS.phone_number,
+          email_address:      body.email_address      ?? CONTACT_DEFAULTS.email_address,
+          stats:              body.stats              ?? CONTACT_DEFAULTS.stats,
+          map_embed_src:      body.map_embed_src      ?? CONTACT_DEFAULTS.map_embed_src,
+          map_address:        body.map_address        ?? CONTACT_DEFAULTS.map_address,
+          map_open_href:      body.map_open_href      ?? CONTACT_DEFAULTS.map_open_href,
+          social_instagram:   body.social_instagram   ?? '',
+          social_facebook:    body.social_facebook    ?? '',
+          social_whatsapp:    body.social_whatsapp    ?? '',
+          branches:           body.branches           ?? CONTACT_DEFAULTS.branches,
           updated_by: 'admin',
         },
         create: {
           id: 1,
-          hero_eyebrow: body.hero_eyebrow ?? CONTACT_DEFAULTS.hero_eyebrow,
-          hero_heading: body.hero_heading ?? CONTACT_DEFAULTS.hero_heading,
-          hero_subtitle: body.hero_subtitle ?? CONTACT_DEFAULTS.hero_subtitle,
-          cta_primary_text: body.cta_primary_text ?? CONTACT_DEFAULTS.cta_primary_text,
+          hero_eyebrow:       body.hero_eyebrow       ?? CONTACT_DEFAULTS.hero_eyebrow,
+          hero_heading:       body.hero_heading       ?? CONTACT_DEFAULTS.hero_heading,
+          hero_subtitle:      body.hero_subtitle      ?? CONTACT_DEFAULTS.hero_subtitle,
+          cta_primary_text:   body.cta_primary_text   ?? CONTACT_DEFAULTS.cta_primary_text,
           cta_secondary_text: body.cta_secondary_text ?? CONTACT_DEFAULTS.cta_secondary_text,
-          phone_number: body.phone_number ?? CONTACT_DEFAULTS.phone_number,
-          email_address: body.email_address ?? CONTACT_DEFAULTS.email_address,
-          stats: body.stats ?? CONTACT_DEFAULTS.stats,
-          map_embed_src: body.map_embed_src ?? CONTACT_DEFAULTS.map_embed_src,
-          map_address: body.map_address ?? CONTACT_DEFAULTS.map_address,
-          map_open_href: body.map_open_href ?? CONTACT_DEFAULTS.map_open_href,
-          social_instagram: body.social_instagram ?? '',
-          social_facebook: body.social_facebook ?? '',
-          social_whatsapp: body.social_whatsapp ?? '',
-          branches: body.branches ?? CONTACT_DEFAULTS.branches,
+          phone_number:       body.phone_number       ?? CONTACT_DEFAULTS.phone_number,
+          email_address:      body.email_address      ?? CONTACT_DEFAULTS.email_address,
+          stats:              body.stats              ?? CONTACT_DEFAULTS.stats,
+          map_embed_src:      body.map_embed_src      ?? CONTACT_DEFAULTS.map_embed_src,
+          map_address:        body.map_address        ?? CONTACT_DEFAULTS.map_address,
+          map_open_href:      body.map_open_href      ?? CONTACT_DEFAULTS.map_open_href,
+          social_instagram:   body.social_instagram   ?? '',
+          social_facebook:    body.social_facebook    ?? '',
+          social_whatsapp:    body.social_whatsapp    ?? '',
+          branches:           body.branches           ?? CONTACT_DEFAULTS.branches,
           updated_by: 'admin',
         },
       };
-
       const results = await Promise.allSettled([
-        localPrisma.contactConfig.upsert(contactPayload),
-        cloudPrisma.contactConfig.upsert(contactPayload),
+        localPrisma.contactConfig.upsert(payload),
+        cloudPrisma.contactConfig.upsert(payload),
+      ]);
+      return NextResponse.json(getFulfilledResult(results) ?? { success: true });
+    }
+
+    /* ── feedback (public submission from feedback form) ── */
+    if (section === 'feedback') {
+      const cusName     = (body.cusName     ?? '').toString().trim();
+      const cusEmail    = (body.cusEmail    ?? '').toString().trim();
+      const cusLocation = (body.cusLocation ?? '').toString().trim();
+      const cusService  = (body.cusService  ?? '').toString().trim();
+      const cusRating   = parseInt(body.cusRating ?? '0', 10);
+      const cusComment  = (body.cusComment  ?? '').toString().trim();
+      const cusConsent  = Boolean(body.cusConsent);
+
+      const validationErrors: Record<string, string> = {};
+      if (!cusName)                                              validationErrors.cusName     = 'Name is required.';
+      if (!cusEmail)                                             validationErrors.cusEmail    = 'Email is required.';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cusEmail))   validationErrors.cusEmail    = 'Invalid email address.';
+      if (!cusLocation)                                          validationErrors.cusLocation = 'Location is required.';
+      if (!cusService)                                           validationErrors.cusService  = 'Service is required.';
+      if (!cusRating || cusRating < 1 || cusRating > 5)         validationErrors.cusRating   = 'Rating must be between 1 and 5.';
+      if (!cusComment)                                           validationErrors.cusComment  = 'Comment is required.';
+      else if (cusComment.length < 20)                           validationErrors.cusComment  = 'Comment must be at least 20 characters.';
+      if (!cusConsent)                                           validationErrors.cusConsent  = 'Consent is required.';
+
+      if (Object.keys(validationErrors).length > 0) {
+        return NextResponse.json(
+          { error: 'Validation failed', fields: validationErrors },
+          { status: 422 }
+        );
+      }
+
+      const feedbackData = {
+        cusName,
+        cusEmail,
+        cusLocation,
+        cusService,
+        cusRating,
+        cusComment,
+        cusConsent,
+      };
+
+      // Dual-write: local + cloud (at least one must succeed).
+      // NOTE: local and cloud each assign their OWN auto-increment id,
+      // so the returned `saved.id` will only match ONE of the two databases.
+      // This is fine for creation, but PATCH/DELETE below are written to
+      // treat CLOUD as the source of truth to stay consistent with GET.
+      const results = await Promise.allSettled([
+        localPrisma.tbl_Feedback.create({ data: feedbackData }),
+        cloudPrisma.tbl_Feedback.create({ data: feedbackData }),
       ]);
 
-      const data = getFulfilledResult(results);
-      return NextResponse.json(data ?? { success: true });
+      if (results[0].status === 'rejected') console.warn('[feedback POST] local write failed:', getErrorMessage(results[0].reason));
+      if (results[1].status === 'rejected') console.warn('[feedback POST] cloud write failed:', getErrorMessage(results[1].reason));
+
+      // Prefer the cloud-created record's id since GET reads from cloud
+      const cloudSaved = results[1].status === 'fulfilled' ? results[1].value : null;
+      const localSaved = results[0].status === 'fulfilled' ? results[0].value : null;
+      const saved = cloudSaved ?? localSaved;
+
+      if (!saved) {
+        console.error('[feedback POST] both DB writes failed', results);
+        return NextResponse.json(
+          { error: 'Failed to save feedback. Please try again.' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'Thank you! Your feedback has been submitted successfully.',
+          id:      saved.id,
+        },
+        { status: 201 }
+      );
     }
 
     return NextResponse.json({ error: 'Invalid section' }, { status: 400 });
@@ -579,5 +761,155 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[site-data POST]', err);
     return NextResponse.json({ error: 'Save failed' }, { status: 500 });
+  }
+}
+
+
+export async function PATCH(req: NextRequest) {
+  const section = req.nextUrl.searchParams.get('section');
+  const idParam = req.nextUrl.searchParams.get('id');
+
+  if (section !== 'feedback') {
+    return NextResponse.json({ error: 'Invalid section' }, { status: 400 });
+  }
+  if (!idParam || isNaN(Number(idParam))) {
+    return NextResponse.json({ error: 'Valid id is required' }, { status: 400 });
+  }
+
+  const id = parseInt(idParam, 10);
+
+  try {
+    const body        = await req.json();
+    const isPublished = Boolean(body.isPublished);
+
+    let cloudResult: unknown = null;
+    let localResult: unknown = null;
+    let cloudError:  unknown = null;
+    let localError:  unknown = null;
+
+    try {
+      cloudResult = await cloudPrisma.tbl_Feedback.update({ where: { id }, data: { isPublished } });
+    } catch (err) {
+      cloudError = err;
+    }
+
+    try {
+      localResult = await localPrisma.tbl_Feedback.update({ where: { id }, data: { isPublished } });
+    } catch (err) {
+      localError = err;
+    }
+
+    // ── Cloud succeeded → this is the primary success path ──
+    if (cloudResult) {
+      if (localError) {
+        console.warn(`[feedback PATCH] cloud OK, local mirror failed for id=${id}:`, getErrorMessage(localError));
+      }
+      return NextResponse.json({
+        success: true,
+        id,
+        isPublished,
+        source: 'cloud',
+        localSynced: !!localResult,
+      });
+    }
+
+    // ── Cloud failed, but local succeeded → still report success, with a warning ──
+    if (localResult) {
+      console.warn(`[feedback PATCH] cloud failed (falling back to local) for id=${id}. Cloud error:`, getErrorMessage(cloudError));
+      return NextResponse.json({
+        success: true,
+        id,
+        isPublished,
+        source: 'local',
+        cloudSynced: false,
+        warning: 'Saved locally only — cloud database was unreachable. It will stay out of sync until the next successful update.',
+      });
+    }
+
+    // ── Both failed → return the REAL error details for debugging ──
+    const cloudMsg = getErrorMessage(cloudError);
+    const localMsg = getErrorMessage(localError);
+    console.error(`[feedback PATCH] BOTH updates failed for id=${id}`, { cloudMsg, localMsg });
+
+    return NextResponse.json(
+      {
+        error: 'Update failed on both databases.',
+        details: { cloud: cloudMsg, local: localMsg },
+      },
+      { status: 500 }
+    );
+  } catch (err) {
+    console.error('[site-data PATCH]', err);
+    return NextResponse.json({ error: getErrorMessage(err) }, { status: 500 });
+  }
+}
+
+/* ─────────────────────────────────────────
+   DELETE  /api/site-data?section=feedback&id=<n>
+   Same cloud-priority logic as PATCH above.
+───────────────────────────────────────── */
+export async function DELETE(req: NextRequest) {
+  const section = req.nextUrl.searchParams.get('section');
+  const idParam = req.nextUrl.searchParams.get('id');
+
+  if (section !== 'feedback') {
+    return NextResponse.json({ error: 'Invalid section' }, { status: 400 });
+  }
+  if (!idParam || isNaN(Number(idParam))) {
+    return NextResponse.json({ error: 'Valid id is required' }, { status: 400 });
+  }
+
+  const id = parseInt(idParam, 10);
+
+  try {
+    let cloudResult: unknown = null;
+    let localResult: unknown = null;
+    let cloudError:  unknown = null;
+    let localError:  unknown = null;
+
+    try {
+      cloudResult = await cloudPrisma.tbl_Feedback.delete({ where: { id } });
+    } catch (err) {
+      cloudError = err;
+    }
+
+    try {
+      localResult = await localPrisma.tbl_Feedback.delete({ where: { id } });
+    } catch (err) {
+      localError = err;
+    }
+
+    if (cloudResult) {
+      if (localError) {
+        console.warn(`[feedback DELETE] cloud OK, local mirror failed for id=${id}:`, getErrorMessage(localError));
+      }
+      return NextResponse.json({ success: true, id, source: 'cloud', localSynced: !!localResult });
+    }
+
+    if (localResult) {
+      console.warn(`[feedback DELETE] cloud failed (falling back to local) for id=${id}. Cloud error:`, getErrorMessage(cloudError));
+      return NextResponse.json({
+        success: true,
+        id,
+        source: 'local',
+        cloudSynced: false,
+        warning: 'Deleted locally only — cloud database was unreachable.',
+      });
+    }
+
+    const cloudMsg = getErrorMessage(cloudError);
+    const localMsg = getErrorMessage(localError);
+    console.error(`[feedback DELETE] BOTH deletes failed for id=${id}`, { cloudMsg, localMsg });
+
+    return NextResponse.json(
+      {
+        error: 'Delete failed on both databases.',
+        details: { cloud: cloudMsg, local: localMsg },
+      },
+      { status: 500 }
+    );
+  } catch (err) {
+    console.error('[site-data DELETE]', err);
+    return NextResponse.json({ error: getErrorMessage(err) }, { status: 500 });
   }
 }
