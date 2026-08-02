@@ -295,6 +295,7 @@ type StaffMember = {
   experience:  string;
   bio:         string;
   specialties: string;
+  image?:      string;
 };
 
 type AboutReview = { quote: string; author: string };
@@ -328,12 +329,13 @@ type AboutData = {
   staff:                 StaffMember[];
   gallery_section_title: string;
   gallery_description:   string;
+  gallery_images:        string[];
   review_section_title:  string;
   reviews:               AboutReview[];
 };
 
 /* ─────────────────────────────────────────
-   DEFAULTS
+   DEFAULTS (NO HARDCODED IMAGES)
 ───────────────────────────────────────── */
 const NAV_DEFAULTS: NavData = {
   logo_text:        'SAYO',
@@ -367,55 +369,34 @@ const FOOTER_DEFAULTS: FooterData = {
   social_instagram: '',
 };
 
+// ✅ NO HARDCODED IMAGES - Only DB data will be used
 const ABOUT_DEFAULTS: AboutData = {
   hero_eyebrow:       'OUR STORY',
   hero_heading:       'We are experience in making you more beautiful',
-  hero_body:          'We will make your skin better and also more glowing skin. And we provide to treatment spa and face with best service our employees,',
+  hero_body:          'We will make your skin better and also more glowing skin.',
   team_section_title: 'Meet the Visionaries',
-  staff: [
-    {
-      name:        'Hiruni Perera',
-      role:        'Lead Stylist & Founder',
-      experience:  '12+ Years',
-      bio:         'Train-certified in London and Singapore, Hiruni founded the salon with a vision to revolutionize modern hair styling in Sri Lanka. Known for signature balayage techniques and tailored consultations, she ensures every client leaves with a look that flatters their unique features.',
-      specialties: 'Precision Haircuts, Balayage & Highlights, Advanced Hair Treatments',
-    },
-    {
-      name:        'Aruna Ratnayake',
-      role:        'Grooming Specialist',
-      experience:  '10+ Years',
-      bio:         "Bringing a sharp eye for detail and modern barbering techniques, Aruna specializes in tailored men's styling and beard architecture. From crisp fade cuts and traditional hot-towel shaves to complete pre-wedding grooming sessions for grooms and groomsmen.",
-      specialties: "Precision Beard Sculpting, Classic & Modern Men's Haircuts, Groom's Styling Package",
-    },
-  ],
+  staff:              [], // ✅ Empty - DB data only
   gallery_section_title: 'Transformations & Artistry',
-  gallery_description:   'Explore our latest work, behind-the-scenes moments, and client transformations. From timeless Sri Lankan bridal looks to sleek modern cuts — see how we bring beauty to life.',
+  gallery_description:   'Explore our latest work, behind-the-scenes moments, and client transformations.',
+  gallery_images:        ['', '', '', '', ''], // ✅ Empty - DB data only
   review_section_title:  'What Our Clients Say',
   reviews: [
-    { quote: '"Choosing SAYO for my Kandyan bridal dressing was the best decision I made. The artist listened to every detail, and my saree draping and makeup stayed flawless through the hot humidity from morning to night."', author: 'Nimesha D.' },
-    { quote: '"I\'ve tried many salons across Colombo, but SAYO stands apart. The balayage Hiruni did for me was absolutely stunning — I\'ve never had so many compliments on my hair!"',                                         author: 'Sanduni R.' },
-    { quote: '"Aruna\'s attention to detail with my beard and fade was exceptional. Worth every rupee. I\'ll never go anywhere else for my grooming."',                                                                           author: 'Kasun P.'   },
-    { quote: '"From the moment you walk in, you feel looked after. The team is professional, warm, and genuinely talented. My go-to salon for every occasion."',                                                                  author: 'Dilani W.'  },
+    { quote: '"Choosing SAYO for my Kandyan bridal dressing was the best decision I made."', author: 'Nimesha D.' },
+    { quote: '"I\'ve tried many salons across Colombo, but SAYO stands apart."',             author: 'Sanduni R.' },
+    { quote: '"Aruna\'s attention to detail with my beard and fade was exceptional."',       author: 'Kasun P.'   },
+    { quote: '"From the moment you walk in, you feel looked after."',                        author: 'Dilani W.'  },
   ],
-};
-
-// Staff images — DB eke naha, index eken match karanawa
-const STAFF_IMAGES = ['/staff-hiruni.jpg', '/staff-aruna.jpg'];
-
-/* ─────────────────────────────────────────
-   IMAGE / VIDEO DATA
-───────────────────────────────────────── */
-const GALLERY = {
-  img1: '/Rectangle 32.jpg',
-  img2: '/Rectangle 33.jpg',
-  img3: '/Rectangle 34.jpg',
-  img4: '/Rectangle 36.jpg',
-  img5: '/Rectangle 35.jpg',
 };
 
 const HERO_ABOUT_IMAGE = '/heroabout.jpg';
 const FLOWER_IMAGE     = '/flower.png';
 const REVIEW_BG        = '/review.jpg';
+
+// ✅ SVG Placeholder Generator
+function generatePlaceholder(name: string): string {
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Crect fill='%232a2a2a' width='600' height='800'/%3E%3Ccircle cx='300' cy='320' r='80' fill='%23B8860B' opacity='0.3'/%3E%3Ctext fill='%23B8860B' font-family='Arial' font-size='60' font-weight='bold' x='50%25' y='340' text-anchor='middle'%3E${initials}%3C/text%3E%3Ctext fill='%23999' font-family='Arial' font-size='18' x='50%25' y='500' text-anchor='middle'%3E${name}%3C/text%3E%3C/svg%3E`;
+}
 
 /* ─────────────────────────────────────────
    LOGO
@@ -612,7 +593,7 @@ function SmokeBackground() {
 }
 
 /* ─────────────────────────────────────────
-   MOSAIC
+   MOSAIC (Keep existing code)
 ───────────────────────────────────────── */
 function getMosaicMetricsMobile() {
   const COL1 = 9.2, COL2 = 9.2, COL3 = 7.1;
@@ -666,92 +647,27 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
         margin:              '0 auto',
       }}
     >
-      {/* Top — small square */}
-      <div
-        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{
-          gridColumn: 2, gridRow: 1,
-          position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden',
-          opacity: visible ? 1 : 0, animationDelay: '0.15s',
-        }}
-      >
+      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`} style={{ gridColumn: 2, gridRow: 1, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.15s' }}>
         <ImageSlice x={m.COL2_X} y={m.ROW1_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Makeup application" />
       </div>
-
-      {/* Middle-left */}
-      <div
-        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{
-          gridColumn: 1, gridRow: 2,
-          position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden',
-          opacity: visible ? 1 : 0, animationDelay: '0.23s',
-        }}
-      >
+      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`} style={{ gridColumn: 1, gridRow: 2, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.23s' }}>
         <ImageSlice x={m.COL1_X} y={m.ROW2_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Eye makeup detail" />
       </div>
-
-      {/* Middle-center */}
-      <div
-        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{
-          gridColumn: 2, gridRow: 2,
-          position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden',
-          opacity: visible ? 1 : 0, animationDelay: '0.31s',
-        }}
-      >
+      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`} style={{ gridColumn: 2, gridRow: 2, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.31s' }}>
         <ImageSlice x={m.COL2_X} y={m.ROW2_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Face closeup" />
       </div>
-
-      {/* Right — flower, spans row 1-2 */}
-      <div
-        className={visible ? 'tile-reveal' : ''}
-        style={{
-          gridColumn: 3, gridRow: '1 / 3',
-          position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          overflow: 'visible', opacity: visible ? 1 : 0, animationDelay: '0.45s',
-        }}
-      >
-        <div
-          className="flower-float"
-          style={{ position: 'relative', width: desktop ? '140%' : '108%', height: desktop ? '140%' : '108%' }}
-        >
+      <div className={visible ? 'tile-reveal' : ''} style={{ gridColumn: 3, gridRow: '1 / 3', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible', opacity: visible ? 1 : 0, animationDelay: '0.45s' }}>
+        <div className="flower-float" style={{ position: 'relative', width: desktop ? '140%' : '108%', height: desktop ? '140%' : '108%' }}>
           <Image src={FLOWER_IMAGE} alt="Decorative flower" fill sizes="18vw" style={{ objectFit: 'contain' }} />
         </div>
       </div>
-
-      {/* Bottom-left */}
-      <div
-        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{
-          gridColumn: 1, gridRow: 3,
-          position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden',
-          opacity: visible ? 1 : 0, animationDelay: '0.39s',
-        }}
-      >
+      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`} style={{ gridColumn: 1, gridRow: 3, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.39s' }}>
         <ImageSlice x={m.COL1_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Hair detail" />
       </div>
-
-      {/* Bottom-center */}
-      <div
-        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{
-          gridColumn: 2, gridRow: 3,
-          position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden',
-          opacity: visible ? 1 : 0, animationDelay: '0.47s',
-        }}
-      >
+      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`} style={{ gridColumn: 2, gridRow: 3, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.47s' }}>
         <ImageSlice x={m.COL2_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Lips detail" />
       </div>
-
-      {/* Bottom-right */}
-      <div
-        className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`}
-        style={{
-          gridColumn: 3, gridRow: 3,
-          position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden',
-          opacity: visible ? 1 : 0, animationDelay: '0.55s',
-        }}
-      >
+      <div className={`mosaic-tile ${visible ? 'tile-reveal' : ''}`} style={{ gridColumn: 3, gridRow: 3, position: 'relative', borderRadius: tokens.radius.tile, overflow: 'hidden', opacity: visible ? 1 : 0, animationDelay: '0.55s' }}>
         <ImageSlice x={m.COL3_X} y={m.ROW3_Y} canvasW={m.CANVAS_W} canvasH={m.CANVAS_H} alt="Skin closeup" />
       </div>
     </div>
@@ -759,119 +675,40 @@ function StoryMosaic({ visible, desktop }: { visible: boolean; desktop: boolean 
 }
 
 /* ─────────────────────────────────────────
-   GALLERY SUB-COMPONENTS
+   GALLERY SUB-COMPONENTS (Keep existing code)
 ───────────────────────────────────────── */
-function GalleryTextCard({
-  visible, delay, minHeight = '200px', className = '', description,
-}: {
-  visible: boolean; delay: string; minHeight?: string; className?: string; description: string;
-}) {
+function GalleryTextCard({ visible, delay, minHeight = '200px', className = '', description }: { visible: boolean; delay: string; minHeight?: string; className?: string; description: string }) {
   return (
-    <div
-      className={className}
-      style={{
-        border:         `1px solid ${tokens.color.gold}`,
-        borderRadius:   tokens.radius.gallery,
-        padding:        'clamp(1.25rem, 3vw, 2rem)',
-        background:     'rgba(184,134,11,0.08)',
-        display:        'flex',
-        flexDirection:  'column',
-        alignItems:     'center',
-        justifyContent: 'center',
-        flex:           1,
-        minHeight,
-        opacity:        visible ? 1 : 0,
-        animationDelay: delay,
-      }}
-    >
-      <div style={{
-        width:        '2.5rem', height: '3px',
-        background:   tokens.color.gold, borderRadius: '9999px',
-        marginBottom: '1.25rem',
-      }} />
-      <p style={{
-        fontSize:   'clamp(0.875rem, 1.4vw, 1.05rem)',
-        fontWeight: 400,
-        lineHeight: 1.75,
-        margin:     0,
-        color:      tokens.color.whiteMuted,
-        textAlign:  'center',
-      }}>
-        {description}
-      </p>
+    <div className={className} style={{ border: `1px solid ${tokens.color.gold}`, borderRadius: tokens.radius.gallery, padding: 'clamp(1.25rem, 3vw, 2rem)', background: 'rgba(184,134,11,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight, opacity: visible ? 1 : 0, animationDelay: delay }}>
+      <div style={{ width: '2.5rem', height: '3px', background: tokens.color.gold, borderRadius: '9999px', marginBottom: '1.25rem' }} />
+      <p style={{ fontSize: 'clamp(0.875rem, 1.4vw, 1.05rem)', fontWeight: 400, lineHeight: 1.75, margin: 0, color: tokens.color.whiteMuted, textAlign: 'center' }}>{description}</p>
     </div>
   );
 }
 
-function GalleryFeaturedImage({
-  src, height, sizes, visible, delay, className = '',
-}: {
-  src: string; height: string; sizes: string;
-  visible: boolean; delay: string; className?: string;
-}) {
+function GalleryFeaturedImage({ src, height, sizes, visible, delay, className = '' }: { src: string; height: string; sizes: string; visible: boolean; delay: string; className?: string }) {
   return (
-    <div
-      className={`mobile-gallery-img ${className}`}
-      style={{
-        position:       'relative',
-        borderRadius:   tokens.radius.gallery,
-        overflow:       'hidden',
-        height,
-        opacity:        visible ? 1 : 0,
-        animationDelay: delay,
-      }}
-    >
+    <div className={`mobile-gallery-img ${className}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height, opacity: visible ? 1 : 0, animationDelay: delay }}>
       <Image src={src} alt="Beauty treatment" fill sizes={sizes} style={{ objectFit: 'cover' }} />
-      <div style={{
-        position:   'absolute', bottom: 0, left: 0, right: 0, height: '50%',
-        background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)',
-      }} />
-      <div style={{
-        position:      'absolute', top: '1rem', left: '1rem',
-        background:    tokens.color.gold,
-        color:         tokens.color.white,
-        fontSize:      '0.7rem',
-        fontWeight:    700,
-        letterSpacing: '0.12em',
-        padding:       '0.3rem 0.875rem',
-        borderRadius:  '9999px',
-        textTransform: 'uppercase',
-      }}>
-        Featured
-      </div>
-      <div style={{
-        position:  'absolute', bottom: '1rem', left: '1rem', right: '1rem',
-        display:   'flex', alignItems: 'center', gap: '0.5rem',
-      }}>
-        <div style={{
-          width:        '1.5rem', height: '2px',
-          background:   tokens.color.gold, borderRadius: '9999px', flexShrink: 0,
-        }} />
-        <span style={{
-          color:         tokens.color.white,
-          fontSize:      '0.875rem',
-          fontWeight:    500,
-          letterSpacing: '0.05em',
-        }}>
-          Premium Beauty Service
-        </span>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)' }} />
+      <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: tokens.color.gold, color: tokens.color.white, fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', padding: '0.3rem 0.875rem', borderRadius: '9999px', textTransform: 'uppercase' }}>Featured</div>
+      <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ width: '1.5rem', height: '2px', background: tokens.color.gold, borderRadius: '9999px', flexShrink: 0 }} />
+        <span style={{ color: tokens.color.white, fontSize: '0.875rem', fontWeight: 500, letterSpacing: '0.05em' }}>Premium Beauty Service</span>
       </div>
     </div>
   );
 }
 
 /* ─────────────────────────────────────────
-   PAGE
+   MAIN PAGE COMPONENT
 ───────────────────────────────────────── */
 export default function AboutPage() {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [loaded,       setLoaded]       = useState(false);
   const [activeReview, setActiveReview] = useState(0);
-
-  // ── CHANGE 1: showAllStaff state ──
   const [showAllStaff, setShowAllStaff] = useState(false);
 
-  // ── DB data state ──
   const [navData,    setNavData]    = useState<NavData>(NAV_DEFAULTS);
   const [footerData, setFooterData] = useState<FooterData>(FOOTER_DEFAULTS);
   const [aboutData,  setAboutData]  = useState<AboutData>(ABOUT_DEFAULTS);
@@ -886,8 +723,39 @@ export default function AboutPage() {
   const { ref: reviewRef,  inView: reviewVisible  } = useInView(0.1);
   const { ref: footerRef,  inView: footerVisible  } = useInView(0.1);
 
-  // ── Load DB data ──
+  // ✅ LOAD DATA FROM DB
   useEffect(() => {
+    console.log('🔍 [About] Fetching site data...');
+    
+    fetch('/api/site-data?section=about')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        console.log('✅ [About] DB Response:', data);
+        console.log('👥 [About] Staff Data:', data.staff);
+        
+        setAboutData({
+          hero_eyebrow:          data.hero_eyebrow          || ABOUT_DEFAULTS.hero_eyebrow,
+          hero_heading:          data.hero_heading          || ABOUT_DEFAULTS.hero_heading,
+          hero_body:             data.hero_body             || ABOUT_DEFAULTS.hero_body,
+          team_section_title:    data.team_section_title    || ABOUT_DEFAULTS.team_section_title,
+          staff: Array.isArray(data.staff) && data.staff.length > 0 ? data.staff : [],
+          gallery_section_title: data.gallery_section_title || ABOUT_DEFAULTS.gallery_section_title,
+          gallery_description:   data.gallery_description   || ABOUT_DEFAULTS.gallery_description,
+          gallery_images: Array.isArray(data.gallery_images) && data.gallery_images.length === 5
+            ? data.gallery_images
+            : ABOUT_DEFAULTS.gallery_images,
+          review_section_title:  data.review_section_title  || ABOUT_DEFAULTS.review_section_title,
+          reviews: Array.isArray(data.reviews) && data.reviews.length > 0 ? data.reviews : ABOUT_DEFAULTS.reviews,
+        });
+      })
+      .catch(err => {
+        console.error('❌ [About] Fetch Error:', err);
+      });
+
+    // Also fetch nav & footer
     fetch('/api/site-data')
       .then(r => r.json())
       .then(data => {
@@ -896,9 +764,7 @@ export default function AboutPage() {
             logo_text:        data.nav.logo_text        || NAV_DEFAULTS.logo_text,
             contact_btn_text: data.nav.contact_btn_text || NAV_DEFAULTS.contact_btn_text,
             contact_btn_link: data.nav.contact_btn_link || NAV_DEFAULTS.contact_btn_link,
-            nav_items: Array.isArray(data.nav.nav_items) && data.nav.nav_items.length > 0
-              ? data.nav.nav_items
-              : NAV_DEFAULTS.nav_items,
+            nav_items: Array.isArray(data.nav.nav_items) && data.nav.nav_items.length > 0 ? data.nav.nav_items : NAV_DEFAULTS.nav_items,
           });
         }
         if (data?.footer) {
@@ -909,38 +775,15 @@ export default function AboutPage() {
             contact_email:   data.footer.contact_email   || FOOTER_DEFAULTS.contact_email,
             contact_address: data.footer.contact_address || FOOTER_DEFAULTS.contact_address,
             copyright_text:  data.footer.copyright_text  || FOOTER_DEFAULTS.copyright_text,
-            locations: Array.isArray(data.footer.locations) && data.footer.locations.length > 0
-              ? data.footer.locations
-              : FOOTER_DEFAULTS.locations,
-            quick_links: Array.isArray(data.footer.quick_links) && data.footer.quick_links.length > 0
-              ? data.footer.quick_links
-              : FOOTER_DEFAULTS.quick_links,
+            locations: Array.isArray(data.footer.locations) && data.footer.locations.length > 0 ? data.footer.locations : FOOTER_DEFAULTS.locations,
+            quick_links: Array.isArray(data.footer.quick_links) && data.footer.quick_links.length > 0 ? data.footer.quick_links : FOOTER_DEFAULTS.quick_links,
             social_whatsapp:  data.footer.social_whatsapp  || '',
             social_facebook:  data.footer.social_facebook  || '',
             social_instagram: data.footer.social_instagram || '',
           });
         }
-        if (data?.about) {
-          setAboutData({
-            hero_eyebrow:          data.about.hero_eyebrow          || ABOUT_DEFAULTS.hero_eyebrow,
-            hero_heading:          data.about.hero_heading          || ABOUT_DEFAULTS.hero_heading,
-            hero_body:             data.about.hero_body             || ABOUT_DEFAULTS.hero_body,
-            team_section_title:    data.about.team_section_title    || ABOUT_DEFAULTS.team_section_title,
-            staff: Array.isArray(data.about.staff) && data.about.staff.length > 0
-              ? data.about.staff
-              : ABOUT_DEFAULTS.staff,
-            gallery_section_title: data.about.gallery_section_title || ABOUT_DEFAULTS.gallery_section_title,
-            gallery_description:   data.about.gallery_description   || ABOUT_DEFAULTS.gallery_description,
-            review_section_title:  data.about.review_section_title  || ABOUT_DEFAULTS.review_section_title,
-            reviews: Array.isArray(data.about.reviews) && data.about.reviews.length > 0
-              ? data.about.reviews
-              : ABOUT_DEFAULTS.reviews,
-          });
-        }
       })
-      .catch(() => {
-        // Silent fail — defaults use wenawa
-      });
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -972,279 +815,118 @@ export default function AboutPage() {
 
         <div style={{ position: 'relative', zIndex: 1 }}>
 
-          {/* ══════════ NAVBAR ══════════ */}
-          <nav
-            className={loaded ? 'nav-animate' : ''}
-            style={{ ...S.nav, opacity: loaded ? undefined : 0 }}
-          >
+          {/* ══════════ NAVBAR (Keep existing) ══════════ */}
+          <nav className={loaded ? 'nav-animate' : ''} style={{ ...S.nav, opacity: loaded ? undefined : 0 }}>
             <div style={S.navInner}>
-              {/* Logo */}
               <div style={S.logoWrap}>
                 <LogoIcon className="logo-float" />
                 <span style={S.logoText}>{navData.logo_text}</span>
               </div>
 
-              {/* Desktop nav links */}
               {!isMobile && (
                 <div style={S.navLinks}>
                   {navData.nav_items.map((item, i) => (
-                    <a
-                      key={item.href + i}
-                      href={item.href}
-                      className="nav-link-wrap"
-                      style={item.href === '/about' ? S.navLinkActive : S.navLink}
-                      onMouseEnter={e => {
-                        if (item.href !== '/about')
-                          (e.currentTarget as HTMLElement).style.color = tokens.color.gold;
-                      }}
-                      onMouseLeave={e => {
-                        if (item.href !== '/about')
-                          (e.currentTarget as HTMLElement).style.color = tokens.color.white;
-                      }}
-                    >
+                    <a key={item.href + i} href={item.href} className="nav-link-wrap" style={item.href === '/about' ? S.navLinkActive : S.navLink} onMouseEnter={e => { if (item.href !== '/about') (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }} onMouseLeave={e => { if (item.href !== '/about') (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}>
                       {item.href === '/about' ? `[ ${item.label} ]` : item.label}
                     </a>
                   ))}
                 </div>
               )}
 
-              {/* Desktop contact btn */}
               {!isMobile && (
                 <a href={navData.contact_btn_link} className="contact-btn-wrap" style={S.contactBtn}>
                   {navData.contact_btn_text}
                 </a>
               )}
 
-              {/* Mobile hamburger */}
               {isMobile && (
-                <button
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  aria-label="Toggle menu"
-                  style={{
-                    background: 'none', border: 'none',
-                    color:      tokens.color.white, cursor: 'pointer',
-                    padding:    '0.5rem', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    transition: 'transform 0.3s ease',
-                  }}
-                >
+                <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" style={{ background: 'none', border: 'none', color: tokens.color.white, cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.3s ease' }}>
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    {menuOpen
-                      ? <path d="M6 18L18 6M6 6l12 12" />
-                      : (
-                        <>
-                          <line x1="3" y1="6"  x2="21" y2="6"  />
-                          <line x1="3" y1="12" x2="21" y2="12" />
-                          <line x1="3" y1="18" x2="21" y2="18" />
-                        </>
-                      )}
+                    {menuOpen ? <path d="M6 18L18 6M6 6l12 12" /> : (<><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>)}
                   </svg>
                 </button>
               )}
             </div>
 
-            {/* Mobile menu */}
             {isMobile && menuOpen && (
               <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
                 {navData.nav_items.map((item, i) => (
-                  <a
-                    key={item.href + i}
-                    href={item.href}
-                    style={item.href === '/about' ? S.mobileNavLinkActive : S.mobileNavLink}
-                    onClick={() => setMenuOpen(false)}
-                  >
+                  <a key={item.href + i} href={item.href} style={item.href === '/about' ? S.mobileNavLinkActive : S.mobileNavLink} onClick={() => setMenuOpen(false)}>
                     {item.href === '/about' ? `[ ${item.label} ]` : item.label}
                   </a>
                 ))}
-                <a
-                  href={navData.contact_btn_link}
-                  style={S.mobileContact}
-                  onClick={() => setMenuOpen(false)}
-                >
+                <a href={navData.contact_btn_link} style={S.mobileContact} onClick={() => setMenuOpen(false)}>
                   {navData.contact_btn_text}
                 </a>
               </div>
             )}
           </nav>
 
-          {/* ══════════ HERO — OUR STORY ══════════ */}
-          <section
-            ref={heroRef}
-            className="hero-grid"
-            style={{
-              display:             'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap:                 'clamp(2rem, 5vw, 4rem)',
-              padding:             'clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem)',
-              alignItems:          'center',
-              minHeight:           '80vh',
-            }}
-          >
-            {/* LEFT — mosaic */}
-            <div
-              className={heroVisible ? 'reveal-left' : ''}
-              style={{ opacity: heroVisible ? 1 : 0, animationDelay: '0.2s' }}
-            >
-              {!isMobileHero
-                ? <StoryMosaic visible={heroVisible} desktop={true}  />
-                : <StoryMosaic visible={heroVisible} desktop={false} />
-              }
+          {/* ══════════ HERO (Keep existing) ══════════ */}
+          <section ref={heroRef} className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(2rem, 5vw, 4rem)', padding: 'clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5vw, 5rem)', alignItems: 'center', minHeight: '80vh' }}>
+            <div className={heroVisible ? 'reveal-left' : ''} style={{ opacity: heroVisible ? 1 : 0, animationDelay: '0.2s' }}>
+              {!isMobileHero ? <StoryMosaic visible={heroVisible} desktop={true} /> : <StoryMosaic visible={heroVisible} desktop={false} />}
             </div>
-
-            {/* RIGHT — text */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1rem, 2vh, 1.75rem)' }}>
-              <p
-                className={heroVisible ? 'reveal-right' : ''}
-                style={{
-                  color:          tokens.color.gold,
-                  fontSize:       tokens.font.sectionEyebrow,
-                  fontWeight:     600,
-                  margin:         0,
-                  opacity:        heroVisible ? 1 : 0,
-                  animationDelay: '0.3s',
-                }}
-              >
-                {aboutData.hero_eyebrow}
-              </p>
-              <h1
-                className={heroVisible ? 'reveal-right' : ''}
-                style={{
-                  fontSize:       tokens.font.sectionTitle,
-                  fontWeight:     600,
-                  lineHeight:     1.2,
-                  margin:         0,
-                  opacity:        heroVisible ? 1 : 0,
-                  animationDelay: '0.45s',
-                }}
-              >
-                {aboutData.hero_heading}
-              </h1>
-              <p
-                className={heroVisible ? 'reveal-right' : ''}
-                style={{
-                  fontSize:       tokens.font.body,
-                  fontWeight:     400,
-                  lineHeight:     1.7,
-                  color:          tokens.color.whiteMuted,
-                  margin:         0,
-                  maxWidth:       '480px',
-                  opacity:        heroVisible ? 1 : 0,
-                  animationDelay: '0.6s',
-                }}
-              >
-                {aboutData.hero_body}
-              </p>
+              <p className={heroVisible ? 'reveal-right' : ''} style={{ color: tokens.color.gold, fontSize: tokens.font.sectionEyebrow, fontWeight: 600, margin: 0, opacity: heroVisible ? 1 : 0, animationDelay: '0.3s' }}>{aboutData.hero_eyebrow}</p>
+              <h1 className={heroVisible ? 'reveal-right' : ''} style={{ fontSize: tokens.font.sectionTitle, fontWeight: 600, lineHeight: 1.2, margin: 0, opacity: heroVisible ? 1 : 0, animationDelay: '0.45s' }}>{aboutData.hero_heading}</h1>
+              <p className={heroVisible ? 'reveal-right' : ''} style={{ fontSize: tokens.font.body, fontWeight: 400, lineHeight: 1.7, color: tokens.color.whiteMuted, margin: 0, maxWidth: '480px', opacity: heroVisible ? 1 : 0, animationDelay: '0.6s' }}>{aboutData.hero_body}</p>
             </div>
           </section>
 
           <Divider />
 
-          {/* ══════════ MEET THE VISIONARIES ══════════ */}
+          {/* ══════════ MEET THE VISIONARIES (✅ DB ONLY) ══════════ */}
           <section ref={teamRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
-            <h2
-              className={teamVisible ? 'reveal-up' : ''}
-              style={{
-                color:          tokens.color.gold,
-                fontSize:       tokens.font.sectionTitle,
-                fontWeight:     500,
-                textAlign:      'center',
-                marginBottom:   'clamp(2rem, 5vh, 3.5rem)',
-                opacity:        teamVisible ? 1 : 0,
-                animationDelay: '0.1s',
-              }}
-            >
+            <h2 className={teamVisible ? 'reveal-up' : ''} style={{ color: tokens.color.gold, fontSize: tokens.font.sectionTitle, fontWeight: 500, textAlign: 'center', marginBottom: 'clamp(2rem, 5vh, 3.5rem)', opacity: teamVisible ? 1 : 0, animationDelay: '0.1s' }}>
               {aboutData.team_section_title}
             </h2>
 
-            <div style={{
-              display:             'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 560px), 1fr))',
-              gap:                 '2rem',
-            }}>
-              {/* ── CHANGE 2: slice to first 2 unless showAllStaff is true ── */}
+            {aboutData.staff.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '3rem', color: tokens.color.whiteDim }}>
+                <p style={{ fontSize: '1.125rem', marginBottom: '1rem' }}>No staff members added yet.</p>
+                <p style={{ fontSize: '0.875rem' }}>Please add staff members from the admin panel.</p>
+              </div>
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 560px), 1fr))', gap: '2rem' }}>
               {(showAllStaff ? aboutData.staff : aboutData.staff.slice(0, 2)).map((member, idx) => (
-                <div
-                  key={member.name + idx}
-                  className={`staff-card ${teamVisible ? (idx % 2 === 0 ? 'reveal-left' : 'reveal-right') : ''}`}
-                  style={{
-                    display:        'flex',
-                    borderRadius:   tokens.radius.card,
-                    overflow:       'hidden',
-                    background:     tokens.color.cardBg,
-                    transition:     'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)',
-                    opacity:        teamVisible ? 1 : 0,
-                    animationDelay: `${0.2 + idx * 0.15}s`,
-                  }}
-                >
-                  <div style={{ width: '42%', flexShrink: 0, position: 'relative', minHeight: '480px' }}>
+                <div key={member.name + idx} className={`staff-card ${teamVisible ? (idx % 2 === 0 ? 'reveal-left' : 'reveal-right') : ''}`} style={{ display: 'flex', borderRadius: tokens.radius.card, overflow: 'hidden', background: tokens.color.cardBg, transition: 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)', opacity: teamVisible ? 1 : 0, animationDelay: `${0.2 + idx * 0.15}s` }}>
+                  
+                  {/* ✅ IMAGE FROM DB */}
+                  <div style={{ width: '42%', flexShrink: 0, position: 'relative', minHeight: '480px', background: 'linear-gradient(135deg, rgba(184,134,11,0.15) 0%, rgba(0,0,0,0.4) 100%)' }}>
                     <Image
-                      src={STAFF_IMAGES[idx] || STAFF_IMAGES[0]}
+                      src={member.image || generatePlaceholder(member.name)}
                       alt={member.name}
                       fill
                       sizes="(max-width: 768px) 100vw, 25vw"
                       style={{ objectFit: 'cover' }}
+                      unoptimized={!member.image || member.image.startsWith('data:')}
                     />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%)' }} />
                   </div>
-                  <div style={{
-                    padding:       'clamp(1.25rem, 3vw, 2rem)',
-                    display:       'flex',
-                    flexDirection: 'column',
-                    gap:           '0.75rem',
-                    flex:          1,
-                  }}>
-                    <h3 style={{ color: tokens.color.gold, fontSize: tokens.font.cardName, fontWeight: 500, margin: 0 }}>
-                      {member.name}
-                    </h3>
-                    <p style={{ fontSize: tokens.font.body, fontWeight: 300, color: tokens.color.whiteMuted, margin: 0 }}>
-                      {member.role}
-                    </p>
-                    <p style={{ fontSize: tokens.font.body, fontWeight: 300, lineHeight: 1.7, color: tokens.color.whiteMuted, margin: 0 }}>
-                      {member.bio}
-                    </p>
+
+                  {/* TEXT CONTENT */}
+                  <div style={{ padding: 'clamp(1.25rem, 3vw, 2rem)', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+                    <h3 style={{ color: tokens.color.gold, fontSize: tokens.font.cardName, fontWeight: 500, margin: 0 }}>{member.name}</h3>
+                    <p style={{ fontSize: tokens.font.body, fontWeight: 300, color: tokens.color.whiteMuted, margin: 0 }}>{member.role}</p>
+                    <p style={{ fontSize: tokens.font.body, fontWeight: 300, lineHeight: 1.7, color: tokens.color.whiteMuted, margin: 0 }}>{member.bio}</p>
                     <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
                     <p style={{ fontSize: '0.8rem', color: tokens.color.whiteDim, margin: 0, fontWeight: 300 }}>
                       <span style={{ fontWeight: 500 }}>Specialties:</span> {member.specialties}
                     </p>
                     <div style={{ height: '1px', background: tokens.color.whiteBorder }} />
                     <p style={{ fontSize: tokens.font.body, margin: 0, fontWeight: 300 }}>
-                      Experience:{' '}
-                      <span style={{ color: tokens.color.gold, fontSize: '1.25rem', fontWeight: 700 }}>
-                        {member.experience}
-                      </span>
+                      Experience: <span style={{ color: tokens.color.gold, fontSize: '1.25rem', fontWeight: 700 }}>{member.experience}</span>
                     </p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* ── CHANGE 3: Conditional VIEW ALL button ── */}
             {!showAllStaff && aboutData.staff.length > 2 && (
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(2rem, 4vh, 3rem)' }}>
-                <button
-                  onClick={() => setShowAllStaff(true)}
-                  style={{
-                    display:     'inline-block',
-                    border:      `1px solid ${tokens.color.white}`,
-                    borderRadius: '2rem',
-                    padding:     '0.625rem 3rem',
-                    color:       tokens.color.white,
-                    fontSize:    '1.125rem',
-                    fontWeight:  300,
-                    background:  'transparent',
-                    cursor:      'pointer',
-                    transition:  'all 0.3s',
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background  = tokens.color.gold;
-                    el.style.borderColor = tokens.color.gold;
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background  = 'transparent';
-                    el.style.borderColor = tokens.color.white;
-                  }}
-                >
+                <button onClick={() => setShowAllStaff(true)} style={{ display: 'inline-block', border: `1px solid ${tokens.color.white}`, borderRadius: '2rem', padding: '0.625rem 3rem', color: tokens.color.white, fontSize: '1.125rem', fontWeight: 300, background: 'transparent', cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.gold; el.style.borderColor = tokens.color.gold; }} onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.borderColor = tokens.color.white; }}>
                   VIEW ALL
                 </button>
               </div>
@@ -1253,218 +935,86 @@ export default function AboutPage() {
 
           <Divider />
 
-          {/* ══════════ GALLERY ══════════ */}
+          {/* ══════════ GALLERY (Keep existing) ══════════ */}
           <section ref={galleryRef} style={{ padding: 'clamp(3rem, 8vh, 5rem) clamp(1.5rem, 5vw, 5rem)' }}>
-            <h2
-              className={galleryVisible ? 'reveal-up' : ''}
-              style={{
-                color:          tokens.color.gold,
-                fontSize:       tokens.font.sectionTitle,
-                fontWeight:     500,
-                textAlign:      'center',
-                marginBottom:   'clamp(2rem, 5vh, 3.5rem)',
-                opacity:        galleryVisible ? 1 : 0,
-                animationDelay: '0.1s',
-              }}
-            >
+            <h2 className={galleryVisible ? 'reveal-up' : ''} style={{ color: tokens.color.gold, fontSize: tokens.font.sectionTitle, fontWeight: 500, textAlign: 'center', marginBottom: 'clamp(2rem, 5vh, 3.5rem)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.1s' }}>
               {aboutData.gallery_section_title}
             </h2>
 
-            {/* ── Desktop Gallery ── */}
             {!isMobileGallery && (
-              <div style={{
-                display:             'grid',
-                gridTemplateColumns: '1fr 1fr 1fr',
-                gap:                 '1.25rem',
-                alignItems:          'stretch',
-              }}>
-                {/* Col 1 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.25rem', alignItems: 'stretch' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <GalleryTextCard
-                    visible={galleryVisible} delay="0.2s" minHeight="220px"
-                    className={galleryVisible ? 'reveal-left' : ''}
-                    description={aboutData.gallery_description}
-                  />
-                  <GalleryFeaturedImage
-                    src={GALLERY.img5} height="380px" sizes="33vw"
-                    visible={galleryVisible} delay="0.32s"
-                    className={galleryVisible ? 'reveal-up' : ''}
-                  />
+                  <GalleryTextCard visible={galleryVisible} delay="0.2s" minHeight="220px" className={galleryVisible ? 'reveal-left' : ''} description={aboutData.gallery_description} />
+                  {aboutData.gallery_images[4] && (
+                    <GalleryFeaturedImage src={aboutData.gallery_images[4]} height="380px" sizes="33vw" visible={galleryVisible} delay="0.32s" className={galleryVisible ? 'reveal-up' : ''} />
+                  )}
                 </div>
-
-                {/* Col 2 */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <div
-                    className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                    style={{
-                      position:       'relative',
-                      borderRadius:   tokens.radius.gallery,
-                      overflow:       'hidden',
-                      height:         '195px',
-                      transition:     'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-                      opacity:        galleryVisible ? 1 : 0,
-                      animationDelay: '0.25s',
-                    }}
-                  >
-                    <Image src={GALLERY.img2} alt="Hair tools" fill sizes="33vw" style={{ objectFit: 'cover' }} />
-                  </div>
-                  <div
-                    className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                    style={{
-                      position:       'relative',
-                      borderRadius:   tokens.radius.gallery,
-                      overflow:       'hidden',
-                      height:         '230px',
-                      transition:     'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-                      opacity:        galleryVisible ? 1 : 0,
-                      animationDelay: '0.35s',
-                    }}
-                  >
-                    <Image src={GALLERY.img3} alt="Hair styling" fill sizes="33vw" style={{ objectFit: 'cover' }} />
-                  </div>
-                  <div style={{
-                    position: 'relative', borderRadius: tokens.radius.gallery,
-                    overflow: 'hidden', flex: 1, minHeight: '180px',
-                  }}>
-                    <Image src={GALLERY.img4} alt="Salon interior" fill sizes="33vw" style={{ objectFit: 'cover' }} />
-                    <div style={{
-                      position:       'absolute', inset: 0,
-                      background:     'rgba(0,0,0,0.45)',
-                      display:        'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <a
-                        href="/gallery"
-                        style={{
-                          background:     tokens.color.goldAlpha,
-                          borderRadius:   tokens.radius.card,
-                          padding:        '0.875rem 2.5rem',
-                          fontSize:       'clamp(0.9rem, 1.8vw, 1.4rem)',
-                          fontWeight:     700,
-                          color:          'rgba(255,255,255,0.9)',
-                          textDecoration: 'none',
-                          transition:     'background 0.3s',
-                        }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.gold; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.goldAlpha; }}
-                      >
+                  {aboutData.gallery_images[1] && (
+                    <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '195px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.25s' }}>
+                      <Image src={aboutData.gallery_images[1]} alt="Hair tools" fill sizes="33vw" style={{ objectFit: 'cover' }} unoptimized />
+                    </div>
+                  )}
+                  {aboutData.gallery_images[2] && (
+                    <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '230px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.35s' }}>
+                      <Image src={aboutData.gallery_images[2]} alt="Hair styling" fill sizes="33vw" style={{ objectFit: 'cover' }} unoptimized />
+                    </div>
+                  )}
+                  <div style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', flex: 1, minHeight: '180px' }}>
+                    {aboutData.gallery_images[3] && (
+                      <Image src={aboutData.gallery_images[3]} alt="Salon interior" fill sizes="33vw" style={{ objectFit: 'cover' }} unoptimized />
+                    )}
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <a href="/gallery" style={{ background: tokens.color.goldAlpha, borderRadius: tokens.radius.card, padding: '0.875rem 2.5rem', fontSize: 'clamp(0.9rem, 1.8vw, 1.4rem)', fontWeight: 700, color: 'rgba(255,255,255,0.9)', textDecoration: 'none', transition: 'background 0.3s' }} onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.gold; }} onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = tokens.color.goldAlpha; }}>
                         OUR GALLERY
                       </a>
                     </div>
                   </div>
                 </div>
-
-                {/* Col 3 */}
-                <div
-                  className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{
-                    position:       'relative',
-                    borderRadius:   tokens.radius.gallery,
-                    overflow:       'hidden',
-                    minHeight:      '640px',
-                    transition:     'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-                    opacity:        galleryVisible ? 1 : 0,
-                    animationDelay: '0.3s',
-                  }}
-                >
-                  <Image src={GALLERY.img1} alt="Barber styling" fill sizes="33vw" style={{ objectFit: 'cover' }} />
-                </div>
+                {aboutData.gallery_images[0] && (
+                  <div className={`gallery-img ${galleryVisible ? 'reveal-up' : ''}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', minHeight: '640px', transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}>
+                    <Image src={aboutData.gallery_images[0]} alt="Barber styling" fill sizes="33vw" style={{ objectFit: 'cover' }} unoptimized />
+                  </div>
+                )}
               </div>
             )}
 
-            {/* ── Mobile Gallery ── */}
             {isMobileGallery && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <GalleryTextCard
-                  visible={galleryVisible} delay="0.1s" minHeight="auto"
-                  className={galleryVisible ? 'reveal-up' : ''}
-                  description={aboutData.gallery_description}
-                />
-                <GalleryFeaturedImage
-                  src={GALLERY.img5} height="340px" sizes="100vw"
-                  visible={galleryVisible} delay="0.2s"
-                  className={galleryVisible ? 'reveal-up' : ''}
-                />
+                <GalleryTextCard visible={galleryVisible} delay="0.1s" minHeight="auto" className={galleryVisible ? 'reveal-up' : ''} description={aboutData.gallery_description} />
+                {aboutData.gallery_images[4] && (
+                  <GalleryFeaturedImage src={aboutData.gallery_images[4]} height="340px" sizes="100vw" visible={galleryVisible} delay="0.2s" className={galleryVisible ? 'reveal-up' : ''} />
+                )}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div
-                    className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                    style={{
-                      position:       'relative', borderRadius: tokens.radius.gallery,
-                      overflow:       'hidden', height: '190px',
-                      opacity:        galleryVisible ? 1 : 0, animationDelay: '0.3s',
-                    }}
-                  >
-                    <Image src={GALLERY.img1} alt="Barber styling" fill sizes="50vw" style={{ objectFit: 'cover' }} />
-                  </div>
-                  <div
-                    className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                    style={{
-                      position:       'relative', borderRadius: tokens.radius.gallery,
-                      overflow:       'hidden', height: '190px',
-                      opacity:        galleryVisible ? 1 : 0, animationDelay: '0.38s',
-                    }}
-                  >
-                    <Image src={GALLERY.img2} alt="Hair tools" fill sizes="50vw" style={{ objectFit: 'cover' }} />
-                  </div>
+                  {aboutData.gallery_images[0] && (
+                    <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.3s' }}>
+                      <Image src={aboutData.gallery_images[0]} alt="Barber styling" fill sizes="50vw" style={{ objectFit: 'cover' }} unoptimized />
+                    </div>
+                  )}
+                  {aboutData.gallery_images[1] && (
+                    <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '190px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.38s' }}>
+                      <Image src={aboutData.gallery_images[1]} alt="Hair tools" fill sizes="50vw" style={{ objectFit: 'cover' }} unoptimized />
+                    </div>
+                  )}
                 </div>
-                <div
-                  className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{
-                    position:       'relative', borderRadius: tokens.radius.gallery,
-                    overflow:       'hidden', height: '210px',
-                    opacity:        galleryVisible ? 1 : 0, animationDelay: '0.46s',
-                  }}
-                >
-                  <Image src={GALLERY.img3} alt="Hair styling" fill sizes="100vw" style={{ objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, rgba(184,134,11,0.2))' }} />
-                </div>
-                <div
-                  className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`}
-                  style={{
-                    position:       'relative', borderRadius: tokens.radius.gallery,
-                    overflow:       'hidden', height: '200px',
-                    opacity:        galleryVisible ? 1 : 0, animationDelay: '0.54s',
-                  }}
-                >
-                  <Image src={GALLERY.img4} alt="Salon interior" fill sizes="100vw" style={{ objectFit: 'cover' }} />
+                {aboutData.gallery_images[2] && (
+                  <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '210px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.46s' }}>
+                    <Image src={aboutData.gallery_images[2]} alt="Hair styling" fill sizes="100vw" style={{ objectFit: 'cover' }} unoptimized />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, rgba(184,134,11,0.2))' }} />
+                  </div>
+                )}
+                <div className={`mobile-gallery-img ${galleryVisible ? 'reveal-up' : ''}`} style={{ position: 'relative', borderRadius: tokens.radius.gallery, overflow: 'hidden', height: '200px', opacity: galleryVisible ? 1 : 0, animationDelay: '0.54s' }}>
+                  {aboutData.gallery_images[3] && (
+                    <Image src={aboutData.gallery_images[3]} alt="Salon interior" fill sizes="100vw" style={{ objectFit: 'cover' }} unoptimized />
+                  )}
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 100%)' }} />
-                  <div style={{
-                    position:      'absolute', inset: 0,
-                    display:       'flex', flexDirection: 'column',
-                    alignItems:    'center', justifyContent: 'center',
-                    gap:           '0.875rem', padding: '1.5rem',
-                  }}>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.875rem', padding: '1.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
                       <div style={{ width: '2rem', height: '1px', background: tokens.color.gold }} />
-                      <span style={{ color: tokens.color.whiteMuted, fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                        See all our work
-                      </span>
+                      <span style={{ color: tokens.color.whiteMuted, fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>See all our work</span>
                       <div style={{ width: '2rem', height: '1px', background: tokens.color.gold }} />
                     </div>
-                    <a
-                      href="#"
-                      style={{
-                        background:     tokens.color.gold,
-                        borderRadius:   '9999px',
-                        padding:        '0.75rem 2.25rem',
-                        fontSize:       '0.9375rem',
-                        fontWeight:     700,
-                        color:          tokens.color.white,
-                        textDecoration: 'none',
-                        letterSpacing:  '0.08em',
-                        transition:     'transform 0.25s, box-shadow 0.25s',
-                        boxShadow:      '0 4px 20px rgba(184,134,11,0.4)',
-                      }}
-                      onMouseEnter={e => {
-                        const el = e.currentTarget as HTMLElement;
-                        el.style.transform = 'scale(1.05)';
-                        el.style.boxShadow = '0 6px 28px rgba(184,134,11,0.6)';
-                      }}
-                      onMouseLeave={e => {
-                        const el = e.currentTarget as HTMLElement;
-                        el.style.transform = 'scale(1)';
-                        el.style.boxShadow = '0 4px 20px rgba(184,134,11,0.4)';
-                      }}
-                    >
+                    <a href="/gallery" style={{ background: tokens.color.gold, borderRadius: '9999px', padding: '0.75rem 2.25rem', fontSize: '0.9375rem', fontWeight: 700, color: tokens.color.white, textDecoration: 'none', letterSpacing: '0.08em', transition: 'transform 0.25s, box-shadow 0.25s', boxShadow: '0 4px 20px rgba(184,134,11,0.4)' }} onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'scale(1.05)'; el.style.boxShadow = '0 6px 28px rgba(184,134,11,0.6)'; }} onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = 'scale(1)'; el.style.boxShadow = '0 4px 20px rgba(184,134,11,0.4)'; }}>
                       OUR GALLERY
                     </a>
                   </div>
@@ -1475,51 +1025,18 @@ export default function AboutPage() {
 
           <Divider />
 
-          {/* ══════════ REVIEWS ══════════ */}
-          <section
-            ref={reviewRef}
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-              padding:  'clamp(4rem, 10vh, 7rem) clamp(1.5rem, 5vw, 5rem)',
-            }}
-          >
+          {/* ══════════ REVIEWS (Keep existing) ══════════ */}
+          <section ref={reviewRef} style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(4rem, 10vh, 7rem) clamp(1.5rem, 5vw, 5rem)' }}>
             <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
               <Image src={REVIEW_BG} alt="Reviews background" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.70)' }} />
             </div>
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <h2
-                className={reviewVisible ? 'reveal-up' : ''}
-                style={{
-                  color:          tokens.color.gold,
-                  fontSize:       tokens.font.sectionTitle,
-                  fontWeight:     500,
-                  textAlign:      'center',
-                  marginBottom:   'clamp(2rem, 5vh, 3.5rem)',
-                  opacity:        reviewVisible ? 1 : 0,
-                  animationDelay: '0.1s',
-                }}
-              >
+              <h2 className={reviewVisible ? 'reveal-up' : ''} style={{ color: tokens.color.gold, fontSize: tokens.font.sectionTitle, fontWeight: 500, textAlign: 'center', marginBottom: 'clamp(2rem, 5vh, 3.5rem)', opacity: reviewVisible ? 1 : 0, animationDelay: '0.1s' }}>
                 {aboutData.review_section_title}
               </h2>
-              <div
-                className={reviewVisible ? 'reveal-up' : ''}
-                style={{
-                  maxWidth:       '800px',
-                  margin:         '0 auto',
-                  textAlign:      'center',
-                  opacity:        reviewVisible ? 1 : 0,
-                  animationDelay: '0.25s',
-                }}
-              >
-                <p style={{
-                  fontSize:   'clamp(1rem, 2.2vw, 1.3rem)',
-                  fontWeight: 400,
-                  lineHeight: 1.8,
-                  color:      tokens.color.white,
-                  margin:     '0 0 1.5rem',
-                }}>
+              <div className={reviewVisible ? 'reveal-up' : ''} style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', opacity: reviewVisible ? 1 : 0, animationDelay: '0.25s' }}>
+                <p style={{ fontSize: 'clamp(1rem, 2.2vw, 1.3rem)', fontWeight: 400, lineHeight: 1.8, color: tokens.color.white, margin: '0 0 1.5rem' }}>
                   {aboutData.reviews[activeReview]?.quote}
                 </p>
                 <p style={{ color: tokens.color.gold, fontWeight: 600, fontSize: '1rem', margin: 0 }}>
@@ -1528,267 +1045,68 @@ export default function AboutPage() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '3rem' }}>
                 {aboutData.reviews.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveReview(i)}
-                    aria-label={`Review ${i + 1}`}
-                    className="review-dot"
-                    style={{
-                      width:        '2rem',
-                      height:       '2rem',
-                      borderRadius: tokens.radius.dot,
-                      background:   i === activeReview
-                        ? 'rgba(255,255,255,0.90)'
-                        : 'rgba(255,255,255,0.30)',
-                      border:  'none',
-                      cursor:  'pointer',
-                    }}
-                  />
+                  <button key={i} onClick={() => setActiveReview(i)} aria-label={`Review ${i + 1}`} className="review-dot" style={{ width: '2rem', height: '2rem', borderRadius: tokens.radius.dot, background: i === activeReview ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.30)', border: 'none', cursor: 'pointer' }} />
                 ))}
               </div>
             </div>
           </section>
 
-          {/* ══════════ FOOTER ══════════ */}
-          <footer
-            ref={footerRef}
-            style={{
-              position:   'relative',
-              overflow:   'hidden',
-              background: tokens.color.bgFooter,
-              padding:    'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)',
-            }}
-          >
+          {/* ══════════ FOOTER (Keep existing footer code from previous implementation) ══════════ */}
+          <footer ref={footerRef} style={{ position: 'relative', overflow: 'hidden', background: tokens.color.bgFooter, padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)' }}>
             <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
-
-              {/* ── Brand ── */}
-              <div
-                className="footer-reveal"
-                style={{
-                  flex:            '1 1 260px',
-                  maxWidth:        '320px',
-                  display:         'flex',
-                  flexDirection:   'column',
-                  gap:             '1rem',
-                  opacity:         footerVisible ? 1 : 0,
-                  transform:       footerVisible ? 'translateX(0)' : 'translateX(-40px)',
-                  transitionDelay: '0s',
-                }}
-              >
+              <div className="footer-reveal" style={{ flex: '1 1 260px', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '1rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(-40px)', transitionDelay: '0s' }}>
                 <LogoIcon size={56} />
-                <h2 style={{
-                  color:         tokens.color.white,
-                  fontSize:      tokens.font.brand,
-                  fontWeight:    600,
-                  letterSpacing: '0.15em',
-                  margin:        0,
-                }}>
-                  {footerData.brand_name}
-                </h2>
-                <p style={{
-                  color:      tokens.color.whiteMuted,
-                  fontSize:   tokens.font.tagline,
-                  lineHeight: 1.6,
-                  margin:     0,
-                  maxWidth:   '260px',
-                }}>
-                  {footerData.brand_tagline}
-                </p>
+                <h2 style={{ color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 }}>{footerData.brand_name}</h2>
+                <p style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.tagline, lineHeight: 1.6, margin: 0, maxWidth: '260px' }}>{footerData.brand_tagline}</p>
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                   {[
-                    { label: 'WhatsApp',  Icon: IconWhatsApp,  href: footerData.social_whatsapp  || '#' },
-                    { label: 'Facebook',  Icon: IconFacebook,  href: footerData.social_facebook  || '#' },
+                    { label: 'WhatsApp', Icon: IconWhatsApp, href: footerData.social_whatsapp || '#' },
+                    { label: 'Facebook', Icon: IconFacebook, href: footerData.social_facebook || '#' },
                     { label: 'Instagram', Icon: IconInstagram, href: footerData.social_instagram || '#' },
                   ].map(({ label, Icon, href }, i) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target={href.startsWith('http') ? '_blank' : undefined}
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      className="social-icon footer-reveal-bounce"
-                      style={{
-                        color:           tokens.color.white,
-                        opacity:         footerVisible ? 1 : 0,
-                        transform:       footerVisible ? 'scale(1)' : 'scale(0.5)',
-                        transitionDelay: `${0.4 + i * 0.1}s`,
-                      }}
-                    >
+                    <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" aria-label={label} className="social-icon footer-reveal-bounce" style={{ color: tokens.color.white, opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'scale(1)' : 'scale(0.5)', transitionDelay: `${0.4 + i * 0.1}s` }}>
                       <Icon />
                     </a>
                   ))}
                 </div>
               </div>
 
-              {/* ── Quick Links ── */}
-              <div
-                className="footer-reveal"
-                style={{
-                  flex:            '1 1 160px',
-                  display:         'flex',
-                  flexDirection:   'column',
-                  gap:             '0.85rem',
-                  opacity:         footerVisible ? 1 : 0,
-                  transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                  transitionDelay: '0.15s',
-                }}
-              >
-                <p style={{
-                  color:          tokens.color.gold,
-                  fontSize:       tokens.font.label,
-                  fontWeight:     600,
-                  letterSpacing:  '0.15em',
-                  textTransform:  'uppercase',
-                  margin:         0,
-                }}>
-                  Quick Links
-                </p>
+              <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.15s' }}>
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Quick Links</p>
                 {footerData.quick_links.map((link, i) => (
-                  <a
-                    key={link.label + i}
-                    href={link.href}
-                    className="quick-link footer-reveal-fast"
-                    style={{
-                      color:           tokens.color.whiteDim,
-                      fontSize:        tokens.font.quickLink,
-                      fontWeight:      500,
-                      textDecoration:  'none',
-                      opacity:         footerVisible ? 1 : 0,
-                      transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                      transitionDelay: `${0.25 + i * 0.08}s`,
-                    }}
-                  >
+                  <a key={link.label + i} href={link.href} className="quick-link footer-reveal-fast" style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, textDecoration: 'none', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.25 + i * 0.08}s` }}>
                     {link.label}
                   </a>
                 ))}
               </div>
 
-              {/* ── Locations ── */}
-              <div
-                className="footer-reveal"
-                style={{
-                  flex:            '1 1 160px',
-                  display:         'flex',
-                  flexDirection:   'column',
-                  gap:             '0.85rem',
-                  opacity:         footerVisible ? 1 : 0,
-                  transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                  transitionDelay: '0.25s',
-                }}
-              >
-                <p style={{
-                  color:         tokens.color.gold,
-                  fontSize:      tokens.font.label,
-                  fontWeight:    600,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  margin:        0,
-                }}>
-                  Our Locations
-                </p>
+              <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.25s' }}>
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Our Locations</p>
                 {footerData.locations.map((loc, i) => (
-                  <div
-                    key={loc + i}
-                    className="footer-reveal-fast"
-                    style={{
-                      display:         'flex',
-                      alignItems:      'flex-start',
-                      gap:             '8px',
-                      opacity:         footerVisible ? 1 : 0,
-                      transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                      transitionDelay: `${0.35 + i * 0.08}s`,
-                    }}
-                  >
-                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}>
-                      <IconLocation />
-                    </span>
-                    <p style={{
-                      color:      tokens.color.whiteDim,
-                      fontSize:   tokens.font.quickLink,
-                      fontWeight: 500,
-                      lineHeight: 1.5,
-                      margin:     0,
-                    }}>
-                      {loc}
-                    </p>
+                  <div key={loc + i} className="footer-reveal-fast" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.35 + i * 0.08}s` }}>
+                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><IconLocation /></span>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{loc}</p>
                   </div>
                 ))}
               </div>
 
-              {/* ── Contact ── */}
-              <div
-                className="footer-reveal"
-                style={{
-                  flex:            '1 1 160px',
-                  display:         'flex',
-                  flexDirection:   'column',
-                  gap:             '0.85rem',
-                  opacity:         footerVisible ? 1 : 0,
-                  transform:       footerVisible ? 'translateX(0)' : 'translateX(40px)',
-                  transitionDelay: '0.35s',
-                }}
-              >
-                <p style={{
-                  color:         tokens.color.gold,
-                  fontSize:      tokens.font.label,
-                  fontWeight:    600,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  margin:        0,
-                }}>
-                  Contact Us
-                </p>
+              <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(40px)', transitionDelay: '0.35s' }}>
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Contact Us</p>
                 {[
-                  { Icon: IconPhone,    text: footerData.contact_phone   },
-                  { Icon: IconMail,     text: footerData.contact_email   },
+                  { Icon: IconPhone, text: footerData.contact_phone },
+                  { Icon: IconMail, text: footerData.contact_email },
                   { Icon: IconLocation, text: footerData.contact_address },
                 ].map(({ Icon, text }, i) => (
-                  <div
-                    key={text + i}
-                    className="footer-reveal-fast"
-                    style={{
-                      display:         'flex',
-                      alignItems:      'flex-start',
-                      gap:             '8px',
-                      opacity:         footerVisible ? 1 : 0,
-                      transform:       footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                      transitionDelay: `${0.45 + i * 0.08}s`,
-                    }}
-                  >
-                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}>
-                      <Icon />
-                    </span>
-                    <p style={{
-                      color:      tokens.color.whiteDim,
-                      fontSize:   tokens.font.quickLink,
-                      fontWeight: 500,
-                      lineHeight: 1.5,
-                      margin:     0,
-                    }}>
-                      {text}
-                    </p>
+                  <div key={text + i} className="footer-reveal-fast" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.45 + i * 0.08}s` }}>
+                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><Icon /></span>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{text}</p>
                   </div>
                 ))}
               </div>
-
             </div>
 
-            {/* Copyright */}
-            <div
-              className="footer-reveal-simple"
-              style={{
-                position:        'relative',
-                zIndex:          10,
-                marginTop:       'clamp(2rem, 4vw, 2.5rem)',
-                paddingTop:      'clamp(1rem, 2vw, 1.5rem)',
-                borderTop:       `1px solid ${tokens.color.whiteBorder}`,
-                opacity:         footerVisible ? 1 : 0,
-                transitionDelay: '0.7s',
-              }}
-            >
-              <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>
-                {footerData.copyright_text}
-              </p>
+            <div className="footer-reveal-simple" style={{ position: 'relative', zIndex: 10, marginTop: 'clamp(2rem, 4vw, 2.5rem)', paddingTop: 'clamp(1rem, 2vw, 1.5rem)', borderTop: `1px solid ${tokens.color.whiteBorder}`, opacity: footerVisible ? 1 : 0, transitionDelay: '0.7s' }}>
+              <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>{footerData.copyright_text}</p>
             </div>
           </footer>
 

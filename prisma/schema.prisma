@@ -92,6 +92,7 @@ model AboutConfig {
   staff                 Json
   gallery_section_title String   @default("Transformations & Artistry") @db.VarChar(200)
   gallery_description   String   @db.Text
+  gallery_images        Json
   review_section_title  String   @default("What Our Clients Say") @db.VarChar(200)
   reviews               Json
   updated_at            DateTime @updatedAt

@@ -57,12 +57,14 @@ export type FooterData = {
   social_instagram: string;
 };
 
+// ✅ UPDATED: Added photo field
 export type StaffMember = {
   name:        string;
   role:        string;
   experience:  string;
   bio:         string;
   specialties: string;
+  photo?:      string;  // Cloudinary URL
 };
 
 export type AboutReview = { quote: string; author: string };
@@ -75,6 +77,7 @@ export type AboutData = {
   staff:                 StaffMember[];
   gallery_section_title: string;
   gallery_description:   string;
+  gallery_images:        string[];   // Cloudinary URLs for gallery (img1..img5)
   review_section_title:  string;
   reviews:               AboutReview[];
 };
@@ -185,17 +188,33 @@ const FOOTER_DEFAULTS: FooterData = {
   social_instagram: '',
 };
 
+// ✅ UPDATED: Added photo: '' to defaults
 const ABOUT_DEFAULTS: AboutData = {
   hero_eyebrow:       'OUR STORY',
   hero_heading:       'We are experience in making you more beautiful',
   hero_body:          'We will make your skin better and also more glowing skin.',
   team_section_title: 'Meet the Visionaries',
   staff: [
-    { name: 'Hiruni Perera',   role: 'Lead Stylist & Founder', experience: '12+ Years', bio: 'Train-certified in London and Singapore.', specialties: 'Precision Haircuts, Balayage & Highlights' },
-    { name: 'Aruna Ratnayake', role: 'Grooming Specialist',    experience: '10+ Years', bio: 'Bringing a sharp eye for detail.',          specialties: 'Precision Beard Sculpting' },
+    { 
+      name: 'Hiruni Perera', 
+      role: 'Lead Stylist & Founder', 
+      experience: '12+ Years', 
+      bio: 'Train-certified in London and Singapore.', 
+      specialties: 'Precision Haircuts, Balayage & Highlights',
+      photo: '' 
+    },
+    { 
+      name: 'Aruna Ratnayake', 
+      role: 'Grooming Specialist', 
+      experience: '10+ Years', 
+      bio: 'Bringing a sharp eye for detail.', 
+      specialties: 'Precision Beard Sculpting',
+      photo: '' 
+    },
   ],
   gallery_section_title: 'Transformations & Artistry',
   gallery_description:   'Explore our latest work, behind-the-scenes moments, and client transformations.',
+  gallery_images:        ['', '', '', '', ''],
   review_section_title:  'What Our Clients Say',
   reviews: [
     { quote: '"Choosing SAYO was the best decision."',                author: 'Nimesha D.' },
@@ -605,11 +624,6 @@ function FbAvatar({ name }: { name: string }) {
 
 /* ═══════════════════════════════════════════
    FEEDBACK — PUBLISH TOGGLE
-   ▸ Cloud is treated as source of truth.
-   ▸ If cloud succeeds → reports success even
-     if local mirror failed (logs warning).
-   ▸ If both fail → shows actual error detail
-     instead of a generic message.
 ═══════════════════════════════════════════ */
 function FbPublishToggle({ id, value, onChange }: {
   id: number;
@@ -640,7 +654,6 @@ function FbPublishToggle({ id, value, onChange }: {
           setTimeout(() => setWarning(''), 6000);
         }
       } else {
-        // Surface the real error from the API response
         let detail = `HTTP ${res.status}`;
         if (json?.details) {
           detail = `Cloud: ${json.details.cloud ?? '—'} | Local: ${json.details.local ?? '—'}`;
@@ -676,15 +689,11 @@ function FbPublishToggle({ id, value, onChange }: {
           {loading ? '…' : value ? 'Published' : 'Hidden'}
         </span>
       </div>
-
-      {/* Error — shows real API/network error message */}
       {error && (
         <span style={{ fontSize:'0.65rem', color:'#e05555', fontWeight:500, lineHeight:1.45, wordBreak:'break-word' }}>
           ✕ {error}
         </span>
       )}
-
-      {/* Warning — cloud succeeded but local mirror failed */}
       {warning && (
         <span style={{ fontSize:'0.65rem', color:'#d4a017', fontWeight:500, lineHeight:1.45, wordBreak:'break-word' }}>
           ⚠ {warning}
@@ -729,15 +738,11 @@ function FbReviewCard({ item, onToggle }: { item: Feedback; onToggle: (id: numbe
 
   return (
     <div className="fb-review-card" style={{ background:'rgba(255,255,255,0.04)', border:`1px solid ${item.isPublished ? GOLD_BORDER : BORDER}`, borderRadius:'1rem', padding:'1.125rem 1.25rem', display:'flex', flexDirection:'column', gap:'0.875rem', position:'relative' }}>
-
-      {/* Published ribbon */}
       {item.isPublished && (
         <span style={{ position:'absolute', top:'-1px', right:'1rem', background:GOLD, color:'#fff', fontSize:'0.6rem', fontWeight:700, padding:'0.2rem 0.6rem', borderRadius:'0 0 0.4rem 0.4rem', letterSpacing:'0.05em', textTransform:'uppercase' }}>
           Live on Site
         </span>
       )}
-
-      {/* Top row */}
       <div style={{ display:'flex', alignItems:'flex-start', gap:'0.75rem' }}>
         <FbAvatar name={item.cusName} />
         <div style={{ flex:1, minWidth:0 }}>
@@ -748,8 +753,6 @@ function FbReviewCard({ item, onToggle }: { item: Feedback; onToggle: (id: numbe
           <span style={{ color:'rgba(255,255,255,0.45)', fontSize:'0.75rem' }}>{date}</span>
         </div>
       </div>
-
-      {/* Pills */}
       <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap' }}>
         <span style={{ background:'rgba(184,134,11,0.10)', border:`1px solid ${GOLD_BORDER}`, borderRadius:'999px', color:GOLD, fontSize:'0.68rem', fontWeight:600, padding:'0.18rem 0.7rem', letterSpacing:'0.05em', textTransform:'uppercase' }}>
           {item.cusService}
@@ -759,16 +762,10 @@ function FbReviewCard({ item, onToggle }: { item: Feedback; onToggle: (id: numbe
           {item.cusLocation}
         </span>
       </div>
-
-      {/* Divider */}
       <div style={{ height:'1px', background:'rgba(255,255,255,0.07)' }} />
-
-      {/* Comment */}
       <p style={{ color:'rgba(255,255,255,0.70)', fontSize:'0.85rem', lineHeight:1.7, margin:0, fontStyle:'italic' }}>
         &ldquo;{item.cusComment}&rdquo;
       </p>
-
-      {/* Bottom row */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'0.6rem', paddingTop:'0.4rem', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
         <span style={{ color:'rgba(255,255,255,0.45)', fontSize:'0.72rem' }}>{item.cusEmail}</span>
         <FbPublishToggle id={item.id} value={item.isPublished} onChange={onToggle} />
@@ -838,8 +835,6 @@ function FeedbackTab() {
   return (
     <>
       <style>{FEEDBACK_CSS}</style>
-
-      {/* Header row */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'1rem', marginBottom:'1.25rem' }}>
         <p style={{ color:'rgba(255,255,255,0.45)', fontSize:'0.82rem', margin:0 }}>
           {allReviews.length} total · {filtered.length} matching · {publishedCount} live on website
@@ -851,11 +846,7 @@ function FeedbackTab() {
           <IconRefresh /> Refresh
         </button>
       </div>
-
-      {/* Stats bar */}
       {!loading && !error && <FbStatsBar data={allReviews} />}
-
-      {/* Filters */}
       <div style={{ display:'flex', flexWrap:'wrap', gap:'0.65rem', marginBottom:'1.5rem', alignItems:'center' }}>
         <select className="fb-select" value={location} onChange={e => changeFilter(() => setLocation(e.target.value))}>
           {FB_LOCATIONS.map(l => <option key={l} value={l}>{l === 'All' ? 'All Locations' : l}</option>)}
@@ -873,8 +864,6 @@ function FeedbackTab() {
           </button>
         ))}
       </div>
-
-      {/* Content */}
       {loading ? (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'4rem', gap:'0.75rem', color:'rgba(255,255,255,0.45)' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2.5" style={{ animation:'fbSpin 0.8s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -897,8 +886,6 @@ function FeedbackTab() {
           ))}
         </div>
       )}
-
-      {/* Pagination */}
       {!loading && !error && totalPages > 1 && (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'0.45rem', marginTop:'2rem', flexWrap:'wrap' }}>
           <button className="fb-pg-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
@@ -947,6 +934,14 @@ export default function SayoAdminPage() {
   const [svcGender,   setSvcGender]   = useState<GenderKey>('her');
   const [svcCategory, setSvcCategory] = useState<string>('');
 
+  // ✅ NEW: Staff photo upload states
+  const [staffUploadLoading, setStaffUploadLoading] = useState<Record<number, boolean>>({});
+  const [staffUploadError,   setStaffUploadError]   = useState<Record<number, string>>({});
+
+  // ✅ NEW: Gallery image upload states
+  const [galleryUploadLoading, setGalleryUploadLoading] = useState<Record<number, boolean>>({});
+  const [galleryUploadError,   setGalleryUploadError]   = useState<Record<number, string>>({});
+
   useEffect(() => {
     if (servicesData.categories.length > 0 && !svcCategory) setSvcCategory(servicesData.categories[0].key);
   }, [servicesData.categories, svcCategory]);
@@ -970,7 +965,7 @@ export default function SayoAdminPage() {
         if (data?.nav)      setNavData({ ...NAV_DEFAULTS, ...data.nav, nav_items: data.nav.nav_items?.length ? data.nav.nav_items : NAV_DEFAULTS.nav_items });
         if (data?.home)     setHomeData({ ...HOME_DEFAULTS, ...data.home });
         if (data?.footer)   setFooterData({ ...FOOTER_DEFAULTS, ...data.footer, locations: data.footer.locations?.length ? data.footer.locations : FOOTER_DEFAULTS.locations, quick_links: data.footer.quick_links?.length ? data.footer.quick_links : FOOTER_DEFAULTS.quick_links });
-        if (data?.about)    setAboutData({ ...ABOUT_DEFAULTS, ...data.about, staff: data.about.staff?.length ? data.about.staff : ABOUT_DEFAULTS.staff, reviews: data.about.reviews?.length ? data.about.reviews : ABOUT_DEFAULTS.reviews });
+        if (data?.about)    setAboutData({ ...ABOUT_DEFAULTS, ...data.about, staff: data.about.staff?.length ? data.about.staff : ABOUT_DEFAULTS.staff, reviews: data.about.reviews?.length ? data.about.reviews : ABOUT_DEFAULTS.reviews, gallery_images: Array.isArray(data.about.gallery_images) && data.about.gallery_images.length === 5 ? data.about.gallery_images : ABOUT_DEFAULTS.gallery_images });
         if (data?.services) {
           const cats = data.services.categories?.length ? data.services.categories : SERVICES_DEFAULTS.categories;
           setServicesData({ ...SERVICES_DEFAULTS, ...data.services, categories: cats, price_list: data.services.price_list ?? SERVICES_DEFAULTS.price_list });
@@ -1030,9 +1025,49 @@ export default function SayoAdminPage() {
 
   /* ── Staff helpers ── */
   const updateStaffMember = (idx:number,field:keyof StaffMember,value:string) => { const u=[...aboutData.staff]; u[idx]={...u[idx],[field]:value}; setAboutData({...aboutData,staff:u}); };
-  const addStaffMember    = () => setAboutData({...aboutData,staff:[...aboutData.staff,{name:'New Staff',role:'Role',experience:'1+ Years',bio:'',specialties:''}]});
+  const addStaffMember    = () => setAboutData({...aboutData,staff:[...aboutData.staff,{name:'New Staff',role:'Role',experience:'1+ Years',bio:'',specialties:'',photo:''}]});
   const removeStaffMember = (idx:number) => setAboutData({...aboutData,staff:aboutData.staff.filter((_,i)=>i!==idx)});
   const moveStaffMember   = (idx:number,dir:-1|1) => { const u=[...aboutData.staff]; const n=idx+dir; if(n<0||n>=u.length)return; [u[idx],u[n]]=[u[n],u[idx]]; setAboutData({...aboutData,staff:u}); };
+
+  // ✅ NEW: Staff photo upload handler
+  const handleStaffPhotoUpload = async (idx: number, file: File) => {
+    setStaffUploadLoading(prev => ({ ...prev, [idx]: true }));
+    setStaffUploadError(prev =>   ({ ...prev, [idx]: '' }));
+    try {
+      const fd = new FormData();
+      fd.append('file',      file);
+      fd.append('staffName', aboutData.staff[idx]?.name ?? 'staff');
+      const res  = await fetch('/api/upload-staff-photo', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error ?? 'Upload failed');
+      updateStaffMember(idx, 'photo', json.url);
+    } catch (err) {
+      setStaffUploadError(prev => ({ ...prev, [idx]: err instanceof Error ? err.message : 'Upload failed' }));
+    } finally {
+      setStaffUploadLoading(prev => ({ ...prev, [idx]: false }));
+    }
+  };
+
+  // ✅ NEW: Gallery image upload handler
+  const handleGalleryImageUpload = async (idx: number, file: File) => {
+    setGalleryUploadLoading(prev => ({ ...prev, [idx]: true }));
+    setGalleryUploadError(prev =>   ({ ...prev, [idx]: '' }));
+    try {
+      const fd = new FormData();
+      fd.append('file',      file);
+      fd.append('staffName', `gallery-${idx + 1}`);
+      const res  = await fetch('/api/upload-staff-photo', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error ?? 'Upload failed');
+      const updated = [...aboutData.gallery_images];
+      updated[idx] = json.url;
+      setAboutData({ ...aboutData, gallery_images: updated });
+    } catch (err) {
+      setGalleryUploadError(prev => ({ ...prev, [idx]: err instanceof Error ? err.message : 'Upload failed' }));
+    } finally {
+      setGalleryUploadLoading(prev => ({ ...prev, [idx]: false }));
+    }
+  };
 
   /* ── Review helpers ── */
   const updateAboutReview = (idx:number,field:keyof AboutReview,value:string) => { const u=[...aboutData.reviews]; u[idx]={...u[idx],[field]:value}; setAboutData({...aboutData,reviews:u}); };
@@ -1242,43 +1277,285 @@ export default function SayoAdminPage() {
                 <div><label style={fieldLabel}>Body Paragraph</label><textarea rows={4} value={aboutData.hero_body} onChange={e=>setAboutData({...aboutData,hero_body:e.target.value})} style={{...inputStyle,resize:'vertical'}}/></div>
               </div>
             </section>
+
+            {/* ✅ REPLACED: Team Section with photo upload */}
             <section style={sectionCard}>
               <h2 style={sectionTitle}>Team Section</h2>
-              <div style={{marginBottom:'1.5rem'}}><label style={fieldLabel}>Section Title</label><input type="text" value={aboutData.team_section_title} onChange={e=>setAboutData({...aboutData,team_section_title:e.target.value})} style={inputStyle}/></div>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1rem'}}>
-                <label style={{...fieldLabel,fontSize:'0.9rem',color:tokens.color.gold}}>Staff Members ({aboutData.staff.length})</label>
-                <button onClick={addStaffMember} style={{background:tokens.color.gold,border:'none',color:'#fff',padding:'0.5rem 1rem',borderRadius:'0.5rem',fontWeight:600,fontSize:'0.8rem',cursor:'pointer',display:'inline-flex',alignItems:'center',gap:'0.4rem'}}><IconPlus /> Add Staff Member</button>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={fieldLabel}>Section Title</label>
+                <input
+                  type="text"
+                  value={aboutData.team_section_title}
+                  onChange={e => setAboutData({ ...aboutData, team_section_title: e.target.value })}
+                  style={inputStyle}
+                />
               </div>
-              <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-                {aboutData.staff.map((member,idx) => (
-                  <div key={idx} style={{background:'rgba(255,255,255,0.03)',border:`1px solid ${tokens.color.whiteBorder}`,borderRadius:'1rem',padding:'1.25rem'}}>
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
-                      <span style={{color:tokens.color.gold,fontWeight:600,fontSize:'0.9rem',display:'flex',alignItems:'center',gap:'0.4rem'}}><IconUser /> Staff #{idx+1}</span>
-                      <div style={{display:'flex',gap:'0.35rem'}}>
-                        <button onClick={()=>moveStaffMember(idx,-1)} disabled={idx===0} style={{...smallIconBtn,opacity:idx===0?0.3:1}}><IconChevronUp /></button>
-                        <button onClick={()=>moveStaffMember(idx,1)} disabled={idx===aboutData.staff.length-1} style={{...smallIconBtn,opacity:idx===aboutData.staff.length-1?0.3:1}}><IconChevronDown /></button>
-                        <button onClick={()=>removeStaffMember(idx)} style={{background:'rgba(229,62,62,0.2)',color:'#fc8181',border:'1px solid rgba(229,62,62,0.4)',borderRadius:'0.4rem',padding:'0.3rem 0.55rem',cursor:'pointer',display:'inline-flex',alignItems:'center',justifyContent:'center'}}><IconTrash /></button>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <label style={{ ...fieldLabel, fontSize: '0.9rem', color: tokens.color.gold }}>
+                  Staff Members ({aboutData.staff.length})
+                </label>
+                <button
+                  onClick={addStaffMember}
+                  style={{
+                    background: tokens.color.gold, border: 'none', color: '#fff',
+                    padding: '0.5rem 1rem', borderRadius: '0.5rem', fontWeight: 600,
+                    fontSize: '0.8rem', cursor: 'pointer', display: 'inline-flex',
+                    alignItems: 'center', gap: '0.4rem',
+                  }}
+                >
+                  <IconPlus /> Add Staff Member
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {aboutData.staff.map((member, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${tokens.color.whiteBorder}`,
+                      borderRadius: '1rem', padding: '1.25rem',
+                    }}
+                  >
+                    {/* Card header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                      <span style={{ color: tokens.color.gold, fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <IconUser /> Staff #{idx + 1}
+                      </span>
+                      <div style={{ display: 'flex', gap: '0.35rem' }}>
+                        <button onClick={() => moveStaffMember(idx, -1)} disabled={idx === 0}
+                          style={{ ...smallIconBtn, opacity: idx === 0 ? 0.3 : 1 }}><IconChevronUp /></button>
+                        <button onClick={() => moveStaffMember(idx, 1)} disabled={idx === aboutData.staff.length - 1}
+                          style={{ ...smallIconBtn, opacity: idx === aboutData.staff.length - 1 ? 0.3 : 1 }}><IconChevronDown /></button>
+                        <button onClick={() => removeStaffMember(idx)}
+                          style={{ background: 'rgba(229,62,62,0.2)', color: '#fc8181', border: '1px solid rgba(229,62,62,0.4)', borderRadius: '0.4rem', padding: '0.3rem 0.55rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <IconTrash />
+                        </button>
                       </div>
                     </div>
-                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'0.75rem',marginBottom:'0.75rem'}}>
-                      <div><label style={{...fieldLabel,fontSize:'0.72rem'}}>Full Name</label><input type="text" value={member.name} onChange={e=>updateStaffMember(idx,'name',e.target.value)} style={{...inputStyle,padding:'0.5rem 0.75rem'}}/></div>
-                      <div><label style={{...fieldLabel,fontSize:'0.72rem'}}>Role / Title</label><input type="text" value={member.role} onChange={e=>updateStaffMember(idx,'role',e.target.value)} style={{...inputStyle,padding:'0.5rem 0.75rem'}}/></div>
-                      <div><label style={{...fieldLabel,fontSize:'0.72rem'}}>Experience</label><input type="text" value={member.experience} onChange={e=>updateStaffMember(idx,'experience',e.target.value)} style={{...inputStyle,padding:'0.5rem 0.75rem'}}/></div>
+
+                    {/* Photo upload row */}
+                    <div style={{ marginBottom: '1rem' }}>
+                      <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Profile Photo</label>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+
+                        {/* Preview */}
+                        <div style={{
+                          width: '80px', height: '80px', borderRadius: '0.6rem', overflow: 'hidden',
+                          border: `1px solid ${tokens.color.whiteBorder}`, flexShrink: 0,
+                          background: 'rgba(255,255,255,0.05)', position: 'relative',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          {member.photo ? (
+                            <Image
+                              src={member.photo}
+                              alt={member.name || 'Staff photo'}
+                              fill
+                              sizes="80px"
+                              style={{ objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5">
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                              <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                          )}
+                        </div>
+
+                        {/* Controls */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+                          {/* File picker */}
+                          <label style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                            background: staffUploadLoading[idx]
+                              ? 'rgba(184,134,11,0.3)'
+                              : 'rgba(184,134,11,0.15)',
+                            border: `1.5px solid ${tokens.color.gold}`,
+                            color: tokens.color.gold,
+                            padding: '0.45rem 1rem', borderRadius: '0.5rem',
+                            fontSize: '0.8rem', fontWeight: 600,
+                            cursor: staffUploadLoading[idx] ? 'not-allowed' : 'pointer',
+                            width: 'fit-content', userSelect: 'none',
+                          }}>
+                            {staffUploadLoading[idx] ? (
+                              <>
+                                <span style={{
+                                  display: 'inline-block', width: '12px', height: '12px',
+                                  border: '2px solid rgba(184,134,11,0.3)',
+                                  borderTopColor: tokens.color.gold,
+                                  borderRadius: '50%', animation: 'spin 0.8s linear infinite',
+                                }} />
+                                Uploading…
+                              </>
+                            ) : (
+                              <>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                  <polyline points="17 8 12 3 7 8"/>
+                                  <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                {member.photo ? 'Change Photo' : 'Upload Photo'}
+                              </>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/gif"
+                              disabled={staffUploadLoading[idx]}
+                              style={{ display: 'none' }}
+                              onChange={e => {
+                                const f = e.target.files?.[0];
+                                if (f) handleStaffPhotoUpload(idx, f);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+
+                          {/* Remove button */}
+                          {member.photo && (
+                            <button
+                              onClick={() => updateStaffMember(idx, 'photo', '')}
+                              style={{
+                                background: 'none', border: 'none',
+                                color: 'rgba(252,129,129,0.8)', fontSize: '0.75rem',
+                                fontWeight: 500, cursor: 'pointer', padding: 0,
+                                textAlign: 'left', width: 'fit-content',
+                                display: 'flex', alignItems: 'center', gap: '0.3rem',
+                              }}
+                            >
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                              </svg>
+                              Remove photo
+                            </button>
+                          )}
+
+                          {/* Error */}
+                          {staffUploadError[idx] && (
+                            <span style={{ fontSize: '0.72rem', color: '#fc8181', fontWeight: 500, lineHeight: 1.4 }}>
+                              ✕ {staffUploadError[idx]}
+                            </span>
+                          )}
+
+                          {/* URL hint */}
+                          {member.photo && (
+                            <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', wordBreak: 'break-all', lineHeight: 1.4 }}>
+                              {member.photo}
+                            </span>
+                          )}
+
+                          <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                            JPEG · PNG · WebP · GIF &nbsp;|&nbsp; Max 5 MB &nbsp;|&nbsp; Auto-cropped to 600 × 600 px
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div style={{marginBottom:'0.75rem'}}><label style={{...fieldLabel,fontSize:'0.72rem'}}>Bio</label><textarea rows={3} value={member.bio} onChange={e=>updateStaffMember(idx,'bio',e.target.value)} style={{...inputStyle,resize:'vertical',padding:'0.5rem 0.75rem'}}/></div>
-                    <div><label style={{...fieldLabel,fontSize:'0.72rem'}}>Specialties (comma separated)</label><input type="text" value={member.specialties} onChange={e=>updateStaffMember(idx,'specialties',e.target.value)} style={{...inputStyle,padding:'0.5rem 0.75rem'}}/></div>
+
+                    {/* Text fields */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                      <div>
+                        <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Full Name</label>
+                        <input type="text" value={member.name} onChange={e => updateStaffMember(idx, 'name', e.target.value)}
+                          style={{ ...inputStyle, padding: '0.5rem 0.75rem' }} />
+                      </div>
+                      <div>
+                        <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Role / Title</label>
+                        <input type="text" value={member.role} onChange={e => updateStaffMember(idx, 'role', e.target.value)}
+                          style={{ ...inputStyle, padding: '0.5rem 0.75rem' }} />
+                      </div>
+                      <div>
+                        <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Experience</label>
+                        <input type="text" value={member.experience} onChange={e => updateStaffMember(idx, 'experience', e.target.value)}
+                          style={{ ...inputStyle, padding: '0.5rem 0.75rem' }} />
+                      </div>
+                    </div>
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Bio</label>
+                      <textarea rows={3} value={member.bio} onChange={e => updateStaffMember(idx, 'bio', e.target.value)}
+                        style={{ ...inputStyle, resize: 'vertical', padding: '0.5rem 0.75rem' }} />
+                    </div>
+                    <div>
+                      <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Specialties (comma separated)</label>
+                      <input type="text" value={member.specialties} onChange={e => updateStaffMember(idx, 'specialties', e.target.value)}
+                        style={{ ...inputStyle, padding: '0.5rem 0.75rem' }} />
+                    </div>
                   </div>
                 ))}
-                {aboutData.staff.length===0 && <div style={{textAlign:'center',padding:'2rem',color:tokens.color.whiteFaint}}>No staff members yet.</div>}
+                {aboutData.staff.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '2rem', color: tokens.color.whiteFaint }}>
+                    No staff members yet.
+                  </div>
+                )}
               </div>
             </section>
+
             <section style={sectionCard}>
               <h2 style={sectionTitle}>Gallery Section</h2>
-              <p style={sectionDesc}>Only titles/text — images are managed directly in code.</p>
-              <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
-                <div><label style={fieldLabel}>Gallery Section Title</label><input type="text" value={aboutData.gallery_section_title} onChange={e=>setAboutData({...aboutData,gallery_section_title:e.target.value})} style={inputStyle}/></div>
-                <div><label style={fieldLabel}>Gallery Description</label><textarea rows={3} value={aboutData.gallery_description} onChange={e=>setAboutData({...aboutData,gallery_description:e.target.value})} style={{...inputStyle,resize:'vertical'}}/></div>
+              <p style={sectionDesc}>Upload the 5 gallery images shown in the Transformations &amp; Artistry section. After uploading, click Save.</p>
+
+              {/* Title + Description */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
+                <div><label style={fieldLabel}>Gallery Section Title</label><input type="text" value={aboutData.gallery_section_title} onChange={e => setAboutData({ ...aboutData, gallery_section_title: e.target.value })} style={inputStyle} /></div>
+                <div><label style={fieldLabel}>Gallery Description</label><textarea rows={3} value={aboutData.gallery_description} onChange={e => setAboutData({ ...aboutData, gallery_description: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} /></div>
               </div>
+
+              {/* Gallery image slots */}
+              <label style={{ ...fieldLabel, fontSize: '0.9rem', color: tokens.color.gold, marginBottom: '1rem', display: 'block' }}>
+                Gallery Images (5 slots)
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                {[
+                  { slot: 0, label: 'Image 1 — Top Left (Featured)' },
+                  { slot: 1, label: 'Image 2 — Top Right' },
+                  { slot: 2, label: 'Image 3 — Middle Left' },
+                  { slot: 3, label: 'Image 4 — Bottom (Wide)' },
+                  { slot: 4, label: 'Image 5 — Bottom Right' },
+                ].map(({ slot, label }) => {
+                  const url     = aboutData.gallery_images?.[slot] ?? '';
+                  const loading = galleryUploadLoading[slot];
+                  const error   = galleryUploadError[slot];
+                  return (
+                    <div key={slot} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${tokens.color.whiteBorder}`, borderRadius: '1rem', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: tokens.color.gold }}>{label}</span>
+
+                      {/* Preview */}
+                      <div style={{ width: '100%', height: '140px', borderRadius: '0.6rem', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', border: `1px solid ${tokens.color.whiteBorder}`, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {url ? (
+                          <Image src={url} alt={label} fill sizes="280px" style={{ objectFit: 'cover' }} unoptimized />
+                        ) : (
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                          </svg>
+                        )}
+                      </div>
+
+                      {/* Upload label */}
+                      <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: loading ? 'rgba(184,134,11,0.3)' : 'rgba(184,134,11,0.15)', border: `1.5px solid ${tokens.color.gold}`, color: tokens.color.gold, padding: '0.45rem 1rem', borderRadius: '0.5rem', fontSize: '0.78rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', width: 'fit-content', userSelect: 'none' }}>
+                        {loading ? (
+                          <><span style={{ display: 'inline-block', width: '11px', height: '11px', border: '2px solid rgba(184,134,11,0.3)', borderTopColor: tokens.color.gold, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Uploading…</>
+                        ) : (
+                          <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>{url ? 'Change Image' : 'Upload Image'}</>
+                        )}
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" disabled={loading} style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) handleGalleryImageUpload(slot, f); e.target.value = ''; }} />
+                      </label>
+
+                      {/* Remove */}
+                      {url && (
+                        <button onClick={() => { const u = [...(aboutData.gallery_images ?? ['','','','',''])]; u[slot] = ''; setAboutData({ ...aboutData, gallery_images: u }); }} style={{ background: 'none', border: 'none', color: 'rgba(252,129,129,0.8)', fontSize: '0.72rem', fontWeight: 500, cursor: 'pointer', padding: 0, textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Remove
+                        </button>
+                      )}
+
+                      {/* Error */}
+                      {error && <span style={{ fontSize: '0.7rem', color: '#fc8181', fontWeight: 500 }}>✕ {error}</span>}
+
+                      {/* URL hint */}
+                      {url && <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.28)', wordBreak: 'break-all', lineHeight: 1.4 }}>{url}</span>}
+                    </div>
+                  );
+                })}
+              </div>
+              <p style={{ fontSize: '0.72rem', color: tokens.color.whiteFaint, marginTop: '0.75rem' }}>JPEG · PNG · WebP · GIF &nbsp;|&nbsp; Max 5 MB &nbsp;|&nbsp; After uploading all images, click <strong style={{ color: tokens.color.gold }}>Save About Changes</strong>.</p>
             </section>
             <section style={sectionCard}>
               <h2 style={sectionTitle}>Client Reviews Carousel</h2>

@@ -71,6 +71,7 @@ const ABOUT_DEFAULTS = {
   ],
   gallery_section_title: 'Transformations & Artistry',
   gallery_description:   'Explore our latest work, behind-the-scenes moments, and client transformations.',
+  gallery_images:        ['', '', '', '', ''],
   review_section_title:  'What Our Clients Say',
   reviews: [
     { quote: '"Choosing SAYO for my Kandyan bridal dressing was the best decision I made."', author: 'Nimesha D.' },
@@ -304,8 +305,9 @@ export async function GET(req: NextRequest) {
       if (!data) return NextResponse.json(ABOUT_DEFAULTS);
       return NextResponse.json({
         ...data,
-        staff:   Array.isArray(data.staff)   && (data.staff   as unknown[]).length > 0 ? data.staff   : ABOUT_DEFAULTS.staff,
-        reviews: Array.isArray(data.reviews) && (data.reviews as unknown[]).length > 0 ? data.reviews : ABOUT_DEFAULTS.reviews,
+        staff:          Array.isArray(data.staff)          && (data.staff          as unknown[]).length > 0 ? data.staff          : ABOUT_DEFAULTS.staff,
+        reviews:        Array.isArray(data.reviews)        && (data.reviews        as unknown[]).length > 0 ? data.reviews        : ABOUT_DEFAULTS.reviews,
+        gallery_images: Array.isArray(data.gallery_images) && (data.gallery_images as unknown[]).length === 5 ? data.gallery_images : ABOUT_DEFAULTS.gallery_images,
       });
     }
 
@@ -581,6 +583,7 @@ export async function POST(req: NextRequest) {
           staff:                 body.staff                 ?? ABOUT_DEFAULTS.staff,
           gallery_section_title: body.gallery_section_title ?? ABOUT_DEFAULTS.gallery_section_title,
           gallery_description:   body.gallery_description   ?? ABOUT_DEFAULTS.gallery_description,
+          gallery_images:        body.gallery_images        ?? ABOUT_DEFAULTS.gallery_images,
           review_section_title:  body.review_section_title  ?? ABOUT_DEFAULTS.review_section_title,
           reviews:               body.reviews               ?? ABOUT_DEFAULTS.reviews,
           updated_by: 'admin',
@@ -594,6 +597,7 @@ export async function POST(req: NextRequest) {
           staff:                 body.staff                 ?? ABOUT_DEFAULTS.staff,
           gallery_section_title: body.gallery_section_title ?? ABOUT_DEFAULTS.gallery_section_title,
           gallery_description:   body.gallery_description   ?? ABOUT_DEFAULTS.gallery_description,
+          gallery_images:        body.gallery_images        ?? ABOUT_DEFAULTS.gallery_images,
           review_section_title:  body.review_section_title  ?? ABOUT_DEFAULTS.review_section_title,
           reviews:               body.reviews               ?? ABOUT_DEFAULTS.reviews,
           updated_by: 'admin',
