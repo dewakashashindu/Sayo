@@ -54,7 +54,7 @@ type FormData = {
   name:     string;
   email:    string;
   location: string;
-  service:  string;
+  service:  string[];
   rating:   number;
   comment:  string;
   consent:  boolean;
@@ -197,6 +197,12 @@ const globalCss = `
     transition: border-color 0.3s;
   }
   .form-card:focus-within { border-color: rgba(184,134,11,0.25); }
+
+  /* ── Service chips ── */
+  .service-chip:hover {
+    border-color: rgba(184,134,11,0.5) !important;
+    background: rgba(184,134,11,0.08) !important;
+  }
 
   /* ── Labels / errors ── */
   .field-label {
@@ -496,7 +502,7 @@ export default function FeedbackPage() {
 
   const [form, setForm] = useState<FormData>({
     name: '', email: '', location: '',
-    service: '', rating: 0, comment: '', consent: false,
+    service: [], rating: 0, comment: '', consent: false,
   });
   const [errors,  setErrors]  = useState<FormErrors>({});
   const [touched, setTouched] = useState<Partial<Record<keyof FormData, boolean>>>({});
@@ -520,8 +526,8 @@ export default function FeedbackPage() {
       e.email = 'Please enter a valid email address.';
     if (!data.location)
       e.location = 'Please select a location.';
-    if (!data.service)
-      e.service = 'Please select a service.';
+    if (!data.service || data.service.length === 0)
+      e.service = 'Please select at least one service.';
     if (data.rating === 0)
       e.rating = 'Please select a star rating.';
     if (!data.comment.trim())
@@ -572,7 +578,7 @@ export default function FeedbackPage() {
           cusName:     form.name,
           cusEmail:    form.email,
           cusLocation: form.location,
-          cusService:  form.service,
+          cusService:  form.service.join(', '),
           cusRating:   form.rating,
           cusComment:  form.comment,
           cusConsent:  form.consent,
@@ -604,7 +610,7 @@ export default function FeedbackPage() {
   };
 
   const handleReset = () => {
-    setForm({ name:'', email:'', location:'', service:'', rating:0, comment:'', consent:false });
+    setForm({ name:'', email:'', location:'', service:[], rating:0, comment:'', consent:false });
     setErrors({});
     setTouched({});
     setSubmitStatus('idle');
@@ -784,7 +790,7 @@ export default function FeedbackPage() {
                         </FieldWrap>
                       </div>
 
-                      {/* ── Row 2: Location + Service ── */}
+                      {/* ── Row 2: Location ── */}
                       <div className="form-row">
                         <FieldWrap label="Branch Location" error={errors.location}>
                           <select
@@ -800,20 +806,57 @@ export default function FeedbackPage() {
                             ))}
                           </select>
                         </FieldWrap>
+                      </div>
 
+                      {/* ── Row 3: Service Received (full width, multi-select) ── */}
+                      <div>
                         <FieldWrap label="Service Received" error={errors.service}>
-                          <select
-                            className={`form-input${errors.service && touched.service ? ' form-input-error' : ''}`}
-                            value={form.service}
-                            onChange={e => handleChange('service', e.target.value)}
+                          <div
+                            style={{
+                              display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
+                              padding: '0.75rem',
+                              background: 'rgba(255,255,255,0.05)',
+                              border: `1.5px solid ${errors.service && touched.service ? 'rgba(220,60,60,0.7)' : 'rgba(255,255,255,0.12)'}`,
+                              borderRadius: '0.75rem',
+                              transition: 'border-color 0.25s',
+                            }}
                             onBlur={() => handleBlur('service')}
-                            style={dropdownStyle}
                           >
-                            <option value="" disabled>Select a service</option>
-                            {SERVICES.map(svc => (
-                              <option key={svc} value={svc}>{svc}</option>
-                            ))}
-                          </select>
+                            {SERVICES.map(svc => {
+                              const selected = form.service.includes(svc);
+                              return (
+                                <button
+                                  key={svc}
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = selected
+                                      ? form.service.filter(s => s !== svc)
+                                      : [...form.service, svc];
+                                    handleChange('service', updated);
+                                    setTouched(prev => ({ ...prev, service: true }));
+                                  }}
+                                  style={{
+                                    padding: '0.375rem 0.875rem',
+                                    borderRadius: '999px',
+                                    border: `1.5px solid ${selected ? tokens.color.gold : 'rgba(255,255,255,0.18)'}`,
+                                    background: selected ? 'rgba(184,134,11,0.18)' : 'rgba(255,255,255,0.04)',
+                                    color: selected ? tokens.color.gold : tokens.color.whiteDim,
+                                    fontSize: '0.8rem',
+                                    fontWeight: selected ? 600 : 400,
+                                    fontFamily: 'Inter, sans-serif',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    letterSpacing: '0.02em',
+                                  }}
+                                >
+                                  {selected && (
+                                    <span style={{ marginRight: '0.3rem', fontSize: '0.7rem' }}>✓</span>
+                                  )}
+                                  {svc}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </FieldWrap>
                       </div>
 

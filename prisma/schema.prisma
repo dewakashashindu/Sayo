@@ -148,3 +148,14 @@ model Tbl_Feedback {
   @@index([cusRating])
   @@index([isPublished])
 }
+model GalleryConfig {
+  id                Int      @id @default(autoincrement())
+  hero_eyebrow      String   @default("")
+  hero_title        String   @default("")
+  hero_subtitle     String   @default("")
+  section_title     String   @default("")
+  section_subtitle  String   @default("")
+  items             Json
+  updated_by        String?
+  updatedAt         DateTime @updatedAt
+}

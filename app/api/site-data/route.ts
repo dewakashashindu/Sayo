@@ -235,6 +235,28 @@ const CONTACT_DEFAULTS = {
   ],
 };
 
+const GALLERY_DEFAULTS = {
+  hero_eyebrow:      '✦ SAYO Beauty Studio ✦',
+  hero_title:        'The Beauty Canvas',
+  hero_subtitle:     'A curated showcase of artistry, elegance, and unforgettable transformations crafted by our expert stylists.',
+  section_title:     'Our Portfolio',
+  section_subtitle:  'Browse through our collection of stunning transformations and beauty artistry',
+  items: [
+    { id: 1,  src: '/gallery/bridal-1.jpg', alt: 'Bridal Makeup',        label: 'Bridal Makeup',        tag: 'Bridal', filter: 'bridal', aspect: 'portrait'  },
+    { id: 2,  src: '/gallery/hair-1.jpg',   alt: 'Hair Coloring',         label: 'Balayage & Highlights', tag: 'Hair',   filter: 'hair',   aspect: 'landscape' },
+    { id: 3,  src: '/gallery/makeup-1.jpg', alt: 'Glam Makeup',           label: 'Evening Glam',          tag: 'Makeup', filter: 'makeup', aspect: 'portrait'  },
+    { id: 4,  src: '/gallery/hair-2.jpg',   alt: 'Hair Styling',          label: 'Precision Cuts',        tag: 'Hair',   filter: 'hair',   aspect: 'square'    },
+    { id: 5,  src: '/gallery/bridal-2.jpg', alt: 'Kandyan Bridal',        label: 'Kandyan Bridal Look',   tag: 'Bridal', filter: 'bridal', aspect: 'landscape' },
+    { id: 6,  src: '/gallery/spa-1.jpg',    alt: 'Spa Treatment',         label: 'Rejuvenating Spa',      tag: 'Spa',    filter: 'spa',    aspect: 'portrait'  },
+    { id: 7,  src: '/gallery/nail-1.jpg',   alt: 'Nail Art',              label: 'Nail Artistry',         tag: 'Nails',  filter: 'nails',  aspect: 'square'    },
+    { id: 8,  src: '/gallery/makeup-2.jpg', alt: 'Bridal Makeup Detail',  label: 'Bridal Eyes',           tag: 'Bridal', filter: 'bridal', aspect: 'landscape' },
+    { id: 9,  src: '/gallery/hair-3.jpg',   alt: 'Hair Treatment',        label: 'Keratin Treatment',     tag: 'Hair',   filter: 'hair',   aspect: 'portrait'  },
+    { id: 10, src: '/gallery/salon-1.jpg',  alt: 'Salon Interior',        label: 'Our Studio',            tag: 'Studio', filter: 'studio', aspect: 'landscape' },
+    { id: 11, src: '/gallery/bridal-3.jpg', alt: 'Modern Bridal',         label: 'Modern Bridal Glow',    tag: 'Bridal', filter: 'bridal', aspect: 'square'    },
+    { id: 12, src: '/gallery/spa-2.jpg',    alt: 'Facial Treatment',      label: 'Luxury Facial',         tag: 'Spa',    filter: 'spa',    aspect: 'portrait'  },
+  ],
+};
+
 /* ─────────────────────────────────────────
    HELPERS
 ───────────────────────────────────────── */
@@ -303,9 +325,23 @@ export async function GET(req: NextRequest) {
         (await cloudPrisma.aboutConfig.findUnique({ where: { id: 1 } })) ??
         (await localPrisma.aboutConfig.findUnique({ where: { id: 1 } }));
       if (!data) return NextResponse.json(ABOUT_DEFAULTS);
+
+      // Normalize staff: pass through all fields including photo (Cloudinary URL saved by admin)
+      const rawStaff = Array.isArray(data.staff) && (data.staff as unknown[]).length > 0
+        ? data.staff as { name: string; role: string; experience: string; bio: string; specialties: string; photo?: string | null; image?: string | null }[]
+        : ABOUT_DEFAULTS.staff;
+      const normalizedStaff = rawStaff.map(member => {
+        const m = member as Record<string, unknown>;
+        return {
+          ...member,
+          photo: typeof m.photo === 'string' ? m.photo.trim() : '',
+          image: typeof m.image === 'string' ? m.image.trim() : '',
+        };
+      });
+
       return NextResponse.json({
         ...data,
-        staff:          Array.isArray(data.staff)          && (data.staff          as unknown[]).length > 0 ? data.staff          : ABOUT_DEFAULTS.staff,
+        staff:          normalizedStaff,
         reviews:        Array.isArray(data.reviews)        && (data.reviews        as unknown[]).length > 0 ? data.reviews        : ABOUT_DEFAULTS.reviews,
         gallery_images: Array.isArray(data.gallery_images) && (data.gallery_images as unknown[]).length === 5 ? data.gallery_images : ABOUT_DEFAULTS.gallery_images,
       });
@@ -344,6 +380,27 @@ export async function GET(req: NextRequest) {
         ...data,
         stats:    Array.isArray(data.stats)    && (data.stats    as unknown[]).length > 0 ? data.stats    : CONTACT_DEFAULTS.stats,
         branches: Array.isArray(data.branches) && (data.branches as unknown[]).length > 0 ? data.branches : CONTACT_DEFAULTS.branches,
+      });
+    }
+
+    /* ── gallery ── */
+    if (section === 'gallery') {
+      const localOk = typeof localPrisma.galleryConfig === 'object';
+      const cloudOk = typeof cloudPrisma.galleryConfig === 'object';
+      let data: { [k: string]: unknown } | null = null;
+      if (cloudOk) data = (await cloudPrisma.galleryConfig.findUnique({ where: { id: 1 } })) ?? data;
+      if (!data && localOk) data = await localPrisma.galleryConfig.findUnique({ where: { id: 1 } });
+      if (!data) return NextResponse.json(GALLERY_DEFAULTS);
+      return NextResponse.json({
+        ...data,
+        hero_eyebrow:     data.hero_eyebrow     ?? GALLERY_DEFAULTS.hero_eyebrow,
+        hero_title:       data.hero_title       ?? GALLERY_DEFAULTS.hero_title,
+        hero_subtitle:    data.hero_subtitle    ?? GALLERY_DEFAULTS.hero_subtitle,
+        section_title:    data.section_title    ?? GALLERY_DEFAULTS.section_title,
+        section_subtitle: data.section_subtitle ?? GALLERY_DEFAULTS.section_subtitle,
+        items: Array.isArray(data.items) && (data.items as unknown[]).length > 0
+          ? data.items
+          : GALLERY_DEFAULTS.items,
       });
     }
 
@@ -402,13 +459,14 @@ export async function GET(req: NextRequest) {
     }
 
     /* ── all sections fallback ── */
-    const [nav, home, footer, about, services, contact] = await Promise.all([
+    const [nav, home, footer, about, services, contact, gallery] = await Promise.all([
       cloudPrisma.navConfig.findUnique({      where: { id: 1 } }).catch(() => localPrisma.navConfig.findUnique({      where: { id: 1 } })),
       cloudPrisma.homeConfig.findUnique({     where: { id: 1 } }).catch(() => localPrisma.homeConfig.findUnique({     where: { id: 1 } })),
       cloudPrisma.footerConfig.findUnique({   where: { id: 1 } }).catch(() => localPrisma.footerConfig.findUnique({   where: { id: 1 } })),
       cloudPrisma.aboutConfig.findUnique({    where: { id: 1 } }).catch(() => localPrisma.aboutConfig.findUnique({    where: { id: 1 } })),
       cloudPrisma.servicesConfig.findUnique({ where: { id: 1 } }).catch(() => localPrisma.servicesConfig.findUnique({ where: { id: 1 } })),
       cloudPrisma.contactConfig.findUnique({  where: { id: 1 } }).catch(() => localPrisma.contactConfig.findUnique({  where: { id: 1 } })),
+      cloudPrisma.galleryConfig?.findUnique?.({  where: { id: 1 } })?.catch(() => localPrisma.galleryConfig?.findUnique?.({  where: { id: 1 } })),
     ]);
 
     return NextResponse.json({
@@ -454,6 +512,19 @@ export async function GET(req: NextRequest) {
             branches: Array.isArray(contact.branches) && (contact.branches as unknown[]).length > 0 ? contact.branches : CONTACT_DEFAULTS.branches,
           }
         : CONTACT_DEFAULTS,
+      gallery: gallery
+        ? {
+            ...gallery,
+            hero_eyebrow:     gallery.hero_eyebrow     ?? GALLERY_DEFAULTS.hero_eyebrow,
+            hero_title:       gallery.hero_title       ?? GALLERY_DEFAULTS.hero_title,
+            hero_subtitle:    gallery.hero_subtitle    ?? GALLERY_DEFAULTS.hero_subtitle,
+            section_title:    gallery.section_title    ?? GALLERY_DEFAULTS.section_title,
+            section_subtitle: gallery.section_subtitle ?? GALLERY_DEFAULTS.section_subtitle,
+            items: Array.isArray(gallery.items) && (gallery.items as unknown[]).length > 0
+              ? gallery.items
+              : GALLERY_DEFAULTS.items,
+          }
+        : GALLERY_DEFAULTS,
     });
 
   } catch (err) {
@@ -461,6 +532,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       nav: NAV_DEFAULTS, home: HOME_DEFAULTS, footer: FOOTER_DEFAULTS,
       about: ABOUT_DEFAULTS, services: SERVICES_DEFAULTS, contact: CONTACT_DEFAULTS,
+      gallery: GALLERY_DEFAULTS,
     });
   }
 }
@@ -683,6 +755,44 @@ export async function POST(req: NextRequest) {
         localPrisma.contactConfig.upsert(payload),
         cloudPrisma.contactConfig.upsert(payload),
       ]);
+      return NextResponse.json(getFulfilledResult(results) ?? { success: true });
+    }
+
+    /* ── gallery ── */
+    if (section === 'gallery') {
+      const localOk = typeof localPrisma.galleryConfig === 'object';
+      const cloudOk = typeof cloudPrisma.galleryConfig === 'object';
+      if (!localOk && !cloudOk) {
+        return NextResponse.json({
+          error: 'GalleryConfig model not found in the Prisma client. Add the GalleryConfig model to prisma/schema.prisma (both local and cloud schemas), then run: npx prisma generate && npx prisma db push. Restart the server afterwards. Model definition: see prisma-schema-snippet.md.',
+        }, { status: 500 });
+      }
+      const payload = {
+        where:  { id: 1 },
+        update: {
+          hero_eyebrow:     body.hero_eyebrow     ?? GALLERY_DEFAULTS.hero_eyebrow,
+          hero_title:       body.hero_title       ?? GALLERY_DEFAULTS.hero_title,
+          hero_subtitle:    body.hero_subtitle    ?? GALLERY_DEFAULTS.hero_subtitle,
+          section_title:    body.section_title    ?? GALLERY_DEFAULTS.section_title,
+          section_subtitle: body.section_subtitle ?? GALLERY_DEFAULTS.section_subtitle,
+          items:            Array.isArray(body.items) ? body.items : GALLERY_DEFAULTS.items,
+          updated_by: 'admin',
+        },
+        create: {
+          id: 1,
+          hero_eyebrow:     body.hero_eyebrow     ?? GALLERY_DEFAULTS.hero_eyebrow,
+          hero_title:       body.hero_title       ?? GALLERY_DEFAULTS.hero_title,
+          hero_subtitle:    body.hero_subtitle    ?? GALLERY_DEFAULTS.hero_subtitle,
+          section_title:    body.section_title    ?? GALLERY_DEFAULTS.section_title,
+          section_subtitle: body.section_subtitle ?? GALLERY_DEFAULTS.section_subtitle,
+          items:            Array.isArray(body.items) ? body.items : GALLERY_DEFAULTS.items,
+          updated_by: 'admin',
+        },
+      };
+      const calls: Promise<unknown>[] = [];
+      if (localOk) calls.push(localPrisma.galleryConfig.upsert(payload));
+      if (cloudOk) calls.push(cloudPrisma.galleryConfig.upsert(payload));
+      const results = await Promise.allSettled(calls);
       return NextResponse.json(getFulfilledResult(results) ?? { success: true });
     }
 

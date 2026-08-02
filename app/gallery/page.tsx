@@ -280,7 +280,17 @@ const NAV_HREFS: Record<string, string> = {
   'REVIEWS':   '/reviews',
 };
 
-const GALLERY_ITEMS = [
+type GalleryItem = {
+  id:     number;
+  src:    string;
+  alt:    string;
+  label:  string;
+  tag:    string;
+  filter: string;
+  aspect: string;
+};
+
+const GALLERY_DEFAULT_ITEMS: GalleryItem[] = [
   { id: 1,  src: '/gallery/bridal-1.jpg',  alt: 'Bridal Makeup',        label: 'Bridal Makeup',        tag: 'Bridal', filter: 'bridal', aspect: 'portrait'  },
   { id: 2,  src: '/gallery/hair-1.jpg',    alt: 'Hair Coloring',         label: 'Balayage & Highlights', tag: 'Hair',   filter: 'hair',   aspect: 'landscape' },
   { id: 3,  src: '/gallery/makeup-1.jpg',  alt: 'Glam Makeup',           label: 'Evening Glam',          tag: 'Makeup', filter: 'makeup', aspect: 'portrait'  },
@@ -295,7 +305,6 @@ const GALLERY_ITEMS = [
   { id: 12, src: '/gallery/spa-2.jpg',     alt: 'Facial Treatment',      label: 'Luxury Facial',         tag: 'Spa',    filter: 'spa',    aspect: 'portrait'  },
 ];
 
-const FILTERS     = ['All', 'Bridal', 'Hair', 'Makeup', 'Spa', 'Nails', 'Studio'] as const;
 const QUICK_LINKS = ['Home', 'Our Story', 'Services', 'Products', 'Reviews'] as const;
 const LOCATIONS   = ['Colombo', 'Negombo', 'Kiribathgoda'] as const;
 
@@ -390,17 +399,8 @@ function IconClose() {
   );
 }
 
-function IconZoom() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="11" cy="11" r="8"/>
-      <path d="m21 21-4.35-4.35M11 8v6M8 11h6"/>
-    </svg>
-  );
-}
-
 /* ─────────────────────────────────────────
-   LOGO  — matches main page.tsx exactly
+   LOGO
 ───────────────────────────────────────── */
 function LogoIcon({ size = 48, className = '' }: { size?: number; className?: string }) {
   return (
@@ -422,11 +422,11 @@ function LogoIcon({ size = 48, className = '' }: { size?: number; className?: st
 function GalleryTile({
   item, height, visible, delay, onClick,
 }: {
-  item: typeof GALLERY_ITEMS[number];
+  item: GalleryItem;
   height: string;
   visible: boolean;
   delay: string;
-  onClick: (item: typeof GALLERY_ITEMS[number]) => void;
+  onClick: (item: GalleryItem) => void;
 }) {
   return (
     <div
@@ -443,6 +443,7 @@ function GalleryTile({
         src={item.src}
         alt={item.alt}
         fill
+        unoptimized
         sizes="(max-width: 768px) 100vw, 33vw"
         style={{ objectFit: 'cover' }}
       />
@@ -474,7 +475,7 @@ function GalleryTile({
 function Lightbox({
   item, onClose,
 }: {
-  item: typeof GALLERY_ITEMS[number] | null;
+  item: GalleryItem | null;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -499,7 +500,7 @@ function Lightbox({
         }}
         onClick={e => e.stopPropagation()}
       >
-        <Image src={item.src} alt={item.alt} fill sizes="90vw" style={{ objectFit: 'cover' }} />
+        <Image src={item.src} alt={item.alt} fill unoptimized sizes="90vw" style={{ objectFit: 'cover' }} />
         <div style={{
           position:   'absolute',
           bottom: 0, left: 0, right: 0,
@@ -534,8 +535,15 @@ export default function GalleryPage() {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [loaded,       setLoaded]       = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>('All');
-  const [lightboxItem, setLightboxItem] = useState<typeof GALLERY_ITEMS[number] | null>(null);
+  const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null);
   const [heroLoaded,   setHeroLoaded]   = useState(false);
+
+  const [galleryItems, setGalleryItems]   = useState<GalleryItem[]>(GALLERY_DEFAULT_ITEMS);
+  const [heroEyebrow,  setHeroEyebrow]    = useState('✦ SAYO Beauty Studio ✦');
+  const [heroTitle,    setHeroTitle]      = useState('The Beauty Canvas');
+  const [heroSubtitle, setHeroSubtitle]   = useState('A curated showcase of artistry, elegance, and unforgettable transformations crafted by our expert stylists.');
+  const [portfolioTitle,    setPortfolioTitle]    = useState('Our Portfolio');
+  const [portfolioSubtitle, setPortfolioSubtitle] = useState('Browse through our collection of stunning transformations and beauty artistry');
 
   const isMobile = useIsMobile(1024);
 
@@ -549,9 +557,36 @@ export default function GalleryPage() {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    fetch('/api/site-data?section=gallery')
+      .then(r => r.json())
+      .then(data => {
+        if (!data) return;
+        if (data.hero_eyebrow)     setHeroEyebrow(data.hero_eyebrow);
+        if (data.hero_title)       setHeroTitle(data.hero_title);
+        if (data.hero_subtitle)    setHeroSubtitle(data.hero_subtitle);
+        if (data.section_title)    setPortfolioTitle(data.section_title);
+        if (data.section_subtitle) setPortfolioSubtitle(data.section_subtitle);
+        if (Array.isArray(data.items) && data.items.length) {
+          setGalleryItems(data.items.map((it: Record<string, unknown>, i: number) => ({
+            id:     typeof it.id === 'number' ? it.id : i + 1,
+            src:    String(it.src ?? ''),
+            alt:    String(it.alt ?? it.label ?? 'Gallery image'),
+            label:  String(it.label ?? it.alt ?? 'Gallery'),
+            tag:    String(it.tag ?? 'Beauty'),
+            filter: String(it.filter ?? String(it.tag ?? '').toLowerCase()) || 'general',
+            aspect: String(it.aspect ?? 'portrait'),
+          })));
+        }
+      })
+      .catch(() => { /* keep defaults */ });
+  }, []);
+
+  const FILTERS = ['All', ...Array.from(new Set(galleryItems.map(g => g.tag).filter(Boolean)))];
+
   const filtered = activeFilter === 'All'
-    ? GALLERY_ITEMS
-    : GALLERY_ITEMS.filter(g => g.filter === activeFilter.toLowerCase());
+    ? galleryItems
+    : galleryItems.filter(g => g.filter === activeFilter.toLowerCase());
 
   return (
     <>
@@ -576,16 +611,18 @@ export default function GalleryPage() {
           display:       'flex',
           flexDirection: 'column',
         }}>
-          {/* Background Image */}
+          {/* ── BACKGROUND IMAGE — contact-bg.jpg ── */}
           <div style={{ position: 'absolute', inset: 0 }}>
             <Image
-              src="https://placehold.co/1728x833"
+              src="/contact-bg.jpg"
               alt="Gallery hero"
               fill
               priority
+              unoptimized
               sizes="100vw"
               style={{
                 objectFit:  'cover',
+                objectPosition: 'center',
                 animation:  heroLoaded ? 'kenBurns 20s ease-in-out alternate infinite' : 'none',
               }}
             />
@@ -771,7 +808,6 @@ export default function GalleryPage() {
               paddingTop:     'clamp(1rem, 3vw, 2rem)',
             }}
           >
-            {/* Eyebrow */}
             <p
               className={heroVisible ? 'reveal-up' : ''}
               style={{
@@ -785,10 +821,9 @@ export default function GalleryPage() {
                 animationDelay: '0.2s',
               }}
             >
-              ✦ SAYO Beauty Studio ✦
+              {heroEyebrow}
             </p>
 
-            {/* Title */}
             <h1
               className={`${heroVisible ? 'reveal-up' : ''} hero-text-glow`}
               style={{
@@ -801,10 +836,9 @@ export default function GalleryPage() {
                 animationDelay: '0.35s',
               }}
             >
-              The Beauty Canvas
+              {heroTitle}
             </h1>
 
-            {/* Decorative line */}
             <div
               className={heroVisible ? 'reveal-up' : ''}
               style={{
@@ -821,7 +855,6 @@ export default function GalleryPage() {
               <div style={{ width: '3rem', height: '1px', background: tokens.color.gold }} />
             </div>
 
-            {/* Subtitle */}
             <p
               className={heroVisible ? 'reveal-up' : ''}
               style={{
@@ -835,12 +868,9 @@ export default function GalleryPage() {
                 animationDelay: '0.5s',
               }}
             >
-              A curated showcase of artistry, elegance,
-              <br />
-              and unforgettable transformations crafted by our expert stylists.
+              {heroSubtitle}
             </p>
 
-            {/* Stats */}
             <div
               className={heroVisible ? 'reveal-up' : ''}
               style={{
@@ -898,7 +928,7 @@ export default function GalleryPage() {
             margin:     0,
             textAlign:  'center',
           }}>
-            Our Portfolio
+            {portfolioTitle}
           </h2>
           <p style={{
             color:      tokens.color.whiteMuted,
@@ -908,10 +938,9 @@ export default function GalleryPage() {
             maxWidth:   '560px',
             lineHeight: 1.7,
           }}>
-            Browse through our collection of stunning transformations and beauty artistry
+            {portfolioSubtitle}
           </p>
 
-          {/* Filter Pills */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center' }}>
             {FILTERS.map(f => (
               <button
@@ -940,7 +969,6 @@ export default function GalleryPage() {
               gap:                 '1rem',
             }}
           >
-            {/* Column 1: Two stacked portrait tiles */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {filtered[0] && (
                 <GalleryTile item={filtered[0]} height="clamp(260px, 30vw, 370px)"
@@ -952,19 +980,16 @@ export default function GalleryPage() {
               )}
             </div>
 
-            {/* Column 2: Large tall tile */}
             {filtered[1] && (
               <GalleryTile item={filtered[1]} height="clamp(520px, 60vw, 740px)"
                 visible={galleryVisible} delay="0.15s" onClick={setLightboxItem} />
             )}
 
-            {/* Column 3: Large tile */}
             {filtered[2] && (
               <GalleryTile item={filtered[2]} height="clamp(520px, 60vw, 740px)"
                 visible={galleryVisible} delay="0.2s" onClick={setLightboxItem} />
             )}
 
-            {/* Wide landscape spanning cols 2+3 */}
             {filtered[4] && (
               <div style={{ gridColumn: '2 / 4' }}>
                 <GalleryTile item={filtered[4]} height="clamp(220px, 22vw, 320px)"
@@ -1020,6 +1045,30 @@ export default function GalleryPage() {
                 <GalleryTile item={filtered[11]} height="clamp(260px, 28vw, 380px)"
                   visible={galleryVisible} delay="0.69s" onClick={setLightboxItem} />
               )}
+            </div>
+          )}
+
+          {/* Extra row for admin-added photos */}
+          {filtered.length > 12 && (
+            <div
+              className="gallery-grid-desktop"
+              style={{
+                display:             'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap:                 '1rem',
+                marginTop:           '1rem',
+              }}
+            >
+              {filtered.slice(12).map((item, i) => (
+                <GalleryTile
+                  key={item.id}
+                  item={item}
+                  height="clamp(200px, 22vw, 300px)"
+                  visible={galleryVisible}
+                  delay={`${0.75 + i * 0.06}s`}
+                  onClick={setLightboxItem}
+                />
+              ))}
             </div>
           )}
 
@@ -1353,7 +1402,6 @@ export default function GalleryPage() {
           >
             <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>
               © {new Date().getFullYear()} SAYO Beauty. All rights reserved.
-              
             </p>
           </div>
         </footer>

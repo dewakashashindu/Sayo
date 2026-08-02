@@ -295,7 +295,8 @@ type StaffMember = {
   experience:  string;
   bio:         string;
   specialties: string;
-  image?:      string;
+  photo?:      string;  // Cloudinary URL (saved by admin panel)
+  image?:      string;  // legacy fallback
 };
 
 type AboutReview = { quote: string; author: string };
@@ -528,6 +529,32 @@ function SmokeBackground() {
       background:    '#0a0a0a',
       overflow:      'hidden',
     }}>
+      {/* ── Hero background image – blurred & darkened ── */}
+      <div style={{
+        position:   'absolute',
+        inset:      0,
+        zIndex:     0,
+      }}>
+        <Image
+          src={HERO_ABOUT_IMAGE}
+          alt=""
+          fill
+          sizes="100vw"
+          priority
+          style={{
+            objectFit:     'cover',
+            objectPosition: 'center',
+            filter:        'blur(6px) brightness(0.45) saturate(0.8)',
+            transform:     'scale(1.08)', // prevents blur edge bleed
+          }}
+        />
+        {/* extra dark vignette so text stays legible */}
+        <div style={{
+          position:   'absolute',
+          inset:      0,
+          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.72) 100%)',
+        }} />
+      </div>
       <div style={{
         position:   'absolute', bottom: '-10%', left: '30%',
         width:      '40%',      height: '40%',
@@ -896,12 +923,12 @@ export default function AboutPage() {
                   {/* ✅ IMAGE FROM DB */}
                   <div style={{ width: '42%', flexShrink: 0, position: 'relative', minHeight: '480px', background: 'linear-gradient(135deg, rgba(184,134,11,0.15) 0%, rgba(0,0,0,0.4) 100%)' }}>
                     <Image
-                      src={member.image || generatePlaceholder(member.name)}
+                      src={(() => { const p = member.photo?.trim(); const i = member.image?.trim(); return (p && p !== '') ? p : (i && i !== '') ? i : generatePlaceholder(member.name); })()}
                       alt={member.name}
                       fill
                       sizes="(max-width: 768px) 100vw, 25vw"
-                      style={{ objectFit: 'cover' }}
-                      unoptimized={!member.image || member.image.startsWith('data:')}
+                      style={{ objectFit: 'cover', objectPosition: 'top center' }}
+                      unoptimized
                     />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%)' }} />
                   </div>

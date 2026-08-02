@@ -139,6 +139,26 @@ type Feedback = {
   submittedAt: string;
 };
 
+/* ✅ NEW: Gallery types */
+export type GalleryItem = {
+  id:     number;
+  src:    string;   // Cloudinary URL or /gallery/*.jpg path
+  alt:    string;
+  label:  string;   // caption shown on hover
+  tag:    string;   // e.g. Bridal, Hair, Makeup, Spa, Nails, Studio
+  filter: string;   // lowercase slug used for filtering
+  aspect: string;   // portrait | landscape | square
+};
+
+export type GalleryData = {
+  hero_eyebrow:      string;
+  hero_title:        string;
+  hero_subtitle:     string;
+  section_title:     string;
+  section_subtitle:  string;
+  items:             GalleryItem[];
+};
+
 type FeedbackApiResponse = {
   data:       Feedback[];
   total:      number;
@@ -284,6 +304,30 @@ const CONTACT_DEFAULTS: ContactData = {
 };
 
 const GENDERS = ['her', 'his'] as const;
+
+/* ✅ NEW: Gallery defaults — matches the public /gallery page */
+const GALLERY_DEFAULTS: GalleryData = {
+  hero_eyebrow:     '✦ SAYO Beauty Studio ✦',
+  hero_title:       'The Beauty Canvas',
+  hero_subtitle:    'A curated showcase of artistry, elegance, and unforgettable transformations crafted by our expert stylists.',
+  section_title:    'Our Portfolio',
+  section_subtitle: 'Browse through our collection of stunning transformations and beauty artistry',
+  items: [
+    { id: 1,  src: '/gallery/bridal-1.jpg', alt: 'Bridal Makeup',        label: 'Bridal Makeup',        tag: 'Bridal', filter: 'bridal', aspect: 'portrait'  },
+    { id: 2,  src: '/gallery/hair-1.jpg',   alt: 'Hair Coloring',         label: 'Balayage & Highlights', tag: 'Hair',   filter: 'hair',   aspect: 'landscape' },
+    { id: 3,  src: '/gallery/makeup-1.jpg', alt: 'Glam Makeup',           label: 'Evening Glam',          tag: 'Makeup', filter: 'makeup', aspect: 'portrait'  },
+    { id: 4,  src: '/gallery/hair-2.jpg',   alt: 'Hair Styling',          label: 'Precision Cuts',        tag: 'Hair',   filter: 'hair',   aspect: 'square'    },
+    { id: 5,  src: '/gallery/bridal-2.jpg', alt: 'Kandyan Bridal',        label: 'Kandyan Bridal Look',   tag: 'Bridal', filter: 'bridal', aspect: 'landscape' },
+    { id: 6,  src: '/gallery/spa-1.jpg',    alt: 'Spa Treatment',         label: 'Rejuvenating Spa',      tag: 'Spa',    filter: 'spa',    aspect: 'portrait'  },
+    { id: 7,  src: '/gallery/nail-1.jpg',   alt: 'Nail Art',              label: 'Nail Artistry',         tag: 'Nails',  filter: 'nails',  aspect: 'square'    },
+    { id: 8,  src: '/gallery/makeup-2.jpg', alt: 'Bridal Makeup Detail',  label: 'Bridal Eyes',           tag: 'Bridal', filter: 'bridal', aspect: 'landscape' },
+    { id: 9,  src: '/gallery/hair-3.jpg',   alt: 'Hair Treatment',        label: 'Keratin Treatment',     tag: 'Hair',   filter: 'hair',   aspect: 'portrait'  },
+    { id: 10, src: '/gallery/salon-1.jpg',  alt: 'Salon Interior',        label: 'Our Studio',            tag: 'Studio', filter: 'studio', aspect: 'landscape' },
+    { id: 11, src: '/gallery/bridal-3.jpg', alt: 'Modern Bridal',         label: 'Modern Bridal Glow',    tag: 'Bridal', filter: 'bridal', aspect: 'square'    },
+    { id: 12, src: '/gallery/spa-2.jpg',    alt: 'Facial Treatment',      label: 'Luxury Facial',         tag: 'Spa',    filter: 'spa',    aspect: 'portrait'  },
+  ],
+};
+
 type GenderKey = typeof GENDERS[number];
 
 const FB_LOCATIONS = ['All', 'Colombo', 'Negombo', 'Kiribathgoda'];
@@ -304,6 +348,10 @@ const FB_SERVICES  = [
 const FEEDBACK_CSS = `
   @keyframes fbSlideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
   @keyframes fbSpin    { to{transform:rotate(360deg)} }
+  @keyframes fbUnattendedPulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(249,115,22,0.3); }
+    50%       { box-shadow: 0 0 0 7px rgba(249,115,22,0);   }
+  }
 
   .fb-toggle-track {
     width:44px; height:24px; border-radius:12px;
@@ -426,6 +474,7 @@ const IconMap           = () => (<svg width="15" height="15" viewBox="0 0 24 24"
 const IconBuilding      = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>);
 const IconSpinner       = () => (<span style={{ display:'inline-block', width:'14px', height:'14px', border:'2px solid rgba(255,255,255,0.3)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.8s linear infinite', flexShrink:0 }} />);
 const IconMessageSquare = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>);
+const IconImage         = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>);
 const IconRefresh       = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>);
 
 /* ─────────────────────────────────────────
@@ -557,7 +606,7 @@ function LivePreviewPanel({ open, onClose, navData, homeData, footerData, active
       <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', marginTop:'0.75rem', paddingTop:'0.5rem', color:'rgba(255,255,255,0.25)', fontSize:'0.5rem', textAlign:'center' }}>{footerData.copyright_text}</div>
     </div>
   );
-  const TAB_LABELS: Record<string, string> = { nav:'Navigation', home:'Home Hero', about:'Our Story', services:'Services', contact:'Contact Page', footer:'Footer', feedback:'Feedback' };
+  const TAB_LABELS: Record<string, string> = { nav:'Navigation', home:'Home Hero', about:'Our Story', services:'Services', contact:'Contact Page', footer:'Footer', feedback:'Feedback', gallery:'Gallery' };
   const renderContent = () => {
     if (activeTab === 'home') return (
       <div><PreviewNav />
@@ -754,16 +803,19 @@ function FbReviewCard({ item, onToggle }: { item: Feedback; onToggle: (id: numbe
         </div>
       </div>
       <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap' }}>
-        <span style={{ background:'rgba(184,134,11,0.10)', border:`1px solid ${GOLD_BORDER}`, borderRadius:'999px', color:GOLD, fontSize:'0.68rem', fontWeight:600, padding:'0.18rem 0.7rem', letterSpacing:'0.05em', textTransform:'uppercase' }}>
-          {item.cusService}
-        </span>
-        <span style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:'999px', color:'rgba(255,255,255,0.7)', fontSize:'0.68rem', fontWeight:500, padding:'0.18rem 0.7rem', display:'flex', alignItems:'center', gap:'0.25rem' }}>
+        {/* Split comma-separated services into individual chips */}
+        {item.cusService.split(',').map(svc => svc.trim()).filter(Boolean).map(svc => (
+          <span key={svc} style={{ background:'rgba(184,134,11,0.10)', border:`1px solid ${GOLD_BORDER}`, borderRadius:'999px', color:GOLD, fontSize:'0.68rem', fontWeight:600, padding:'0.18rem 0.7rem', letterSpacing:'0.05em', textTransform:'uppercase', whiteSpace:'nowrap' }}>
+            {svc}
+          </span>
+        ))}
+        <span style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:'999px', color:'rgba(255,255,255,0.7)', fontSize:'0.68rem', fontWeight:500, padding:'0.18rem 0.7rem', display:'flex', alignItems:'center', gap:'0.25rem', whiteSpace:'nowrap' }}>
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           {item.cusLocation}
         </span>
       </div>
       <div style={{ height:'1px', background:'rgba(255,255,255,0.07)' }} />
-      <p style={{ color:'rgba(255,255,255,0.70)', fontSize:'0.85rem', lineHeight:1.7, margin:0, fontStyle:'italic' }}>
+      <p style={{ color:'rgba(255,255,255,0.70)', fontSize:'0.85rem', lineHeight:1.7, margin:0, fontStyle:'italic', wordBreak:'break-word', overflowWrap:'anywhere' }}>
         &ldquo;{item.cusComment}&rdquo;
       </p>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'0.6rem', paddingTop:'0.4rem', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
@@ -784,11 +836,12 @@ function FeedbackTab() {
   const [location,      setLocation]      = useState('All');
   const [serviceFilter, setServiceFilter] = useState('All');
   const [ratingFilter,  setRatingFilter]  = useState(0);
-  const [pubFilter,     setPubFilter]     = useState<'all'|'published'|'hidden'>('all');
+  const [pubFilter,     setPubFilter]     = useState<'all'|'published'|'hidden'|'unattended'>('all');
   const [page,          setPage]          = useState(1);
 
-  const PAGE_SIZE = 9;
-  const GOLD      = '#B8860B';
+  const PAGE_SIZE       = 9;
+  const GOLD            = '#B8860B';
+  const UNATTENDED_DAYS = 7;
 
   const fetchReviews = useCallback(async () => {
     setLoading(true); setError('');
@@ -807,37 +860,57 @@ function FeedbackTab() {
 
   useEffect(() => { fetchReviews(); }, [fetchReviews]);
 
+  /* ── Unattended = unpublished AND submitted within UNATTENDED_DAYS days ── */
+  const isUnattended = useCallback((r: Feedback) => {
+    if (r.isPublished) return false;
+    const ageDays = (Date.now() - new Date(r.submittedAt).getTime()) / (1000 * 60 * 60 * 24);
+    return ageDays <= UNATTENDED_DAYS;
+  }, []);
+
+  /* ── FIX: service filter handles comma-separated multi-service strings ── */
   const filtered = useMemo(() => {
     return allReviews
       .filter(r => {
-        if (location      !== 'All' && r.cusLocation !== location)      return false;
-        if (serviceFilter !== 'All' && r.cusService  !== serviceFilter) return false;
-        if (ratingFilter  > 0       && r.cusRating   !== ratingFilter)  return false;
-        if (pubFilter === 'published' && !r.isPublished) return false;
-        if (pubFilter === 'hidden'    &&  r.isPublished) return false;
+        if (location !== 'All' && r.cusLocation !== location) return false;
+        if (serviceFilter !== 'All') {
+          const segments = r.cusService.split(',').map(s => s.trim());
+          if (!segments.includes(serviceFilter)) return false;
+        }
+        if (ratingFilter > 0 && r.cusRating !== ratingFilter) return false;
+        if (pubFilter === 'published'  && !r.isPublished)   return false;
+        if (pubFilter === 'hidden'     &&  r.isPublished)   return false;
+        if (pubFilter === 'unattended' && !isUnattended(r)) return false;
         return true;
       })
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
-  }, [allReviews, location, serviceFilter, ratingFilter, pubFilter]);
+  }, [allReviews, location, serviceFilter, ratingFilter, pubFilter, isUnattended]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages, page]);
 
-  const handleToggle   = (id: number, val: boolean) =>
+  const handleToggle = (id: number, val: boolean) =>
     setAllReviews(prev => prev.map(r => r.id === id ? { ...r, isPublished: val } : r));
 
   const changeFilter = (fn: () => void) => { fn(); setPage(1); };
 
-  const publishedCount = allReviews.filter(r => r.isPublished).length;
+  const publishedCount  = allReviews.filter(r => r.isPublished).length;
+  const unattendedCount = allReviews.filter(isUnattended).length;
 
   return (
     <>
       <style>{FEEDBACK_CSS}</style>
+
+      {/* ── Top bar ── */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'1rem', marginBottom:'1.25rem' }}>
         <p style={{ color:'rgba(255,255,255,0.45)', fontSize:'0.82rem', margin:0 }}>
           {allReviews.length} total · {filtered.length} matching · {publishedCount} live on website
+          {unattendedCount > 0 && (
+            <span style={{ marginLeft:'0.65rem', background:'rgba(249,115,22,0.18)', border:'1px solid rgba(249,115,22,0.45)', color:'#f97316', fontSize:'0.72rem', fontWeight:700, padding:'0.1rem 0.55rem', borderRadius:'999px' }}>
+              {unattendedCount} unattended
+            </span>
+          )}
         </p>
         <button
           onClick={fetchReviews}
@@ -846,7 +919,35 @@ function FeedbackTab() {
           <IconRefresh /> Refresh
         </button>
       </div>
+
+      {/* ── Stats bar ── */}
       {!loading && !error && <FbStatsBar data={allReviews} />}
+
+      {/* ── Unattended alert banner ── */}
+      {!loading && !error && unattendedCount > 0 && (
+        <div style={{ marginBottom:'1.25rem', background:'rgba(249,115,22,0.07)', border:'1.5px solid rgba(249,115,22,0.35)', borderRadius:'0.75rem', padding:'0.875rem 1.25rem', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'0.75rem' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'0.55rem' }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span style={{ color:'#f97316', fontWeight:700, fontSize:'0.85rem' }}>
+              {unattendedCount} unattended review{unattendedCount > 1 ? 's' : ''} need your attention
+            </span>
+            <span style={{ color:'rgba(255,255,255,0.4)', fontSize:'0.78rem' }}>
+              — submitted in the last {UNATTENDED_DAYS} days, not yet published
+            </span>
+          </div>
+          <button
+            onClick={() => changeFilter(() => setPubFilter('unattended'))}
+            style={{ background:'rgba(249,115,22,0.18)', border:'1.5px solid rgba(249,115,22,0.5)', color:'#f97316', fontFamily:'inherit', fontSize:'0.8rem', fontWeight:700, padding:'0.4rem 1rem', borderRadius:'0.5rem', cursor:'pointer', whiteSpace:'nowrap' }}
+          >
+            View unattended →
+          </button>
+        </div>
+      )}
+
+      {/* ── Filters ── */}
       <div style={{ display:'flex', flexWrap:'wrap', gap:'0.65rem', marginBottom:'1.5rem', alignItems:'center' }}>
         <select className="fb-select" value={location} onChange={e => changeFilter(() => setLocation(e.target.value))}>
           {FB_LOCATIONS.map(l => <option key={l} value={l}>{l === 'All' ? 'All Locations' : l}</option>)}
@@ -858,12 +959,21 @@ function FeedbackTab() {
           <option value={0}>All Ratings</option>
           {[5,4,3,2,1].map(r => (<option key={r} value={r}>{'★'.repeat(r)} {r} Star{r > 1 ? 's' : ''}</option>))}
         </select>
-        {(['all','published','hidden'] as const).map(f => (
-          <button key={f} className={`fb-filter-pill${pubFilter === f ? ' active' : ''}`} onClick={() => changeFilter(() => setPubFilter(f))}>
-            {f === 'all' ? 'All' : f === 'published' ? '✓ Published' : '○ Hidden'}
+        {(['all','published','hidden','unattended'] as const).map(f => (
+          <button
+            key={f}
+            className={`fb-filter-pill${pubFilter === f ? ' active' : ''}`}
+            onClick={() => changeFilter(() => setPubFilter(f))}
+            style={f === 'unattended' && pubFilter !== 'unattended' && unattendedCount > 0
+              ? { borderColor:'rgba(249,115,22,0.45)', color:'#f97316', background:'rgba(249,115,22,0.08)' }
+              : undefined}
+          >
+            {f === 'all' ? 'All' : f === 'published' ? '✓ Published' : f === 'hidden' ? '○ Hidden' : `🔔 Unattended${unattendedCount > 0 ? ` (${unattendedCount})` : ''}`}
           </button>
         ))}
       </div>
+
+      {/* ── Results ── */}
       {loading ? (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'4rem', gap:'0.75rem', color:'rgba(255,255,255,0.45)' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2.5" style={{ animation:'fbSpin 0.8s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -880,12 +990,18 @@ function FeedbackTab() {
       ) : (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(min(100%,410px),1fr))', gap:'1rem' }}>
           {pageItems.map((item, i) => (
-            <div key={item.id} style={{ animationDelay:`${i * 0.04}s` }}>
+            <div key={item.id} style={{ animationDelay:`${i * 0.04}s`, position:'relative' }}>
+              {/* Unattended pulse dot */}
+              {isUnattended(item) && (
+                <span style={{ position:'absolute', top:'-5px', left:'-5px', zIndex:10, width:'13px', height:'13px', borderRadius:'50%', background:'#f97316', border:'2px solid #0a0a0c', animation:'fbUnattendedPulse 2s ease infinite' }} />
+              )}
               <FbReviewCard item={item} onToggle={handleToggle} />
             </div>
           ))}
         </div>
       )}
+
+      {/* ── Pagination ── */}
       {!loading && !error && totalPages > 1 && (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'0.45rem', marginTop:'2rem', flexWrap:'wrap' }}>
           <button className="fb-pg-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
@@ -905,7 +1021,6 @@ function FeedbackTab() {
     </>
   );
 }
-
 /* ═══════════════════════════════════════════
    MAIN ADMIN PAGE
 ═══════════════════════════════════════════ */
@@ -920,16 +1035,17 @@ export default function SayoAdminPage() {
   const [aboutData,    setAboutData]    = useState<AboutData>(ABOUT_DEFAULTS);
   const [servicesData, setServicesData] = useState<ServicesData>(SERVICES_DEFAULTS);
   const [contactData,  setContactData]  = useState<ContactData>(CONTACT_DEFAULTS);
+  const [galleryData,  setGalleryData]  = useState<GalleryData>(GALLERY_DEFAULTS);
 
-  const [activeTab,    setActiveTab]    = useState<'nav'|'home'|'footer'|'about'|'services'|'contact'|'feedback'>('nav');
+  const [activeTab,    setActiveTab]    = useState<'nav'|'home'|'footer'|'about'|'services'|'contact'|'gallery'|'feedback'>('nav');
   const [previewOpen,  setPreviewOpen]  = useState(false);
   const [toastMessage, setToastMessage] = useState<string|null>(null);
   const [toastType,    setToastType]    = useState<'success'|'error'>('success');
   const [isLoading,    setIsLoading]    = useState(false);
 
-  const [saving,  setSaving]  = useState({ nav:false, home:false, footer:false, about:false, services:false, contact:false });
-  const [saved,   setSaved]   = useState({ nav:false, home:false, footer:false, about:false, services:false, contact:false });
-  const [saveErr, setSaveErr] = useState({ nav:'',    home:'',    footer:'',    about:'',    services:'',    contact:''    });
+  const [saving,  setSaving]  = useState({ nav:false, home:false, footer:false, about:false, services:false, contact:false, gallery:false });
+  const [saved,   setSaved]   = useState({ nav:false, home:false, footer:false, about:false, services:false, contact:false, gallery:false });
+  const [saveErr, setSaveErr] = useState({ nav:'',    home:'',    footer:'',    about:'',    services:'',    contact:'',    gallery:''    });
 
   const [svcGender,   setSvcGender]   = useState<GenderKey>('her');
   const [svcCategory, setSvcCategory] = useState<string>('');
@@ -941,6 +1057,10 @@ export default function SayoAdminPage() {
   // ✅ NEW: Gallery image upload states
   const [galleryUploadLoading, setGalleryUploadLoading] = useState<Record<number, boolean>>({});
   const [galleryUploadError,   setGalleryUploadError]   = useState<Record<number, string>>({});
+
+  // ✅ NEW: Gallery TAB photo upload states (keyed by item index)
+  const [galPhotoUploadLoading, setGalPhotoUploadLoading] = useState<Record<number, boolean>>({});
+  const [galPhotoUploadError,   setGalPhotoUploadError]   = useState<Record<number, string>>({});
 
   useEffect(() => {
     if (servicesData.categories.length > 0 && !svcCategory) setSvcCategory(servicesData.categories[0].key);
@@ -972,6 +1092,11 @@ export default function SayoAdminPage() {
           if (cats.length > 0) setSvcCategory(cats[0].key);
         }
         if (data?.contact)  setContactData({ ...CONTACT_DEFAULTS, ...data.contact, stats: data.contact.stats?.length ? data.contact.stats : CONTACT_DEFAULTS.stats, branches: data.contact.branches?.length ? data.contact.branches : CONTACT_DEFAULTS.branches });
+        if (data?.gallery)  setGalleryData({
+          ...GALLERY_DEFAULTS,
+          ...data.gallery,
+          items: Array.isArray(data.gallery.items) && data.gallery.items.length ? data.gallery.items : GALLERY_DEFAULTS.items,
+        });
       })
       .catch(() => showToast('Could not load DB data — showing defaults', 'error'))
       .finally(() => setIsLoading(false));
@@ -982,10 +1107,10 @@ export default function SayoAdminPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const saveSection = async (section: 'nav'|'home'|'footer'|'about'|'services'|'contact') => {
+  const saveSection = async (section: 'nav'|'home'|'footer'|'about'|'services'|'contact'|'gallery') => {
     setSaving(s => ({ ...s, [section]:true }));
     setSaveErr(s => ({ ...s, [section]:'' }));
-    const bodyData = section==='nav' ? navData : section==='home' ? homeData : section==='footer' ? footerData : section==='about' ? aboutData : section==='services' ? servicesData : contactData;
+    const bodyData = section==='nav' ? navData : section==='home' ? homeData : section==='footer' ? footerData : section==='about' ? aboutData : section==='services' ? servicesData : section==='gallery' ? galleryData : contactData;
     try {
       const res = await fetch(`/api/site-data?section=${section}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(bodyData) });
       if (!res.ok) throw new Error('Save failed');
@@ -999,7 +1124,7 @@ export default function SayoAdminPage() {
   };
 
   const saveAll = async () => {
-    for (const s of ['nav','home','footer','about','services','contact'] as const) await saveSection(s);
+    for (const s of ['nav','home','footer','about','services','contact','gallery'] as const) await saveSection(s);
   };
 
   const handleLogout = () => {
@@ -1069,6 +1194,37 @@ export default function SayoAdminPage() {
     }
   };
 
+  /* ✅ NEW: Gallery TAB helpers */
+  const updateGalleryItem = (idx:number, field:keyof GalleryItem, value:string) => {
+    const u=[...galleryData.items];
+    u[idx]={...u[idx],[field]:value};
+    // keep `filter` slug in sync with the tag so filtering keeps working
+    if (field === 'tag') u[idx].filter = value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'general';
+    setGalleryData({...galleryData, items:u});
+  };
+  const addGalleryItem    = () => setGalleryData({...galleryData, items:[...galleryData.items,{ id:Date.now(), src:'', alt:'New Gallery Image', label:'New Photo', tag:'Bridal', filter:'bridal', aspect:'portrait' }]});
+  const removeGalleryItem = (idx:number) => setGalleryData({...galleryData, items:galleryData.items.filter((_,i)=>i!==idx)});
+  const moveGalleryItem   = (idx:number,dir:-1|1) => { const u=[...galleryData.items]; const n=idx+dir; if(n<0||n>=u.length)return; [u[idx],u[n]]=[u[n],u[idx]]; setGalleryData({...galleryData,items:u}); };
+
+  // ✅ NEW: Gallery TAB photo upload handler → Cloudinary
+  const handleGalleryPhotoUpload = async (idx: number, file: File) => {
+    setGalPhotoUploadLoading(prev => ({ ...prev, [idx]: true }));
+    setGalPhotoUploadError(prev =>   ({ ...prev, [idx]: '' }));
+    try {
+      const fd = new FormData();
+      fd.append('file',      file);
+      fd.append('itemLabel', galleryData.items[idx]?.label ?? 'gallery-item');
+      const res  = await fetch('/api/upload-gallery-photo', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error ?? 'Upload failed');
+      updateGalleryItem(idx, 'src', json.url);
+    } catch (err) {
+      setGalPhotoUploadError(prev => ({ ...prev, [idx]: err instanceof Error ? err.message : 'Upload failed' }));
+    } finally {
+      setGalPhotoUploadLoading(prev => ({ ...prev, [idx]: false }));
+    }
+  };
+
   /* ── Review helpers ── */
   const updateAboutReview = (idx:number,field:keyof AboutReview,value:string) => { const u=[...aboutData.reviews]; u[idx]={...u[idx],[field]:value}; setAboutData({...aboutData,reviews:u}); };
   const addAboutReview    = () => setAboutData({...aboutData,reviews:[...aboutData.reviews,{quote:'',author:''}]});
@@ -1112,12 +1268,13 @@ export default function SayoAdminPage() {
     { key:'home'     as const, label:'HOME HERO',  icon:<IconHome />           },
     { key:'about'    as const, label:'OUR STORY',  icon:<IconBook />           },
     { key:'services' as const, label:'SERVICES',   icon:<IconScissors />       },
+    { key:'gallery'  as const, label:'GALLERY',    icon:<IconImage />          },
     { key:'contact'  as const, label:'CONTACT',    icon:<IconPhone />          },
     { key:'footer'   as const, label:'FOOTER',     icon:<IconMapPin />         },
     { key:'feedback' as const, label:'FEEDBACK',   icon:<IconMessageSquare />  },
   ];
 
-  const SaveButton = ({ section }: { section:'nav'|'home'|'footer'|'about'|'services'|'contact' }) => (
+  const SaveButton = ({ section }: { section:'nav'|'home'|'footer'|'about'|'services'|'contact'|'gallery' }) => (
     <div style={{ marginTop:'2rem', display:'flex', alignItems:'center', gap:'1rem', flexWrap:'wrap' }}>
       <button onClick={() => saveSection(section)} disabled={saving[section]}
         style={{ background:saved[section]?'rgba(56,161,105,0.8)':saving[section]?'rgba(184,134,11,0.5)':'linear-gradient(135deg,#B8860B 0%,#d4a017 100%)', border:'none', color:'#fff', padding:'0.75rem 2rem', borderRadius:'0.6rem', fontWeight:700, fontSize:'0.9rem', cursor:saving[section]?'not-allowed':'pointer', boxShadow:saving[section]||saved[section]?'none':'0 4px 14px rgba(184,134,11,0.4)', display:'flex', alignItems:'center', gap:'0.5rem', transition:'all 0.3s' }}>
@@ -1755,6 +1912,135 @@ export default function SayoAdminPage() {
               </div>
             </section>
             <SaveButton section="contact" />
+          </div>
+        )}
+
+        {/* ══ GALLERY ══ */}
+        {activeTab === 'gallery' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <section style={sectionCard}>
+              <h2 style={sectionTitle}>Gallery — Hero Text</h2>
+              <p style={sectionDesc}>Text shown at the top of the /gallery page banner.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div><label style={fieldLabel}>Hero Eyebrow</label><input type="text" value={galleryData.hero_eyebrow} onChange={e => setGalleryData({ ...galleryData, hero_eyebrow: e.target.value })} style={inputStyle} /></div>
+                <div><label style={fieldLabel}>Hero Title</label><input type="text" value={galleryData.hero_title} onChange={e => setGalleryData({ ...galleryData, hero_title: e.target.value })} style={inputStyle} /></div>
+                <div><label style={fieldLabel}>Hero Subtitle</label><textarea rows={3} value={galleryData.hero_subtitle} onChange={e => setGalleryData({ ...galleryData, hero_subtitle: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} /></div>
+              </div>
+            </section>
+
+            <section style={sectionCard}>
+              <h2 style={sectionTitle}>Gallery — Portfolio Heading</h2>
+              <p style={sectionDesc}>Heading shown above the photo grid.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div><label style={fieldLabel}>Section Title</label><input type="text" value={galleryData.section_title} onChange={e => setGalleryData({ ...galleryData, section_title: e.target.value })} style={inputStyle} /></div>
+                <div><label style={fieldLabel}>Section Subtitle</label><textarea rows={2} value={galleryData.section_subtitle} onChange={e => setGalleryData({ ...galleryData, section_subtitle: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} /></div>
+              </div>
+            </section>
+
+            <section style={sectionCard}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.4rem' }}>
+                <h2 style={{ ...sectionTitle, marginBottom: 0 }}>Gallery Photos</h2>
+                <button onClick={addGalleryItem} style={{ background: tokens.color.gold, border: 'none', color: '#fff', padding: '0.5rem 1rem', borderRadius: '0.5rem', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <IconPlus /> Add Photo
+                </button>
+              </div>
+              <p style={sectionDesc}>
+                Upload new photos (Cloudinary), or paste an image URL. Edit labels, tags &amp; order, then click <strong style={{ color: tokens.color.gold }}>Save Gallery Changes</strong>. The public gallery page updates instantly.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {galleryData.items.map((item, idx) => {
+                  const loading = galPhotoUploadLoading[idx];
+                  const error   = galPhotoUploadError[idx];
+                  return (
+                    <div key={item.id} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${tokens.color.whiteBorder}`, borderRadius: '1rem', padding: '1.25rem' }}>
+                      {/* Card header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <span style={{ color: tokens.color.gold, fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <IconImage /> Photo #{idx + 1}
+                        </span>
+                        <div style={{ display: 'flex', gap: '0.35rem' }}>
+                          <button onClick={() => moveGalleryItem(idx, -1)} disabled={idx === 0} style={{ ...smallIconBtn, opacity: idx === 0 ? 0.3 : 1 }}><IconChevronUp /></button>
+                          <button onClick={() => moveGalleryItem(idx, 1)} disabled={idx === galleryData.items.length - 1} style={{ ...smallIconBtn, opacity: idx === galleryData.items.length - 1 ? 0.3 : 1 }}><IconChevronDown /></button>
+                          <button onClick={() => removeGalleryItem(idx)} style={{ background: 'rgba(229,62,62,0.2)', color: '#fc8181', border: '1px solid rgba(229,62,62,0.4)', borderRadius: '0.4rem', padding: '0.3rem 0.55rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><IconTrash /></button>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(150px, 220px) 1fr', gap: '1.25rem', alignItems: 'start' }}>
+                        {/* Preview + upload */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                          <div style={{ width: '100%', height: '160px', borderRadius: '0.6rem', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', border: `1px solid ${tokens.color.whiteBorder}`, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {item.src ? (
+                              <Image src={item.src} alt={item.alt} fill sizes="220px" style={{ objectFit: 'cover' }} unoptimized />
+                            ) : (
+                              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                              </svg>
+                            )}
+                          </div>
+                          <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: loading ? 'rgba(184,134,11,0.3)' : 'rgba(184,134,11,0.15)', border: `1.5px solid ${tokens.color.gold}`, color: tokens.color.gold, padding: '0.45rem 1rem', borderRadius: '0.5rem', fontSize: '0.78rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', width: 'fit-content', userSelect: 'none' }}>
+                            {loading ? (
+                              <><span style={{ display: 'inline-block', width: '11px', height: '11px', border: '2px solid rgba(184,134,11,0.3)', borderTopColor: tokens.color.gold, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Uploading…</>
+                            ) : (
+                              <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>{item.src ? 'Change Image' : 'Upload Image'}</>
+                            )}
+                            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" disabled={loading} style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) handleGalleryPhotoUpload(idx, f); e.target.value = ''; }} />
+                          </label>
+                          {error && <span style={{ fontSize: '0.7rem', color: '#fc8181', fontWeight: 500 }}>✕ {error}</span>}
+                        </div>
+
+                        {/* Fields */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.85rem' }}>
+                            <div>
+                              <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Label / Caption</label>
+                              <input type="text" value={item.label} onChange={e => updateGalleryItem(idx, 'label', e.target.value)} style={{ ...inputStyle, padding: '0.5rem 0.75rem' }} />
+                            </div>
+                            <div>
+                              <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Alt Text</label>
+                              <input type="text" value={item.alt} onChange={e => updateGalleryItem(idx, 'alt', e.target.value)} style={{ ...inputStyle, padding: '0.5rem 0.75rem' }} />
+                            </div>
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.85rem' }}>
+                            <div>
+                              <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Tag / Filter Category</label>
+                              <input type="text" list="gallery-tag-options" value={item.tag} onChange={e => updateGalleryItem(idx, 'tag', e.target.value)} style={{ ...inputStyle, padding: '0.5rem 0.75rem' }} />
+                              <datalist id="gallery-tag-options">
+                                {['Bridal','Hair','Makeup','Spa','Nails','Studio','Skin','Beauty'].map(t => <option key={t} value={t} />)}
+                              </datalist>
+                            </div>
+                            <div>
+                              <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Aspect Ratio</label>
+                              <select value={item.aspect} onChange={e => updateGalleryItem(idx, 'aspect', e.target.value)} style={{ ...inputStyle, padding: '0.5rem 0.75rem', appearance: 'auto' }}>
+                                <option value="portrait">Portrait</option>
+                                <option value="landscape">Landscape</option>
+                                <option value="square">Square</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div>
+                            <label style={{ ...fieldLabel, fontSize: '0.72rem' }}>Image URL (Cloudinary or local path)</label>
+                            <input type="text" value={item.src} onChange={e => updateGalleryItem(idx, 'src', e.target.value)} style={{ ...inputStyle, padding: '0.5rem 0.75rem', fontSize: '0.78rem', color: tokens.color.whiteDim }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {galleryData.items.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '2rem', color: tokens.color.whiteFaint, border: `1px dashed ${tokens.color.whiteBorder}`, borderRadius: '1rem' }}>
+                    No photos yet. Click <strong style={{ color: tokens.color.gold }}>Add Photo</strong> to get started.
+                  </div>
+                )}
+              </div>
+
+              <p style={{ fontSize: '0.72rem', color: tokens.color.whiteFaint, marginTop: '0.75rem' }}>
+                JPEG · PNG · WebP · GIF &nbsp;|&nbsp; Max 5 MB &nbsp;|&nbsp; Uploads go to Cloudinary (sayo/gallery) &nbsp;|&nbsp; The tag text becomes the filter category on the public page.
+              </p>
+            </section>
+            <SaveButton section="gallery" />
           </div>
         )}
 
