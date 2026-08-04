@@ -1187,7 +1187,7 @@ export default function Home() {
               {homeData.hero_body}
             </p>
             <a
-              href={homeData.hero_cta_link}
+              href="https://sayoadmin.netlify.app/login"
               style={S.ctaBtn}
               className={`cta-btn-wrap ${loaded ? 'cta-animate' : ''}`}
               onMouseEnter={e => {
