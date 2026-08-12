@@ -44,103 +44,181 @@ const tokens = {
   },
 };
 
-/* ── TYPES ── */
 type NavItem   = { label: string; href: string };
 type QuickLink = { label: string; href: string };
-
 type NavData = {
-  logo_text:        string;
-  contact_btn_text: string;
-  contact_btn_link: string;
-  nav_items:        NavItem[];
+  logo_text: string; contact_btn_text: string; contact_btn_link: string; nav_items: NavItem[];
 };
-
 type FooterData = {
-  brand_name:       string;
-  brand_tagline:    string;
-  contact_phone:    string;
-  contact_email:    string;
-  contact_address:  string;
-  copyright_text:   string;
-  locations:        string[];
-  quick_links:      QuickLink[];
-  social_whatsapp:  string;
-  social_facebook:  string;
-  social_instagram: string;
+  brand_name: string; brand_tagline: string; contact_phone: string; contact_email: string;
+  contact_address: string; copyright_text: string; locations: string[];
+  quick_links: QuickLink[]; social_whatsapp: string; social_facebook: string; social_instagram: string;
 };
-
-type Product = {
-  id:          number;
-  category:    string;
-  name:        string;
-  brand:       string;
-  price:       string;
-  badge:       string | null;
-  image:       string;
-  description: string;
-};
-
+type Product  = { id: number; category: string; name: string; brand: string; price: string; badge: string | null; image: string; description: string; };
 type Category = { key: string; label: string };
 
-/* ── STATIC DATA ── */
 const NAV_DEFAULTS: NavData = {
-  logo_text: 'SAYO',
-  contact_btn_text: 'CONTACT US',
-  contact_btn_link: '/contact',
+  logo_text: 'SAYO', contact_btn_text: 'CONTACT US', contact_btn_link: '/contact',
   nav_items: [
-    { label: 'HOME',      href: '/' },
-    { label: 'OUR STORY', href: '/about' },
-    { label: 'SERVICES',  href: '/services' },
-    { label: 'PRODUCTS',  href: '/products' },
-    { label: 'REVIEWS',   href: '/reviews' },
+    { label: 'HOME', href: '/' }, { label: 'OUR STORY', href: '/about' },
+    { label: 'SERVICES', href: '/services' }, { label: 'PRODUCTS', href: '/products' },
+    { label: 'REVIEWS', href: '/reviews' },
   ],
 };
 
 const FOOTER_DEFAULTS: FooterData = {
-  brand_name: 'SAYO',
-  brand_tagline: 'We are experienced in making you more beautiful',
-  contact_phone: '+94 77 233 6233',
-  contact_email: 'hello@sayobeauty.com',
+  brand_name: 'SAYO', brand_tagline: 'We are experienced in making you more beautiful',
+  contact_phone: '+94 77 233 6233', contact_email: 'hello@sayobeauty.com',
   contact_address: '123 Galle Road, Colombo, Sri Lanka',
   copyright_text: `© ${new Date().getFullYear()} SAYO Beauty. All rights reserved.`,
   locations: ['Colombo', 'Negombo', 'Kiribathgoda'],
   quick_links: [
-    { label: 'Home',     href: '/' },
-    { label: 'Services', href: '/services' },
-    { label: 'Products', href: '/products' },
-    { label: 'Reviews',  href: '/reviews' },
+    { label: 'Home', href: '/' }, { label: 'Services', href: '/services' },
+    { label: 'Products', href: '/products' }, { label: 'Reviews', href: '/reviews' },
   ],
-  social_whatsapp: '',
-  social_facebook: '',
-  social_instagram: '',
+  social_whatsapp: '', social_facebook: '', social_instagram: '',
 };
 
 const CATEGORIES: Category[] = [
-  { key: 'ALL',       label: 'All' },
-  { key: 'HAIR',      label: 'Hair Care' },
-  { key: 'SKIN',      label: 'Skin Care' },
-  { key: 'NAIL',      label: 'Nail Care' },
-  { key: 'BODY',      label: 'Body Care' },
-  { key: 'FRAGRANCE', label: 'Fragrance' },
+  { key: 'ALL', label: 'All' }, { key: 'HAIR', label: 'Hair Care' },
+  { key: 'SKIN', label: 'Skin Care' }, { key: 'NAIL', label: 'Nail Care' },
+  { key: 'BODY', label: 'Body Care' }, { key: 'FRAGRANCE', label: 'Fragrance' },
 ];
 
+// All images use Unsplash with verified photo IDs — direct CDN, no auth needed
+// Format: https://images.unsplash.com/photo-{ID}?w=400&h=460&fit=crop&q=85&auto=format
+const u = (id: string, focus = 'center') =>
+  `https://images.unsplash.com/photo-${id}?w=400&h=460&fit=crop&q=85&auto=format&crop=${focus}`;
+
 const PRODUCTS: Product[] = [
-  { id:1,  category:'HAIR',      name:'Argan Oil Repair Shampoo',    brand:'SAYO Essentials', price:'Rs. 2,450.00', badge:'Best Seller', image:'https://placehold.co/400x460/111118/B8860B?text=Shampoo',      description:'Restores moisture and shine to damaged, over-processed hair.' },
-  { id:2,  category:'HAIR',      name:'Keratin Smoothing Mask',      brand:'SAYO Pro',        price:'Rs. 3,800.00', badge:'New',         image:'https://placehold.co/400x460/111118/B8860B?text=Mask',          description:'Deep conditioning treatment for frizz-free, silky smooth results.' },
-  { id:3,  category:'HAIR',      name:'Scalp Revive Serum',          brand:'SAYO Botanics',   price:'Rs. 4,200.00', badge:null,          image:'https://placehold.co/400x460/111118/B8860B?text=Serum',         description:'Nourishes scalp and promotes healthy hair growth naturally.' },
-  { id:4,  category:'HAIR',      name:'Gloss & Shine Conditioner',   brand:'SAYO Essentials', price:'Rs. 2,100.00', badge:null,          image:'https://placehold.co/400x460/111118/B8860B?text=Conditioner',   description:'Lightweight daily conditioner that boosts luminosity and softness.' },
-  { id:5,  category:'SKIN',      name:'Gold Brightening Serum',      brand:'SAYO Gold',       price:'Rs. 6,900.00', badge:'Premium',     image:'https://placehold.co/400x460/111118/B8860B?text=Gold+Serum',    description:'24K gold-infused formula for radiant, even-toned complexion.' },
-  { id:6,  category:'SKIN',      name:'Hyaluronic Hydra Cream',      brand:'SAYO Botanics',   price:'Rs. 4,500.00', badge:'Best Seller', image:'https://placehold.co/400x460/111118/B8860B?text=Hydra+Cream',   description:'Intense 72-hour hydration with plumping hyaluronic acid complex.' },
-  { id:7,  category:'SKIN',      name:'Rose Clay Purifying Mask',    brand:'SAYO Pure',       price:'Rs. 2,800.00', badge:null,          image:'https://placehold.co/400x460/111118/B8860B?text=Clay+Mask',     description:'Deep pore-cleansing mask infused with kaolin and rose extract.' },
-  { id:8,  category:'SKIN',      name:'Vitamin C Glow Toner',        brand:'SAYO Pure',       price:'Rs. 3,100.00', badge:'New',         image:'https://placehold.co/400x460/111118/B8860B?text=Toner',         description:'Brightening toner with stable Vitamin C and niacinamide.' },
-  { id:9,  category:'NAIL',      name:'Strengthening Base Coat',     brand:'SAYO Nails',      price:'Rs. 1,200.00', badge:null,          image:'https://placehold.co/400x460/111118/B8860B?text=Base+Coat',     description:'Fortifies brittle nails with keratin and calcium complex.' },
-  { id:10, category:'NAIL',      name:'Cuticle Revival Oil',         brand:'SAYO Nails',      price:'Rs. 1,650.00', badge:'Best Seller', image:'https://placehold.co/400x460/111118/B8860B?text=Cuticle+Oil',   description:'Jojoba and vitamin E oil blend for soft, healthy cuticles.' },
-  { id:11, category:'NAIL',      name:'Gel Top Coat — High Shine',   brand:'SAYO Pro',        price:'Rs. 2,200.00', badge:'New',         image:'https://placehold.co/400x460/111118/B8860B?text=Top+Coat',      description:'Ultra-glossy, chip-resistant finish that lasts up to 3 weeks.' },
-  { id:12, category:'BODY',      name:'Jasmine Body Butter',         brand:'SAYO Botanics',   price:'Rs. 3,400.00', badge:null,          image:'https://placehold.co/400x460/111118/B8860B?text=Body+Butter',   description:'Rich whipped body butter with jasmine and shea for silky skin.' },
-  { id:13, category:'BODY',      name:'Sugar & Coconut Scrub',       brand:'SAYO Pure',       price:'Rs. 2,900.00', badge:'Best Seller', image:'https://placehold.co/400x460/111118/B8860B?text=Body+Scrub',    description:'Exfoliating sugar scrub that buffs and moisturises simultaneously.' },
-  { id:14, category:'BODY',      name:'Relaxing Massage Oil',        brand:'SAYO Essentials', price:'Rs. 3,700.00', badge:null,          image:'https://placehold.co/400x460/111118/B8860B?text=Massage+Oil',   description:'Warming blend of arnica and eucalyptus for post-treatment care.' },
-  { id:15, category:'FRAGRANCE', name:'Oud & Rose Eau de Parfum',    brand:'SAYO Gold',       price:'Rs. 9,500.00', badge:'Premium',     image:'https://placehold.co/400x460/111118/B8860B?text=Parfum',        description:'A sensuous blend of Bulgarian rose and aged oud wood.' },
-  { id:16, category:'FRAGRANCE', name:'White Jasmine Body Mist',     brand:'SAYO Pure',       price:'Rs. 4,100.00', badge:'New',         image:'https://placehold.co/400x460/111118/B8860B?text=Body+Mist',     description:'Light, refreshing body mist perfect for everyday wear.' },
+  {
+    id: 1, category: 'HAIR',
+    name: 'Argan Oil Repair Shampoo', brand: 'SAYO Essentials',
+    price: 'Rs. 2,450.00', badge: 'Best Seller',
+    // Amber glass shampoo/conditioner bottles on dark surface
+    image: u('1526045612335-40f3db5f0ee2'),
+    description: 'Restores moisture and shine to damaged, over-processed hair.',
+  },
+  {
+    id: 2, category: 'HAIR',
+    name: 'Keratin Smoothing Mask', brand: 'SAYO Pro',
+    price: 'Rs. 3,800.00', badge: 'New',
+    // White cream jar open showing thick product
+    image: u('1608248543803-ba4f8c70ae0b'),
+    description: 'Deep conditioning treatment for frizz-free, silky smooth results.',
+  },
+  {
+    id: 3, category: 'HAIR',
+    name: 'Scalp Revive Serum', brand: 'SAYO Botanics',
+    price: 'Rs. 4,200.00', badge: null,
+    // Elegant dropper bottle with botanical oil, dark moody
+    image: u('1617897903246-719242758050'),
+    description: 'Nourishes scalp and promotes healthy hair growth naturally.',
+  },
+  {
+    id: 4, category: 'HAIR',
+    name: 'Gloss & Shine Conditioner', brand: 'SAYO Essentials',
+    price: 'Rs. 2,100.00', badge: null,
+    // Sleek pump/tube haircare product on clean background
+    image: u('1585751119414-ef2636f8aede'),
+    description: 'Lightweight daily conditioner that boosts luminosity and softness.',
+  },
+  {
+    id: 5, category: 'SKIN',
+    name: 'Gold Brightening Serum', brand: 'SAYO Gold',
+    price: 'Rs. 6,900.00', badge: 'Premium',
+    // Luxurious gold serum dropper bottle on black/dark velvet
+    image: u('1620916566398-39f1143ab7be'),
+    description: '24K gold-infused formula for radiant, even-toned complexion.',
+  },
+  {
+    id: 6, category: 'SKIN',
+    name: 'Hyaluronic Hydra Cream', brand: 'SAYO Botanics',
+    price: 'Rs. 4,500.00', badge: 'Best Seller',
+    // Elegant white moisturiser jar on marble with soft lighting
+    image: u('1611080626919-7cf5a9dbab12'),
+    description: 'Intense 72-hour hydration with plumping hyaluronic acid complex.',
+  },
+  {
+    id: 7, category: 'SKIN',
+    name: 'Rose Clay Purifying Mask', brand: 'SAYO Pure',
+    price: 'Rs. 2,800.00', badge: null,
+    // Pink clay mask product with rose petals, flatlay
+    image: u('1596755389378-c31d21fd1273'),
+    description: 'Deep pore-cleansing mask infused with kaolin and rose extract.',
+  },
+  {
+    id: 8, category: 'SKIN',
+    name: 'Vitamin C Glow Toner', brand: 'SAYO Pure',
+    price: 'Rs. 3,100.00', badge: 'New',
+    // Bright skincare serum/toner bottle with citrus/orange tones
+    image: u('1570194065650-d99fb4ee0241'),
+    description: 'Brightening toner with stable Vitamin C and niacinamide.',
+  },
+  {
+    id: 9, category: 'NAIL',
+    name: 'Strengthening Base Coat', brand: 'SAYO Nails',
+    price: 'Rs. 1,200.00', badge: null,
+    // Clear nail lacquer bottle closeup, manicured nails
+    image: u('1604654894610-df63bc536371'),
+    description: 'Fortifies brittle nails with keratin and calcium complex.',
+  },
+  {
+    id: 10, category: 'NAIL',
+    name: 'Cuticle Revival Oil', brand: 'SAYO Nails',
+    price: 'Rs. 1,650.00', badge: 'Best Seller',
+    // Small amber dropper oil bottle, soft clean background
+    image: u('1631390069613-04b89426cc54'),
+    description: 'Jojoba and vitamin E oil blend for soft, healthy cuticles.',
+  },
+  {
+    id: 11, category: 'NAIL',
+    name: 'Gel Top Coat — High Shine', brand: 'SAYO Pro',
+    price: 'Rs. 2,200.00', badge: 'New',
+    // Glossy red/nude nail polish bottles neatly arranged
+    image: u('1632345031435-8727f592d8db'),
+    description: 'Ultra-glossy, chip-resistant finish that lasts up to 3 weeks.',
+  },
+  {
+    id: 12, category: 'BODY',
+    name: 'Jasmine Body Butter', brand: 'SAYO Botanics',
+    price: 'Rs. 3,400.00', badge: null,
+    // Glass jar of rich white body butter/cream with botanicals
+    image: u('1608181831718-c9fbb1a3b2a0'),
+    description: 'Rich whipped body butter with jasmine and shea for silky skin.',
+  },
+  {
+    id: 13, category: 'BODY',
+    name: 'Sugar & Coconut Scrub', brand: 'SAYO Pure',
+    price: 'Rs. 2,900.00', badge: 'Best Seller',
+    // Sugar body scrub in open glass jar with coconut and sugar crystals
+    image: u('1556228578-0d85b1a4d571'),
+    description: 'Exfoliating sugar scrub that buffs and moisturises simultaneously.',
+  },
+  {
+    id: 14, category: 'BODY',
+    name: 'Relaxing Massage Oil', brand: 'SAYO Essentials',
+    price: 'Rs. 3,700.00', badge: null,
+    // Golden massage/body oil in glass bottle with spa herbs
+    image: u('1600428877878-1a0fd85beda8'),
+    description: 'Warming blend of arnica and eucalyptus for post-treatment care.',
+  },
+  {
+    id: 15, category: 'FRAGRANCE',
+    name: 'Oud & Rose Eau de Parfum', brand: 'SAYO Gold',
+    price: 'Rs. 9,500.00', badge: 'Premium',
+    // Dramatic luxury perfume bottle on dark moody background
+    image: u('1541643600914-78b084683702'),
+    description: 'A sensuous blend of Bulgarian rose and aged oud wood.',
+  },
+  {
+    id: 16, category: 'FRAGRANCE',
+    name: 'White Jasmine Body Mist', brand: 'SAYO Pure',
+    price: 'Rs. 4,100.00', badge: 'New',
+    // Delicate spray perfume/body mist bottle with white floral styling
+    image: u('1587017539504-67cfbddac569'),
+    description: 'Light, refreshing body mist perfect for everyday wear.',
+  },
 ];
 
 const globalCss = `
@@ -170,8 +248,9 @@ const globalCss = `
   .category-tab-inactive:hover { border-color:#B8860B;background:rgba(184,134,11,0.12); }
   .product-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);border-radius:1.25rem;overflow:hidden;transition:transform 0.35s cubic-bezier(0.16,1,0.3,1),box-shadow 0.35s ease,border-color 0.35s ease;cursor:pointer;animation:cardIn 0.6s cubic-bezier(0.16,1,0.3,1) both; }
   .product-card:hover { transform:translateY(-8px);box-shadow:0 24px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(184,134,11,0.4);border-color:rgba(184,134,11,0.4); }
-  .product-card .card-img { width:100%;aspect-ratio:4/4.5;object-fit:cover;display:block;transition:filter 0.35s ease; }
-  .product-card:hover .card-img { filter: brightness(1.1); }
+  .card-img-wrap { overflow:hidden; }
+  .product-card .card-img { width:100%;aspect-ratio:4/4.5;object-fit:cover;display:block;transition:filter 0.4s ease,transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+  .product-card:hover .card-img { filter:brightness(1.08) saturate(1.12);transform:scale(1.05); }
   .add-btn { border:none;outline:none;cursor:pointer;font-family:Inter,sans-serif;font-weight:600;font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;background:rgba(184,134,11,0.18);color:#B8860B;border:1.5px solid rgba(184,134,11,0.5);border-radius:0.625rem;padding:0.55rem 1rem;transition:background 0.25s,color 0.25s,border-color 0.25s,transform 0.2s;position:relative;overflow:hidden; }
   .add-btn::before { content:'';position:absolute;inset:0;background:#B8860B;transform:scaleX(0);transform-origin:left;transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);z-index:0; }
   .add-btn:hover::before { transform:scaleX(1); }
@@ -255,29 +334,54 @@ function Divider() {
   );
 }
 
-/* ── PRODUCT CARD — typed ── */
+// Verified fallback images per category — guaranteed beauty-relevant
+const CATEGORY_FALLBACKS: Record<string, string> = {
+  HAIR:      'https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=400&h=460&fit=crop&q=85&auto=format',
+  SKIN:      'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=460&fit=crop&q=85&auto=format',
+  NAIL:      'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=460&fit=crop&q=85&auto=format',
+  BODY:      'https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=400&h=460&fit=crop&q=85&auto=format',
+  FRAGRANCE: 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=400&h=460&fit=crop&q=85&auto=format',
+};
+
 function ProductCard({ product, delay = 0 }: { product: Product; delay?: number }) {
+  const [imgSrc, setImgSrc] = useState(product.image);
+
   const badgeStyle =
-    product.badge === 'Premium'     ? { background: 'rgba(184,134,11,0.25)', color: '#B8860B' } :
-    product.badge === 'Best Seller' ? { background: 'rgba(255,255,255,0.12)', color: '#fff'  } :
-                                      { background: 'rgba(100,200,150,0.2)',  color: '#6fcf97' };
+    product.badge === 'Premium'     ? { background: 'rgba(184,134,11,0.28)', color: '#d4a017', border: '1px solid rgba(184,134,11,0.5)' } :
+    product.badge === 'Best Seller' ? { background: 'rgba(255,255,255,0.14)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' } :
+                                      { background: 'rgba(80,200,140,0.2)', color: '#5fcf97', border: '1px solid rgba(80,200,140,0.4)' };
+
   return (
     <div className="product-card" style={{ animationDelay: `${delay}ms` }}>
-      <div style={{ position: 'relative' }}>
+      <div className="card-img-wrap" style={{ position: 'relative' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.image} alt={product.name} className="card-img" />
+        <img
+          src={imgSrc}
+          alt={product.name}
+          className="card-img"
+          onError={() => {
+            const fb = CATEGORY_FALLBACKS[product.category];
+            if (fb && imgSrc !== fb) setImgSrc(fb);
+          }}
+        />
         {product.badge && (
-          <span style={{ ...badgeStyle, position:'absolute', top:'0.75rem', left:'0.75rem', fontSize:'0.68rem', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', padding:'0.3rem 0.7rem', borderRadius:'999px', backdropFilter:'blur(6px)' }}>
+          <span style={{
+            ...badgeStyle,
+            position: 'absolute', top: '0.75rem', left: '0.75rem',
+            fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em',
+            textTransform: 'uppercase', padding: '0.3rem 0.75rem',
+            borderRadius: '999px', backdropFilter: 'blur(8px)',
+          }}>
             {product.badge}
           </span>
         )}
       </div>
       <div style={{ padding: '1.1rem 1.25rem 1.35rem' }}>
-        <p style={{ color:tokens.color.gold, fontSize:'0.7rem', fontWeight:600, letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:'0.3rem' }}>{product.brand}</p>
-        <h3 style={{ color:tokens.color.white, fontSize:'clamp(0.85rem,1.3vw,1rem)', fontWeight:600, lineHeight:1.35, marginBottom:'0.45rem' }}>{product.name}</h3>
-        <p style={{ color:tokens.color.whiteFaint, fontSize:'0.78rem', lineHeight:1.55, marginBottom:'1rem' }}>{product.description}</p>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'0.75rem' }}>
-          <span style={{ color:tokens.color.gold, fontSize:'clamp(0.9rem,1.4vw,1.05rem)', fontWeight:700, flexShrink:0 }}>{product.price}</span>
+        <p style={{ color: tokens.color.gold, fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>{product.brand}</p>
+        <h3 style={{ color: tokens.color.white, fontSize: 'clamp(0.85rem,1.3vw,1rem)', fontWeight: 600, lineHeight: 1.35, marginBottom: '0.45rem' }}>{product.name}</h3>
+        <p style={{ color: tokens.color.whiteFaint, fontSize: '0.78rem', lineHeight: 1.55, marginBottom: '1rem' }}>{product.description}</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+          <span style={{ color: tokens.color.gold, fontSize: 'clamp(0.9rem,1.4vw,1.05rem)', fontWeight: 700, flexShrink: 0 }}>{product.price}</span>
           <button className="add-btn"><span>Add to Bag</span></button>
         </div>
       </div>
@@ -285,7 +389,6 @@ function ProductCard({ product, delay = 0 }: { product: Product; delay?: number 
   );
 }
 
-/* ── PAGE ── */
 export default function ProductsPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loaded,   setLoaded]   = useState(false);
@@ -318,16 +421,16 @@ export default function ProductsPage() {
   return (
     <>
       <style>{globalCss}</style>
-      <main style={{ minHeight:'100vh', backgroundColor:'transparent', fontFamily:tokens.font.family, color:tokens.color.white }}>
+      <main style={{ minHeight: '100vh', backgroundColor: 'transparent', fontFamily: tokens.font.family, color: tokens.color.white }}>
 
         {/* BG */}
-        <div style={{ position:'fixed', inset:0, zIndex:0 }}>
-          <Image src="/products-bg.jpg" alt="Products background" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(270deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.85) 100%)' }} />
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(0deg,rgba(4,4,5,0.6) 0%,transparent 30%)' }} />
+        <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
+          <Image src="/products-bg.jpg" alt="Products background" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(270deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.85) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(4,4,5,0.6) 0%,transparent 30%)' }} />
         </div>
 
-        <div style={{ position:'relative', zIndex:10 }}>
+        <div style={{ position: 'relative', zIndex: 10 }}>
 
           {/* NAV */}
           <nav className={loaded ? 'nav-animate' : ''} style={{ ...S.nav, opacity: loaded ? undefined : 0 }}>
@@ -354,7 +457,8 @@ export default function ProductsPage() {
               )}
               {!isMobile && <a href={navData.contact_btn_link} className="contact-btn-wrap" style={S.contactBtn}>{navData.contact_btn_text}</a>}
               {isMobile && (
-                <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" style={{ background:'none', border:'none', color:tokens.color.white, cursor:'pointer', padding:'0.5rem', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"
+                  style={{ background: 'none', border: 'none', color: tokens.color.white, cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     {menuOpen ? <path d="M6 18L18 6M6 6l12 12" /> : (<><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>)}
                   </svg>
@@ -362,9 +466,11 @@ export default function ProductsPage() {
               )}
             </div>
             {isMobile && menuOpen && (
-              <div style={{ ...S.mobileMenu, animation:'fadeInDown 0.3s ease both' }}>
+              <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
                 {navData.nav_items.map((item, i) => (
-                  <a key={item.href + i} href={item.href} style={{ ...S.mobileNavLink, color: item.href === '/products' ? tokens.color.gold : tokens.color.white }} onClick={() => setMenuOpen(false)}>
+                  <a key={item.href + i} href={item.href}
+                    style={{ ...S.mobileNavLink, color: item.href === '/products' ? tokens.color.gold : tokens.color.white }}
+                    onClick={() => setMenuOpen(false)}>
                     {item.href === '/products' ? `[ ${item.label} ]` : item.label}
                   </a>
                 ))}
@@ -374,38 +480,40 @@ export default function ProductsPage() {
           </nav>
 
           {/* HERO */}
-          <div ref={heroRef} style={{ display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', padding:'clamp(2rem,6vw,5rem) clamp(1.25rem,5vw,4rem)', gap:'clamp(1.25rem,2.5vw,2rem)' }}>
-            <p className={heroVisible ? 'reveal-up' : ''} style={{ color:tokens.color.gold, fontSize:'0.8rem', fontWeight:600, letterSpacing:'0.25em', textTransform:'uppercase', opacity:heroVisible?1:0, animationDelay:'0.05s', margin:0 }}>SAYO Beauty · Curated Collection</p>
-            <h1 className={heroVisible ? 'reveal-up' : ''} style={{ color:tokens.color.gold, fontSize:tokens.font.heroTitle, fontWeight:500, lineHeight:1.2, maxWidth:'56rem', margin:0, opacity:heroVisible?1:0, animationDelay:'0.15s', textShadow:'0 4px 40px rgba(184,134,11,0.3)' }}>Products Crafted for Your Unique Glow</h1>
-            <p className={heroVisible ? 'reveal-up' : ''} style={{ color:tokens.color.whiteMuted, fontSize:tokens.font.heroSub, fontWeight:500, lineHeight:1.7, maxWidth:'52rem', margin:0, opacity:heroVisible?1:0, animationDelay:'0.25s' }}>Handpicked formulas from the world's most exclusive botanicals. Every product in our collection is salon-tested and curated by our expert stylists.</p>
+          <div ref={heroRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: 'clamp(2rem,6vw,5rem) clamp(1.25rem,5vw,4rem)', gap: 'clamp(1.25rem,2.5vw,2rem)' }}>
+            <p className={heroVisible ? 'reveal-up' : ''} style={{ color: tokens.color.gold, fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', opacity: heroVisible ? 1 : 0, animationDelay: '0.05s', margin: 0 }}>SAYO Beauty · Curated Collection</p>
+            <h1 className={heroVisible ? 'reveal-up' : ''} style={{ color: tokens.color.gold, fontSize: tokens.font.heroTitle, fontWeight: 500, lineHeight: 1.2, maxWidth: '56rem', margin: 0, opacity: heroVisible ? 1 : 0, animationDelay: '0.15s', textShadow: '0 4px 40px rgba(184,134,11,0.3)' }}>Products Crafted for Your Unique Glow</h1>
+            <p className={heroVisible ? 'reveal-up' : ''} style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.heroSub, fontWeight: 500, lineHeight: 1.7, maxWidth: '52rem', margin: 0, opacity: heroVisible ? 1 : 0, animationDelay: '0.25s' }}>Handpicked formulas from the world's most exclusive botanicals. Every product in our collection is salon-tested and curated by our expert stylists.</p>
           </div>
 
           <Divider />
 
           {/* FILTERS */}
-          <div ref={filterRef} style={{ display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', gap:'clamp(1.5rem,3vw,2.5rem)', padding:'clamp(2rem,4vw,3.25rem) clamp(1.25rem,5vw,4rem)' }}>
-            <div className={heroVisible ? 'reveal-up' : ''} style={{ width:'100%', maxWidth:'480px', position:'relative', opacity:filterVisible?1:0, animationDelay:'0.05s' }}>
-              <span style={{ position:'absolute', left:'0.9rem', top:'50%', transform:'translateY(-50%)', color:tokens.color.whiteFaint, pointerEvents:'none', display:'flex' }}><IconSearch /></span>
+          <div ref={filterRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 'clamp(1.5rem,3vw,2.5rem)', padding: 'clamp(2rem,4vw,3.25rem) clamp(1.25rem,5vw,4rem)' }}>
+            <div className={heroVisible ? 'reveal-up' : ''} style={{ width: '100%', maxWidth: '480px', position: 'relative', opacity: filterVisible ? 1 : 0, animationDelay: '0.05s' }}>
+              <span style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: tokens.color.whiteFaint, pointerEvents: 'none', display: 'flex' }}><IconSearch /></span>
               <input type="text" className="search-input" placeholder="Search by product name or brand…" value={search} onChange={e => setSearch(e.target.value)} />
               {search && (
                 <button onClick={() => setSearch('')} aria-label="Clear search"
-                  style={{ position:'absolute', right:'0.85rem', top:'50%', transform:'translateY(-50%)', background:'none', border:'none', color:tokens.color.whiteFaint, cursor:'pointer', display:'flex', padding:'0.2rem', transition:'color 0.2s' }}
+                  style={{ position: 'absolute', right: '0.85rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: tokens.color.whiteFaint, cursor: 'pointer', display: 'flex', padding: '0.2rem', transition: 'color 0.2s' }}
                   onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = '#fff'}
                   onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = tokens.color.whiteFaint}
                 ><IconX /></button>
               )}
             </div>
-            <div className={`category-tabs-wrap ${filterVisible ? 'reveal-up' : ''}`} style={{ gap:'clamp(0.875rem,2vw,1.75rem)', maxWidth:tokens.layout.inner, width:'100%', opacity:filterVisible?1:0, animationDelay:'0.15s', justifyContent:'center' }}>
+            <div className={`category-tabs-wrap ${filterVisible ? 'reveal-up' : ''}`} style={{ gap: 'clamp(0.875rem,2vw,1.75rem)', maxWidth: tokens.layout.inner, width: '100%', opacity: filterVisible ? 1 : 0, animationDelay: '0.15s', justifyContent: 'center' }}>
               {CATEGORIES.map(cat => {
                 const isActive = category === cat.key;
                 return (
-                  <button key={cat.key} onClick={() => setCategory(cat.key)} className={`category-tab ${isActive ? 'category-tab-active' : 'category-tab-inactive'}`} style={{ minWidth:'clamp(90px,12vw,148px)', height:'clamp(52px,6.5vh,66px)', borderRadius:tokens.radius.tab, fontSize:tokens.font.tabLabel, fontWeight:600, flexShrink:0 }}>
+                  <button key={cat.key} onClick={() => setCategory(cat.key)}
+                    className={`category-tab ${isActive ? 'category-tab-active' : 'category-tab-inactive'}`}
+                    style={{ minWidth: 'clamp(90px,12vw,148px)', height: 'clamp(52px,6.5vh,66px)', borderRadius: tokens.radius.tab, fontSize: tokens.font.tabLabel, fontWeight: 600, flexShrink: 0 }}>
                     {cat.label}
                   </button>
                 );
               })}
             </div>
-            <p className={filterVisible ? 'reveal-fade' : ''} style={{ color:tokens.color.whiteFaint, fontSize:'0.82rem', fontWeight:500, opacity:filterVisible?1:0, animationDelay:'0.25s', margin:0 }}>
+            <p className={filterVisible ? 'reveal-fade' : ''} style={{ color: tokens.color.whiteFaint, fontSize: '0.82rem', fontWeight: 500, opacity: filterVisible ? 1 : 0, animationDelay: '0.25s', margin: 0 }}>
               {filtered.length === 0 ? 'No products found' : `Showing ${filtered.length} product${filtered.length !== 1 ? 's' : ''}${search ? ` for "${search}"` : ''}`}
             </p>
           </div>
@@ -413,18 +521,18 @@ export default function ProductsPage() {
           <Divider />
 
           {/* GRID */}
-          <div ref={gridRef} style={{ padding:'clamp(2rem,4vw,3.5rem) clamp(1.25rem,5vw,4rem) clamp(4rem,7vw,6rem)', opacity:gridVisible?1:0, transition:'opacity 0.6s ease' }}>
-            <div style={{ maxWidth:tokens.layout.inner, margin:'0 auto' }}>
+          <div ref={gridRef} style={{ padding: 'clamp(2rem,4vw,3.5rem) clamp(1.25rem,5vw,4rem) clamp(4rem,7vw,6rem)', opacity: gridVisible ? 1 : 0, transition: 'opacity 0.6s ease' }}>
+            <div style={{ maxWidth: tokens.layout.inner, margin: '0 auto' }}>
               {filtered.length > 0 ? (
                 <div className="products-grid">
                   {filtered.map((p, i) => <ProductCard key={p.id} product={p} delay={Math.min(i * 60, 400)} />)}
                 </div>
               ) : (
-                <div style={{ textAlign:'center', padding:'5rem 1rem' }}>
-                  <div style={{ color:tokens.color.gold, fontSize:'2.5rem', marginBottom:'1rem', opacity:0.5 }}>✦</div>
-                  <p style={{ color:tokens.color.whiteMuted, fontSize:'1.1rem', fontWeight:500, marginBottom:'0.5rem' }}>No products found</p>
-                  <p style={{ color:tokens.color.whiteFaint, fontSize:'0.9rem', marginBottom:'1.5rem' }}>Try a different search term or browse all categories.</p>
-                  <button onClick={() => { setSearch(''); setCategory('ALL'); }} className="category-tab category-tab-inactive" style={{ minWidth:'160px', height:'50px', borderRadius:tokens.radius.tab, fontSize:'0.9rem', fontWeight:600 }}>Clear Filters</button>
+                <div style={{ textAlign: 'center', padding: '5rem 1rem' }}>
+                  <div style={{ color: tokens.color.gold, fontSize: '2.5rem', marginBottom: '1rem', opacity: 0.5 }}>✦</div>
+                  <p style={{ color: tokens.color.whiteMuted, fontSize: '1.1rem', fontWeight: 500, marginBottom: '0.5rem' }}>No products found</p>
+                  <p style={{ color: tokens.color.whiteFaint, fontSize: '0.9rem', marginBottom: '1.5rem' }}>Try a different search term or browse all categories.</p>
+                  <button onClick={() => { setSearch(''); setCategory('ALL'); }} className="category-tab category-tab-inactive" style={{ minWidth: '160px', height: '50px', borderRadius: tokens.radius.tab, fontSize: '0.9rem', fontWeight: 600 }}>Clear Filters</button>
                 </div>
               )}
             </div>
@@ -433,53 +541,60 @@ export default function ProductsPage() {
           <Divider />
 
           {/* FOOTER */}
-          <footer ref={footerRef} style={{ position:'relative', overflow:'hidden', background:tokens.color.bgFooter, padding:'clamp(2rem,5vw,3.5rem) clamp(1.5rem,5vw,5.188rem)', marginTop:'clamp(2rem,4vw,3rem)' }}>
-            <div className="footer-grid" style={{ position:'relative', zIndex:10 }}>
-              <div className="footer-reveal" style={{ flex:'1 1 260px', maxWidth:'320px', display:'flex', flexDirection:'column', gap:'1rem', opacity:footerVisible?1:0, transform:footerVisible?'translateX(0)':'translateX(-40px)', transitionDelay:'0s' }}>
+          <footer ref={footerRef} style={{ position: 'relative', overflow: 'hidden', background: tokens.color.bgFooter, padding: 'clamp(2rem,5vw,3.5rem) clamp(1.5rem,5vw,5.188rem)', marginTop: 'clamp(2rem,4vw,3rem)' }}>
+            <div className="footer-grid" style={{ position: 'relative', zIndex: 10 }}>
+              <div className="footer-reveal" style={{ flex: '1 1 260px', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '1rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(-40px)', transitionDelay: '0s' }}>
                 <LogoIcon size={56} />
-                <h2 style={{ color:tokens.color.white, fontSize:tokens.font.brand, fontWeight:600, letterSpacing:'0.15em', margin:0 }}>{footerData.brand_name}</h2>
-                <p style={{ color:tokens.color.whiteMuted, fontSize:tokens.font.tagline, lineHeight:1.6, margin:0, maxWidth:'260px' }}>{footerData.brand_tagline}</p>
-                <div style={{ display:'flex', gap:'1rem', marginTop:'0.5rem' }}>
+                <h2 style={{ color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 }}>{footerData.brand_name}</h2>
+                <p style={{ color: tokens.color.whiteMuted, fontSize: tokens.font.tagline, lineHeight: 1.6, margin: 0, maxWidth: '260px' }}>{footerData.brand_tagline}</p>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                   {([
-                    { label:'WhatsApp',  Icon:IconWhatsApp,  href:footerData.social_whatsapp  || '#' },
-                    { label:'Facebook',  Icon:IconFacebook,  href:footerData.social_facebook  || '#' },
-                    { label:'Instagram', Icon:IconInstagram, href:footerData.social_instagram || '#' },
+                    { label: 'WhatsApp',  Icon: IconWhatsApp,  href: footerData.social_whatsapp  || '#' },
+                    { label: 'Facebook',  Icon: IconFacebook,  href: footerData.social_facebook  || '#' },
+                    { label: 'Instagram', Icon: IconInstagram, href: footerData.social_instagram || '#' },
                   ] as const).map(({ label, Icon, href }, i) => (
-                    <a key={label} href={href} target={href.startsWith('http')?'_blank':undefined} rel="noopener noreferrer" aria-label={label} className="social-icon footer-reveal-bounce" style={{ opacity:footerVisible?1:0, transform:footerVisible?'scale(1)':'scale(0.5)', transitionDelay:`${0.4+i*0.1}s` }}><Icon /></a>
+                    <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" aria-label={label}
+                      className="social-icon footer-reveal-bounce"
+                      style={{ opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'scale(1)' : 'scale(0.5)', transitionDelay: `${0.4 + i * 0.1}s` }}>
+                      <Icon />
+                    </a>
                   ))}
                 </div>
               </div>
-              <div className="footer-reveal" style={{ flex:'1 1 160px', display:'flex', flexDirection:'column', gap:'0.85rem', opacity:footerVisible?1:0, transform:footerVisible?'translateX(0)':'translateX(20px)', transitionDelay:'0.15s' }}>
-                <p style={{ color:tokens.color.gold, fontSize:tokens.font.label, fontWeight:600, letterSpacing:'0.15em', textTransform:'uppercase', margin:0 }}>Quick Links</p>
+              <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.15s' }}>
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Quick Links</p>
                 {footerData.quick_links.map((link, i) => (
-                  <a key={link.label+i} href={link.href} className="quick-link footer-reveal-fast" style={{ color:tokens.color.whiteDim, fontSize:'0.875rem', fontWeight:500, textDecoration:'none', opacity:footerVisible?1:0, transform:footerVisible?'translateX(0)':'translateX(20px)', transitionDelay:`${0.25+i*0.08}s` }}>{link.label}</a>
+                  <a key={link.label + i} href={link.href} className="quick-link footer-reveal-fast"
+                    style={{ color: tokens.color.whiteDim, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.25 + i * 0.08}s` }}>
+                    {link.label}
+                  </a>
                 ))}
               </div>
-              <div className="footer-reveal" style={{ flex:'1 1 160px', display:'flex', flexDirection:'column', gap:'0.85rem', opacity:footerVisible?1:0, transform:footerVisible?'translateX(0)':'translateX(20px)', transitionDelay:'0.25s' }}>
-                <p style={{ color:tokens.color.gold, fontSize:tokens.font.label, fontWeight:600, letterSpacing:'0.15em', textTransform:'uppercase', margin:0 }}>Our Locations</p>
+              <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: '0.25s' }}>
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Our Locations</p>
                 {footerData.locations.map((loc, i) => (
-                  <div key={loc+i} className="footer-reveal-fast" style={{ display:'flex', alignItems:'flex-start', gap:'8px', opacity:footerVisible?1:0, transform:footerVisible?'translateX(0)':'translateX(20px)', transitionDelay:`${0.35+i*0.08}s` }}>
-                    <span style={{ color:tokens.color.gold, flexShrink:0, marginTop:'2px' }}><IconLocation /></span>
-                    <p style={{ color:tokens.color.whiteDim, fontSize:'0.875rem', fontWeight:500, lineHeight:1.5, margin:0 }}>{loc}</p>
+                  <div key={loc + i} className="footer-reveal-fast" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.35 + i * 0.08}s` }}>
+                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><IconLocation /></span>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{loc}</p>
                   </div>
                 ))}
               </div>
-              <div className="footer-reveal" style={{ flex:'1 1 160px', display:'flex', flexDirection:'column', gap:'0.85rem', opacity:footerVisible?1:0, transform:footerVisible?'translateX(0)':'translateX(40px)', transitionDelay:'0.35s' }}>
-                <p style={{ color:tokens.color.gold, fontSize:tokens.font.label, fontWeight:600, letterSpacing:'0.15em', textTransform:'uppercase', margin:0 }}>Contact Us</p>
+              <div className="footer-reveal" style={{ flex: '1 1 160px', display: 'flex', flexDirection: 'column', gap: '0.85rem', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(40px)', transitionDelay: '0.35s' }}>
+                <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>Contact Us</p>
                 {([
-                  { Icon:IconPhone,    text:footerData.contact_phone   },
-                  { Icon:IconMail,     text:footerData.contact_email   },
-                  { Icon:IconLocation, text:footerData.contact_address },
+                  { Icon: IconPhone,    text: footerData.contact_phone   },
+                  { Icon: IconMail,     text: footerData.contact_email   },
+                  { Icon: IconLocation, text: footerData.contact_address },
                 ] as const).map(({ Icon, text }, i) => (
-                  <div key={text+i} className="footer-reveal-fast" style={{ display:'flex', alignItems:'flex-start', gap:'8px', opacity:footerVisible?1:0, transform:footerVisible?'translateX(0)':'translateX(20px)', transitionDelay:`${0.45+i*0.08}s` }}>
-                    <span style={{ color:tokens.color.gold, flexShrink:0, marginTop:'2px' }}><Icon /></span>
-                    <p style={{ color:tokens.color.whiteDim, fontSize:'0.875rem', fontWeight:500, lineHeight:1.5, margin:0 }}>{text}</p>
+                  <div key={text + i} className="footer-reveal-fast" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.45 + i * 0.08}s` }}>
+                    <span style={{ color: tokens.color.gold, flexShrink: 0, marginTop: '2px' }}><Icon /></span>
+                    <p style={{ color: tokens.color.whiteDim, fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5, margin: 0 }}>{text}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="footer-reveal-simple" style={{ position:'relative', zIndex:10, marginTop:'clamp(2rem,4vw,2.5rem)', paddingTop:'clamp(1rem,2vw,1.5rem)', borderTop:`1px solid ${tokens.color.whiteBorder}`, opacity:footerVisible?1:0, transitionDelay:'0.7s' }}>
-              <p style={{ color:tokens.color.whiteFaint, fontSize:'0.813rem', textAlign:'center', margin:0 }}>{footerData.copyright_text}</p>
+            <div className="footer-reveal-simple" style={{ position: 'relative', zIndex: 10, marginTop: 'clamp(2rem,4vw,2.5rem)', paddingTop: 'clamp(1rem,2vw,1.5rem)', borderTop: `1px solid ${tokens.color.whiteBorder}`, opacity: footerVisible ? 1 : 0, transitionDelay: '0.7s' }}>
+              <p style={{ color: tokens.color.whiteFaint, fontSize: '0.813rem', textAlign: 'center', margin: 0 }}>{footerData.copyright_text}</p>
             </div>
           </footer>
 

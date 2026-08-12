@@ -1,14 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import backgroundImage from '../public/model1.png';
 import sayoLogo from '../public/sayologo.png';
 
-/* ─────────────────────────────────────────
-   DESIGN TOKENS
-───────────────────────────────────────── */
 const tokens = {
   color: {
     gold:        '#B8860B',
@@ -47,9 +43,6 @@ const tokens = {
   },
 } as const;
 
-/* ─────────────────────────────────────────
-   DEFAULT DATA
-───────────────────────────────────────── */
 const NAV_DEFAULTS = {
   logo_text:        'SAYO',
   contact_btn_text: 'CONTACT US',
@@ -91,10 +84,10 @@ const FOOTER_DEFAULTS = {
   social_instagram: '',
 };
 
-/* ─────────────────────────────────────────
-   GLOBAL CSS ANIMATIONS
-───────────────────────────────────────── */
 const globalCss = `
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; }
+
   @keyframes fadeInDown {
     from { opacity: 0; transform: translateY(-30px); }
     to   { opacity: 1; transform: translateY(0);     }
@@ -107,10 +100,6 @@ const globalCss = `
     from { opacity: 0; transform: translateY(40px); }
     to   { opacity: 1; transform: translateY(0);    }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
   @keyframes scaleIn {
     from { opacity: 0; transform: scale(0.85); }
     to   { opacity: 1; transform: scale(1);    }
@@ -118,6 +107,10 @@ const globalCss = `
   @keyframes shimmer {
     0%   { background-position: -200% center; }
     100% { background-position:  200% center; }
+  }
+  @keyframes imgShimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position:  600px 0; }
   }
   @keyframes drawLine {
     from { stroke-dashoffset: 3000; }
@@ -145,10 +138,10 @@ const globalCss = `
     100% { transform: translateY(0)     rotate(360deg); opacity: 0.4; }
   }
 
-  .hero-bg-img    { animation: bgZoom 1.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
-  .hero-overlay   { animation: overlayFade 1.5s ease forwards; }
-  .nav-animate    { animation: fadeInDown 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
-  .logo-float     { animation: floatY 4s ease-in-out 1.5s infinite; }
+  .hero-bg-img      { animation: bgZoom 1.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+  .hero-overlay     { animation: overlayFade 1.5s ease forwards; }
+  .nav-animate      { animation: fadeInDown 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
+  .logo-float       { animation: floatY 4s ease-in-out 1.5s infinite; }
   .eyebrow-animate  { animation: fadeInLeft 0.7s cubic-bezier(0.16,1,0.3,1) 0.8s both; }
   .heading-animate  { animation: fadeInUp  0.8s cubic-bezier(0.16,1,0.3,1) 1s   both; }
   .body-animate     { animation: fadeInUp  0.8s cubic-bezier(0.16,1,0.3,1) 1.2s both; }
@@ -197,7 +190,7 @@ const globalCss = `
     background: rgba(255,255,255,0.08);
     border: 1.5px solid rgba(255,255,255,0.15);
     transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
-                background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+                background 0.3s ease, border-color 0.3s ease;
   }
   .social-icon:hover {
     transform: scale(1.12) translateY(-3px);
@@ -240,11 +233,46 @@ const globalCss = `
   @media (min-width: 640px) and (max-width: 1023px) {
     .footer-grid { flex-direction: row; flex-wrap: wrap; justify-content: space-between; }
   }
+
+  /* ── product grid responsive ── */
+  .prod-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  @media (max-width: 900px)  { .prod-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px)  { .prod-grid { grid-template-columns: 1fr; } }
+
+  /* ── product card image hover ── */
+  .prod-card-img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center top;
+    display: block;
+    transition: transform 0.55s cubic-bezier(0.16,1,0.3,1), filter 0.4s ease;
+    will-change: transform;
+  }
+  .prod-card:hover .prod-card-img {
+    transform: scale(1.07);
+    filter: brightness(1.08) saturate(1.1);
+  }
+
+  /* ── brand story image hover ── */
+  .story-img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.5s ease;
+  }
+  .story-img-wrap:hover .story-img {
+    transform: scale(1.05);
+    filter: brightness(1.05) saturate(1.1);
+  }
 `;
 
-/* ─────────────────────────────────────────
-   STYLES
-───────────────────────────────────────── */
 const S = {
   main: {
     minHeight: '100vh',
@@ -253,14 +281,11 @@ const S = {
   } as React.CSSProperties,
 
   hero: {
-    position: 'relative',
-    width: '100%',
-    minHeight: '100vh',
-    overflow: 'hidden',
+    position: 'relative', width: '100%',
+    minHeight: '100vh', overflow: 'hidden',
   } as React.CSSProperties,
 
-  heroBg: { position: 'absolute', inset: 0 } as React.CSSProperties,
-
+  heroBg:      { position: 'absolute', inset: 0 } as React.CSSProperties,
   heroOverlay: {
     position: 'absolute', inset: 0,
     background: `linear-gradient(270deg, ${tokens.color.overlayR} 0%, ${tokens.color.overlayL} 100%)`,
@@ -278,11 +303,10 @@ const S = {
     backdropFilter: 'blur(8px)', minHeight: '3.5rem',
   } as React.CSSProperties,
 
-  logoWrap: { display: 'flex', alignItems: 'center', gap: 'clamp(0.5rem, 1vw, 0.75rem)' } as React.CSSProperties,
-  logoText: { color: tokens.color.white, fontSize: tokens.font.logoText, fontWeight: 600, letterSpacing: '0.15em' } as React.CSSProperties,
-  navLinks: { display: 'flex', alignItems: 'center', gap: 'clamp(1.25rem, 2.5vw, 2.5rem)' } as React.CSSProperties,
-
-  navLinkActive: { color: tokens.color.gold, fontSize: tokens.font.nav, fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' } as React.CSSProperties,
+  logoWrap:      { display: 'flex', alignItems: 'center', gap: 'clamp(0.5rem, 1vw, 0.75rem)' } as React.CSSProperties,
+  logoText:      { color: tokens.color.white, fontSize: tokens.font.logoText, fontWeight: 600, letterSpacing: '0.15em' } as React.CSSProperties,
+  navLinks:      { display: 'flex', alignItems: 'center', gap: 'clamp(1.25rem, 2.5vw, 2.5rem)' } as React.CSSProperties,
+  navLinkActive: { color: tokens.color.gold,  fontSize: tokens.font.nav, fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap' } as React.CSSProperties,
   navLink:       { color: tokens.color.white, fontSize: tokens.font.nav, fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s', whiteSpace: 'nowrap' } as React.CSSProperties,
 
   contactBtn: {
@@ -299,7 +323,7 @@ const S = {
     display: 'flex', flexDirection: 'column', gap: '1rem',
   } as React.CSSProperties,
 
-  mobileNavLinkActive: { color: tokens.color.gold, fontSize: '1rem', fontWeight: 500, textDecoration: 'none' } as React.CSSProperties,
+  mobileNavLinkActive: { color: tokens.color.gold,  fontSize: '1rem', fontWeight: 500, textDecoration: 'none' } as React.CSSProperties,
   mobileNavLink:       { color: tokens.color.white, fontSize: '1rem', fontWeight: 500, textDecoration: 'none' } as React.CSSProperties,
   mobileContact: {
     color: tokens.color.white, fontSize: '1rem', textAlign: 'center' as const,
@@ -350,18 +374,17 @@ const S = {
     padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 5.188rem)',
   } as React.CSSProperties,
 
-  footerGridBase: { position: 'relative', zIndex: 10 } as React.CSSProperties,
-
-  footerBrand: { display: 'flex', flexDirection: 'column' as const, gap: 'clamp(0.75rem, 1.5vw, 1rem)' } as React.CSSProperties,
-  brandName:   { color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 } as React.CSSProperties,
-  tagline:     { color: tokens.color.white, fontSize: tokens.font.tagline, fontWeight: 400, lineHeight: 1.6, margin: 0, opacity: 0.75, maxWidth: '260px' } as React.CSSProperties,
-  socialRow:   { display: 'flex', alignItems: 'center', gap: 'clamp(0.75rem, 1.5vw, 1rem)', marginTop: '0.5rem' } as React.CSSProperties,
-  socialLink:  { color: tokens.color.white } as React.CSSProperties,
-  footerCol:   { display: 'flex', flexDirection: 'column' as const, gap: '0.85rem' } as React.CSSProperties,
-  quickLabel:  { color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: 0, paddingBottom: '0.25rem' } as React.CSSProperties,
-  quickLink:   { color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, textDecoration: 'none' } as React.CSSProperties,
-  footerItemText: { color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 } as React.CSSProperties,
-  footerItemIcon: { color: tokens.color.gold, flexShrink: 0, marginTop: '2px' } as React.CSSProperties,
+  footerGridBase:  { position: 'relative', zIndex: 10 } as React.CSSProperties,
+  footerBrand:     { display: 'flex', flexDirection: 'column' as const, gap: 'clamp(0.75rem, 1.5vw, 1rem)' } as React.CSSProperties,
+  brandName:       { color: tokens.color.white, fontSize: tokens.font.brand, fontWeight: 600, letterSpacing: '0.15em', margin: 0 } as React.CSSProperties,
+  tagline:         { color: tokens.color.white, fontSize: tokens.font.tagline, fontWeight: 400, lineHeight: 1.6, margin: 0, opacity: 0.75, maxWidth: '260px' } as React.CSSProperties,
+  socialRow:       { display: 'flex', alignItems: 'center', gap: 'clamp(0.75rem, 1.5vw, 1rem)', marginTop: '0.5rem' } as React.CSSProperties,
+  socialLink:      { color: tokens.color.white } as React.CSSProperties,
+  footerCol:       { display: 'flex', flexDirection: 'column' as const, gap: '0.85rem' } as React.CSSProperties,
+  quickLabel:      { color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' as const, margin: 0, paddingBottom: '0.25rem' } as React.CSSProperties,
+  quickLink:       { color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, textDecoration: 'none' } as React.CSSProperties,
+  footerItemText:  { color: tokens.color.whiteDim, fontSize: tokens.font.quickLink, fontWeight: 500, lineHeight: 1.5, margin: 0 } as React.CSSProperties,
+  footerItemIcon:  { color: tokens.color.gold, flexShrink: 0, marginTop: '2px' } as React.CSSProperties,
   footerBottom: {
     position: 'relative' as const, zIndex: 10,
     marginTop: 'clamp(2rem, 4vw, 2.5rem)', paddingTop: 'clamp(1rem, 2vw, 1.5rem)',
@@ -370,495 +393,42 @@ const S = {
   copyright: { color: tokens.color.whiteFaint, fontSize: tokens.font.copy, textAlign: 'center' as const, margin: 0 } as React.CSSProperties,
 };
 
-/* ─────────────────────────────────────────
-   LOGO COMPONENT
-───────────────────────────────────────── */
+/* ── HOOKS ── */
+function useInView(threshold = 0.2) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+}
+
+function useIsMobile(breakpoint = 1024) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < breakpoint);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, [breakpoint]);
+  return isMobile;
+}
+
+/* ── LOGO ── */
 function LogoIcon({ className = '', size = 48 }: { className?: string; size?: number }) {
   return (
-    <Image
-      src={sayoLogo}
-      alt="SAYO Logo"
-      width={size}
-      height={size}
-      className={className}
-      style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto', objectFit: 'contain' }}
-      priority
-    />
+    <Image src={sayoLogo} alt="SAYO Logo" width={size} height={size} className={className}
+      style={{ width: 'clamp(2rem, 4vw, 3.5rem)', height: 'auto', objectFit: 'contain' }} priority />
   );
 }
 
-/* ─────────────────────────────────────────
-   BRAND STORY SECTION
-───────────────────────────────────────── */
-function BrandStorySection() {
-  const { ref, inView } = useInView(0.2);
-  return (
-    <section ref={ref} style={{
-      position: 'relative', overflow: 'hidden',
-      background: '#1c1c1c',
-      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
-    }}>
-      <div style={{
-        position: 'absolute', top: 0, left: 0,
-        width: '35%', height: '2px',
-        background: `linear-gradient(90deg, ${tokens.color.gold}, transparent)`,
-      }} />
-
-      <div style={{
-        display: 'flex', alignItems: 'stretch',
-        gap: 'clamp(2rem, 5vw, 5rem)',
-        maxWidth: '1200px', margin: '0 auto', flexWrap: 'wrap',
-      }}>
-        {/* LEFT */}
-        <div style={{
-          flex: '1 1 340px',
-          minHeight: 'clamp(300px, 40vw, 520px)',
-          borderRadius: '1.25rem', overflow: 'hidden',
-          position: 'relative', background: '#2a2520',
-          opacity: inView ? 1 : 0,
-          transform: inView ? 'translateX(0)' : 'translateX(-40px)',
-          transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)',
-        }}>
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(135deg,#2a2520 0%,#1a1a1a 60%,#0d0d0d 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{
-              color: tokens.color.gold, opacity: 0.2,
-              fontSize: '0.8rem', letterSpacing: '0.2em',
-              textTransform: 'uppercase', fontFamily: tokens.font.family,
-            }}>Treatment Photo / Video</span>
-          </div>
-          <div style={{
-            position: 'absolute', bottom: 0, right: 0,
-            width: '40%', height: '3px',
-            background: `linear-gradient(270deg, ${tokens.color.gold}, transparent)`,
-          }} />
-        </div>
-
-        {/* RIGHT */}
-        <div style={{
-          flex: '1 1 320px', display: 'flex', flexDirection: 'column',
-          justifyContent: 'center', gap: 'clamp(1rem, 2vw, 1.75rem)',
-          opacity: inView ? 1 : 0,
-          transform: inView ? 'translateX(0)' : 'translateX(40px)',
-          transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s',
-        }}>
-          <p style={{
-            color: tokens.color.gold, fontSize: tokens.font.label,
-            fontWeight: 600, letterSpacing: '0.25em',
-            textTransform: 'uppercase', margin: 0, fontFamily: tokens.font.family,
-          }}>Our Philosophy</p>
-
-          <h2 style={{
-            color: tokens.color.white,
-            fontSize: 'clamp(1.75rem, 4vw, 3rem)',
-            fontWeight: 600, lineHeight: 1.15, margin: 0,
-            fontFamily: tokens.font.family,
-          }}>Beauty That&apos;s Kind —<br />To You &amp; The World</h2>
-
-          <div style={{ width: '3rem', height: '2px', background: tokens.color.gold }} />
-
-          <p style={{
-            color: tokens.color.whiteMuted,
-            fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
-            lineHeight: 1.8, margin: 0, fontFamily: tokens.font.family,
-          }}>
-            At SAYO, every treatment begins with a promise: only nature&apos;s finest
-            ingredients ever touch your skin. Our formulations are 100% cruelty-free —
-            tested on results, never on animals.
-          </p>
-
-          <p style={{
-            color: tokens.color.whiteMuted,
-            fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
-            lineHeight: 1.8, margin: 0, fontFamily: tokens.font.family,
-          }}>
-            What sets us apart is care in the details — personalised consultations,
-            bespoke blends, and a sanctuary space so you leave feeling genuinely renewed,
-            not just refreshed.
-          </p>
-
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.25rem' }}>
-            {['100% Natural', 'Cruelty-Free', 'Personalised Care'].map(tag => (
-              <span key={tag} style={{
-                color: tokens.color.gold,
-                border: '1.5px solid rgba(184,134,11,0.4)',
-                borderRadius: '2rem', padding: '0.35rem 1rem',
-                fontSize: '0.78rem', fontWeight: 500, letterSpacing: '0.08em',
-                background: 'rgba(184,134,11,0.07)', fontFamily: tokens.font.family,
-              }}>{tag}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────
-   FEATURED SERVICES
-───────────────────────────────────────── */
-const FEATURED_SERVICES = [
-  { icon: '✂', title: 'Hair Styling',   from: '1,500', href: '/services',
-    desc: 'Precision cuts, luxury blowouts and colour transformations tailored to your texture and vision.' },
-  { icon: '✦', title: 'Skincare',        from: '3,000', href: '/services',
-    desc: 'Deep-cleansing facials, brightening treatments and anti-aging rituals using plant-based actives.' },
-  { icon: '◈', title: 'Makeup',          from: '4,500', href: '/services',
-    desc: 'Editorial, bridal, or everyday glam — applied with professional-grade, skin-friendly products.' },
-  { icon: '◉', title: 'Body Treatments', from: '4,200', href: '/services',
-    desc: 'Aromatherapy massages, detox wraps, and full-body scrubs to restore and rebalance.' },
-] as const;
-
-function FeaturedServicesSection() {
-  const { ref, inView } = useInView(0.15);
-  return (
-    <section ref={ref} style={{
-      background: '#111111',
-      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,0.015) 60px)',
-      }} />
-
-      <div style={{
-        textAlign: 'center', marginBottom: 'clamp(2.5rem, 5vw, 4rem)',
-        position: 'relative', zIndex: 1,
-        opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(28px)',
-        transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)',
-      }}>
-        <p style={{
-          color: tokens.color.gold, fontSize: tokens.font.label,
-          fontWeight: 600, letterSpacing: '0.25em',
-          textTransform: 'uppercase', margin: '0 0 0.75rem', fontFamily: tokens.font.family,
-        }}>What We Offer</p>
-        <h2 style={{
-          color: tokens.color.white,
-          fontSize: 'clamp(1.75rem, 4vw, 3rem)',
-          fontWeight: 600, lineHeight: 1.2, margin: '0 0 0.9rem', fontFamily: tokens.font.family,
-        }}>Our Signature Services</h2>
-        <p style={{
-          color: tokens.color.whiteMuted,
-          fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)',
-          maxWidth: '500px', margin: '0 auto', lineHeight: 1.7, fontFamily: tokens.font.family,
-        }}>Each service is designed as an experience — not just a treatment.</p>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(255px, 1fr))',
-        gap: '1.25rem', maxWidth: '1200px', margin: '0 auto',
-        position: 'relative', zIndex: 1,
-      }}>
-        {FEATURED_SERVICES.map((svc, i) => (
-          <div key={svc.title}
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '1.25rem',
-              padding: 'clamp(1.5rem, 3vw, 2rem)',
-              display: 'flex', flexDirection: 'column', gap: '0.9rem',
-              position: 'relative', overflow: 'hidden',
-              opacity: inView ? 1 : 0,
-              transform: inView ? 'translateY(0)' : 'translateY(40px)',
-              transition: `opacity 0.7s ease ${0.1 + i * 0.1}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${0.1 + i * 0.1}s`,
-            }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.background = 'rgba(184,134,11,0.06)';
-              el.style.borderColor = 'rgba(184,134,11,0.35)';
-              el.style.transform = 'translateY(-4px)';
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.background = 'rgba(255,255,255,0.03)';
-              el.style.borderColor = 'rgba(255,255,255,0.08)';
-              el.style.transform = 'translateY(0)';
-            }}
-          >
-            <div style={{
-              position: 'absolute', top: 0, left: '1.5rem', right: '1.5rem', height: '1px',
-              background: `linear-gradient(90deg,transparent,${tokens.color.gold},transparent)`,
-              opacity: 0.3,
-            }} />
-            <span style={{ fontSize: '1.4rem', color: tokens.color.gold, lineHeight: 1 }}>{svc.icon}</span>
-            <h3 style={{
-              color: tokens.color.white,
-              fontSize: 'clamp(1.05rem, 1.8vw, 1.3rem)',
-              fontWeight: 600, margin: 0, fontFamily: tokens.font.family,
-            }}>{svc.title}</h3>
-            <p style={{
-              color: tokens.color.whiteMuted,
-              fontSize: 'clamp(0.875rem, 1.2vw, 0.95rem)',
-              lineHeight: 1.7, margin: 0, flex: 1, fontFamily: tokens.font.family,
-            }}>{svc.desc}</p>
-            <div style={{
-              display: 'flex', alignItems: 'center',
-              justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.6rem',
-              marginTop: '0.25rem',
-            }}>
-              <span style={{ color: tokens.color.whiteDim, fontSize: '0.8rem', fontFamily: tokens.font.family }}>
-                From{' '}
-                <span style={{ color: tokens.color.gold, fontWeight: 700, fontSize: '0.95rem' }}>
-                  Rs. {svc.from}
-                </span>
-              </span>
-              <a href={svc.href} style={{
-                color: tokens.color.white, background: tokens.color.goldAlpha,
-                borderRadius: tokens.radius.cta,
-                padding: '0.4rem 1.1rem', fontSize: '0.8rem', fontWeight: 600,
-                textDecoration: 'none', letterSpacing: '0.05em',
-                transition: 'background 0.3s, transform 0.2s',
-                fontFamily: tokens.font.family, whiteSpace: 'nowrap',
-              }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.background = tokens.color.gold;
-                  el.style.transform = 'scale(1.05)';
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.background = tokens.color.goldAlpha;
-                  el.style.transform = 'scale(1)';
-                }}
-              >Book Now</a>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{
-        textAlign: 'center', marginTop: 'clamp(2rem, 4vw, 3rem)',
-        position: 'relative', zIndex: 1,
-        opacity: inView ? 1 : 0,
-        transition: 'opacity 0.8s ease 0.5s',
-      }}>
-        <a href="/services" style={{
-          color: tokens.color.gold, fontSize: '0.85rem', fontWeight: 500,
-          textDecoration: 'none', letterSpacing: '0.15em', textTransform: 'uppercase',
-          borderBottom: '1px solid rgba(184,134,11,0.4)', paddingBottom: '3px',
-          transition: 'border-color 0.3s', fontFamily: tokens.font.family,
-        }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = tokens.color.gold; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,134,11,0.4)'; }}
-        >View All Services →</a>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────
-   PRODUCT SHOWCASE
-───────────────────────────────────────── */
-const PRODUCTS = [
-  { name: 'Rose Hip Face Oil',       category: 'Skincare',  price: '3,800', rating: 4.9, reviews: 124 },
-  { name: 'Argan Hair Serum',        category: 'Hair Care', price: '2,600', rating: 4.8, reviews: 98  },
-  { name: 'Charcoal Cleansing Mask', category: 'Skincare',  price: '2,200', rating: 4.7, reviews: 76  },
-  { name: 'Coconut Scalp Treatment', category: 'Hair Care', price: '1,900', rating: 4.9, reviews: 143 },
-  { name: 'Green Tea Toner',         category: 'Skincare',  price: '1,600', rating: 4.6, reviews: 61  },
-  { name: 'Keratin Repair Mask',     category: 'Hair Care', price: '3,100', rating: 4.8, reviews: 89  },
-] as const;
-
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <span style={{ display: 'inline-flex', gap: '2px', alignItems: 'center' }}>
-      {[1,2,3,4,5].map(n => (
-        <svg key={n} width="11" height="11" viewBox="0 0 24 24"
-          fill={n <= Math.round(rating) ? tokens.color.gold : 'rgba(184,134,11,0.2)'}>
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-        </svg>
-      ))}
-    </span>
-  );
-}
-
-function ProductShowcaseSection() {
-  const { ref, inView } = useInView(0.1);
-  return (
-    <section ref={ref} style={{
-      background: '#181818',
-      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      <div style={{
-        position: 'absolute', top: '-8rem', right: '-8rem',
-        width: '34rem', height: '34rem', borderRadius: '50%',
-        background: 'radial-gradient(circle,rgba(184,134,11,0.07) 0%,transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-
-      <div style={{
-        display: 'flex', alignItems: 'flex-end',
-        justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.25rem',
-        maxWidth: '1200px', margin: '0 auto',
-        marginBottom: 'clamp(2.5rem, 5vw, 4rem)',
-        position: 'relative', zIndex: 1,
-        opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(28px)',
-        transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)',
-      }}>
-        <div>
-          <p style={{
-            color: tokens.color.gold, fontSize: tokens.font.label,
-            fontWeight: 600, letterSpacing: '0.25em',
-            textTransform: 'uppercase', margin: '0 0 0.75rem', fontFamily: tokens.font.family,
-          }}>Natural Products</p>
-          <h2 style={{
-            color: tokens.color.white,
-            fontSize: 'clamp(1.75rem, 4vw, 3rem)',
-            fontWeight: 600, lineHeight: 1.2, margin: 0, fontFamily: tokens.font.family,
-          }}>Shop Our Collection</h2>
-        </div>
-        <a href="/products" style={{
-          color: tokens.color.gold, fontSize: '0.85rem', fontWeight: 500,
-          textDecoration: 'none', letterSpacing: '0.15em', textTransform: 'uppercase',
-          borderBottom: '1px solid rgba(184,134,11,0.4)', paddingBottom: '3px',
-          whiteSpace: 'nowrap', transition: 'border-color 0.3s', fontFamily: tokens.font.family,
-        }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = tokens.color.gold; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,134,11,0.4)'; }}
-        >View All →</a>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-        gap: '1.25rem', maxWidth: '1200px', margin: '0 auto',
-        position: 'relative', zIndex: 1,
-      }}>
-        {PRODUCTS.map((p, i) => (
-          <div key={p.name}
-            style={{
-              background: 'rgba(255,255,255,0.025)',
-              border: '1px solid rgba(255,255,255,0.07)',
-              borderRadius: '1.25rem', overflow: 'hidden',
-              display: 'flex', flexDirection: 'column',
-              opacity: inView ? 1 : 0,
-              transform: inView ? 'translateY(0)' : 'translateY(50px)',
-              transition: `opacity 0.7s ease ${i * 0.06}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${i * 0.06}s`,
-            }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.borderColor = 'rgba(184,134,11,0.3)';
-              el.style.transform = 'translateY(-6px)';
-              el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.45)';
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.borderColor = 'rgba(255,255,255,0.07)';
-              el.style.transform = 'translateY(0)';
-              el.style.boxShadow = 'none';
-            }}
-          >
-            <div style={{
-              height: '175px', position: 'relative',
-              background: 'linear-gradient(135deg,#232020 0%,#1a1a1a 100%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <div style={{
-                width: '60px', height: '60px', borderRadius: '50%',
-                background: 'rgba(184,134,11,0.1)',
-                border: '1.5px solid rgba(184,134,11,0.25)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <span style={{ color: tokens.color.gold, fontSize: '1.35rem' }}>✿</span>
-              </div>
-              <span style={{
-                position: 'absolute', top: '0.65rem', left: '0.65rem',
-                background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)',
-                color: tokens.color.gold,
-                fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.12em',
-                textTransform: 'uppercase', padding: '0.22rem 0.55rem',
-                borderRadius: '999px', fontFamily: tokens.font.family,
-              }}>{p.category}</span>
-            </div>
-
-            <div style={{
-              padding: '1.1rem', display: 'flex',
-              flexDirection: 'column', gap: '0.55rem', flex: 1,
-            }}>
-              <h3 style={{
-                color: tokens.color.white,
-                fontSize: 'clamp(0.875rem, 1.2vw, 0.95rem)',
-                fontWeight: 600, margin: 0, lineHeight: 1.35, fontFamily: tokens.font.family,
-              }}>{p.name}</h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <StarRating rating={p.rating} />
-                <span style={{ color: tokens.color.whiteFaint, fontSize: '0.7rem', fontFamily: tokens.font.family }}>
-                  {p.rating} ({p.reviews})
-                </span>
-              </div>
-              <div style={{
-                display: 'flex', alignItems: 'center',
-                justifyContent: 'space-between',
-                marginTop: 'auto', paddingTop: '0.5rem',
-                flexWrap: 'wrap', gap: '0.45rem',
-              }}>
-                <span style={{
-                  color: tokens.color.gold,
-                  fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
-                  fontWeight: 700, fontFamily: tokens.font.family,
-                }}>Rs. {p.price}</span>
-                <button style={{
-                  color: tokens.color.white, background: tokens.color.goldAlpha,
-                  border: 'none', borderRadius: tokens.radius.cta,
-                  padding: '0.38rem 0.9rem', fontSize: '0.75rem', fontWeight: 600,
-                  cursor: 'pointer', letterSpacing: '0.05em',
-                  transition: 'background 0.3s, transform 0.2s',
-                  fontFamily: tokens.font.family, whiteSpace: 'nowrap',
-                }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background = tokens.color.gold;
-                    el.style.transform = 'scale(1.06)';
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.background = tokens.color.goldAlpha;
-                    el.style.transform = 'scale(1)';
-                  }}
-                >Add to Cart</button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────
-   GOLDEN CURVE
-───────────────────────────────────────── */
-function GoldenCurve() {
-  return (
-    <div style={S.curveWrap}>
-      <svg
-        width="100%" height="100%"
-        viewBox="0 0 1200 400"
-        preserveAspectRatio="none"
-        fill="none"
-      >
-        <path
-          className="gold-curve"
-          d="M 0 320 C 150 340, 300 180, 500 260 C 700 340, 950 160, 1200 200"
-          stroke={tokens.color.gold}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </svg>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────
-   SVG ICONS
-───────────────────────────────────────── */
+/* ── SVG ICONS ── */
 function IconWhatsApp() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -883,28 +453,26 @@ function IconInstagram() {
 function IconLocation() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0Z" /><circle cx="12" cy="10" r="3" />
+      <path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>
     </svg>
   );
 }
 function IconPhone() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z" />
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/>
     </svg>
   );
 }
 function IconMail() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 6-10 7L2 6" />
+      <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>
     </svg>
   );
 }
 
-/* ─────────────────────────────────────────
-   FLOATING PARTICLES
-───────────────────────────────────────── */
+/* ── FLOATING PARTICLES ── */
 const PARTICLES = [
   { size: 4, x: '15%', delay: '0s',   dur: '6s'   },
   { size: 6, x: '30%', delay: '1s',   dur: '8s'   },
@@ -913,7 +481,6 @@ const PARTICLES = [
   { size: 4, x: '85%', delay: '1.5s', dur: '6.5s' },
   { size: 3, x: '60%', delay: '3s',   dur: '7.5s' },
 ];
-
 function FloatingParticles() {
   return (
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5, overflow: 'hidden' }}>
@@ -929,120 +496,536 @@ function FloatingParticles() {
   );
 }
 
+/* ── GOLDEN CURVE ── */
+function GoldenCurve() {
+  return (
+    <div style={S.curveWrap}>
+      <svg width="100%" height="100%" viewBox="0 0 1200 400" preserveAspectRatio="none" fill="none">
+        <path className="gold-curve"
+          d="M 0 320 C 150 340, 300 180, 500 260 C 700 340, 950 160, 1200 200"
+          stroke={tokens.color.gold} strokeWidth="2.5" strokeLinecap="round" fill="none"
+        />
+      </svg>
+    </div>
+  );
+}
+
 /* ─────────────────────────────────────────
-   HOOKS
+   BRAND STORY SECTION  ← image added here
 ───────────────────────────────────────── */
-function useInView(threshold = 0.2) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, inView };
+function BrandStorySection() {
+  const { ref, inView } = useInView(0.2);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError,  setImgError]  = useState(false);
+
+  return (
+    <section ref={ref} style={{
+      position: 'relative', overflow: 'hidden', background: '#1c1c1c',
+      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
+    }}>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, width: '35%', height: '2px',
+        background: `linear-gradient(90deg, ${tokens.color.gold}, transparent)`,
+      }} />
+      <div style={{
+        display: 'flex', alignItems: 'stretch',
+        gap: 'clamp(2rem, 5vw, 5rem)',
+        maxWidth: '1200px', margin: '0 auto', flexWrap: 'wrap',
+      }}>
+        {/* LEFT — image */}
+        <div
+          className="story-img-wrap"
+          style={{
+            flex: '1 1 340px', minHeight: 'clamp(300px, 40vw, 520px)',
+            borderRadius: '1.25rem', overflow: 'hidden',
+            position: 'relative', background: '#2a2520',
+            opacity: inView ? 1 : 0,
+            transform: inView ? 'translateX(0)' : 'translateX(-40px)',
+            transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)',
+          }}
+        >
+          {/* shimmer skeleton while loading */}
+          {!imgLoaded && !imgError && (
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg,#1e1a15 25%,#2a2520 50%,#1e1a15 75%)',
+              backgroundSize: '600px 100%',
+              animation: 'imgShimmer 1.4s infinite linear',
+            }} />
+          )}
+
+          {imgError ? (
+            /* fallback */
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(135deg,#2a2520 0%,#1a1a1a 60%,#0d0d0d 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{
+                color: tokens.color.gold, opacity: 0.3,
+                fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase',
+              }}>Treatment Photo</span>
+            </div>
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src="https://img.freepik.com/premium-photo/girl-modern-beauty-salon_327483-17954.jpg"
+              alt="Natural beauty treatment at SAYO"
+              className="story-img"
+              loading="lazy"
+              onLoad={()  => setImgLoaded(true)}
+              onError={() => setImgError(true)}
+              style={{
+                position: 'absolute', inset: 0,
+                opacity: imgLoaded ? 1 : 0,
+                transition: 'opacity 0.6s ease',
+              }}
+            />
+          )}
+
+          {/* subtle overlay for text contrast if ever needed */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 100%)',
+            pointerEvents: 'none',
+          }} />
+
+          <div style={{
+            position: 'absolute', bottom: 0, right: 0,
+            width: '40%', height: '3px',
+            background: `linear-gradient(270deg, ${tokens.color.gold}, transparent)`,
+          }} />
+        </div>
+
+        {/* RIGHT — text */}
+        <div style={{
+          flex: '1 1 320px', display: 'flex', flexDirection: 'column',
+          justifyContent: 'center', gap: 'clamp(1rem, 2vw, 1.75rem)',
+          opacity: inView ? 1 : 0,
+          transform: inView ? 'translateX(0)' : 'translateX(40px)',
+          transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s',
+        }}>
+          <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', margin: 0 }}>
+            Our Philosophy
+          </p>
+          <h2 style={{ color: tokens.color.white, fontSize: 'clamp(1.75rem, 4vw, 3rem)', fontWeight: 600, lineHeight: 1.15, margin: 0 }}>
+            Beauty That&apos;s Kind —<br />To You &amp; The World
+          </h2>
+          <div style={{ width: '3rem', height: '2px', background: tokens.color.gold }} />
+          <p style={{ color: tokens.color.whiteMuted, fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)', lineHeight: 1.8, margin: 0 }}>
+            At SAYO, every treatment begins with a promise: only nature&apos;s finest ingredients ever touch your skin.
+            Our formulations are 100% cruelty-free — tested on results, never on animals.
+          </p>
+          <p style={{ color: tokens.color.whiteMuted, fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)', lineHeight: 1.8, margin: 0 }}>
+            What sets us apart is care in the details — personalised consultations, bespoke blends,
+            and a sanctuary space so you leave feeling genuinely renewed, not just refreshed.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.25rem' }}>
+            {['100% Natural', 'Cruelty-Free', 'Personalised Care'].map(tag => (
+              <span key={tag} style={{
+                color: tokens.color.gold, border: '1.5px solid rgba(184,134,11,0.4)',
+                borderRadius: '2rem', padding: '0.35rem 1rem',
+                fontSize: '0.78rem', fontWeight: 500, letterSpacing: '0.08em',
+                background: 'rgba(184,134,11,0.07)',
+              }}>{tag}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
-function useIsMobile(breakpoint = 1024) {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < breakpoint);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, [breakpoint]);
-  return isMobile;
+/* ── FEATURED SERVICES ── */
+const FEATURED_SERVICES = [
+  { icon: '✂', title: 'Hair Styling',   from: '1,500', href: '/services', desc: 'Precision cuts, luxury blowouts and colour transformations tailored to your texture and vision.' },
+  { icon: '✦', title: 'Skincare',        from: '3,000', href: '/services', desc: 'Deep-cleansing facials, brightening treatments and anti-aging rituals using plant-based actives.' },
+  { icon: '◈', title: 'Makeup',          from: '4,500', href: '/services', desc: 'Editorial, bridal, or everyday glam — applied with professional-grade, skin-friendly products.' },
+  { icon: '◉', title: 'Body Treatments', from: '4,200', href: '/services', desc: 'Aromatherapy massages, detox wraps, and full-body scrubs to restore and rebalance.' },
+] as const;
+
+function FeaturedServicesSection() {
+  const { ref, inView } = useInView(0.15);
+  return (
+    <section ref={ref} style={{
+      background: '#111111',
+      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
+      position: 'relative', overflow: 'hidden',
+    }}>
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,0.015) 60px)',
+      }} />
+      <div style={{
+        textAlign: 'center', marginBottom: 'clamp(2.5rem, 5vw, 4rem)',
+        position: 'relative', zIndex: 1,
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(28px)',
+        transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)',
+      }}>
+        <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', margin: '0 0 0.75rem' }}>What We Offer</p>
+        <h2 style={{ color: tokens.color.white, fontSize: 'clamp(1.75rem, 4vw, 3rem)', fontWeight: 600, lineHeight: 1.2, margin: '0 0 0.9rem' }}>Our Signature Services</h2>
+        <p style={{ color: tokens.color.whiteMuted, fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)', maxWidth: '500px', margin: '0 auto', lineHeight: 1.7 }}>
+          Each service is designed as an experience — not just a treatment.
+        </p>
+      </div>
+
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(255px, 1fr))',
+        gap: '1.25rem', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1,
+      }}>
+        {FEATURED_SERVICES.map((svc, i) => (
+          <div key={svc.title} style={{
+            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '1.25rem', padding: 'clamp(1.5rem, 3vw, 2rem)',
+            display: 'flex', flexDirection: 'column', gap: '0.9rem',
+            position: 'relative', overflow: 'hidden',
+            opacity: inView ? 1 : 0,
+            transform: inView ? 'translateY(0)' : 'translateY(40px)',
+            transition: `opacity 0.7s ease ${0.1 + i * 0.1}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${0.1 + i * 0.1}s`,
+          }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(184,134,11,0.06)'; el.style.borderColor = 'rgba(184,134,11,0.35)'; el.style.transform = 'translateY(-4px)'; }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(255,255,255,0.03)'; el.style.borderColor = 'rgba(255,255,255,0.08)'; el.style.transform = 'translateY(0)'; }}
+          >
+            <div style={{ position: 'absolute', top: 0, left: '1.5rem', right: '1.5rem', height: '1px', background: `linear-gradient(90deg,transparent,${tokens.color.gold},transparent)`, opacity: 0.3 }} />
+            <span style={{ fontSize: '1.4rem', color: tokens.color.gold, lineHeight: 1 }}>{svc.icon}</span>
+            <h3 style={{ color: tokens.color.white, fontSize: 'clamp(1.05rem, 1.8vw, 1.3rem)', fontWeight: 600, margin: 0 }}>{svc.title}</h3>
+            <p style={{ color: tokens.color.whiteMuted, fontSize: 'clamp(0.875rem, 1.2vw, 0.95rem)', lineHeight: 1.7, margin: 0, flex: 1 }}>{svc.desc}</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.6rem', marginTop: '0.25rem' }}>
+              <span style={{ color: tokens.color.whiteDim, fontSize: '0.8rem' }}>
+                From <span style={{ color: tokens.color.gold, fontWeight: 700, fontSize: '0.95rem' }}>Rs. {svc.from}</span>
+              </span>
+              <a href={svc.href} style={{
+                color: tokens.color.white, background: tokens.color.goldAlpha,
+                borderRadius: tokens.radius.cta, padding: '0.4rem 1.1rem',
+                fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none',
+                letterSpacing: '0.05em', transition: 'background 0.3s, transform 0.2s', whiteSpace: 'nowrap',
+              }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.gold; el.style.transform = 'scale(1.05)'; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.goldAlpha; el.style.transform = 'scale(1)'; }}
+              >Book Now</a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: 'clamp(2rem, 4vw, 3rem)', position: 'relative', zIndex: 1, opacity: inView ? 1 : 0, transition: 'opacity 0.8s ease 0.5s' }}>
+        <a href="/services" style={{
+          color: tokens.color.gold, fontSize: '0.85rem', fontWeight: 500,
+          textDecoration: 'none', letterSpacing: '0.15em', textTransform: 'uppercase',
+          borderBottom: '1px solid rgba(184,134,11,0.4)', paddingBottom: '3px', transition: 'border-color 0.3s',
+        }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = tokens.color.gold; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,134,11,0.4)'; }}
+        >View All Services →</a>
+      </div>
+    </section>
+  );
 }
 
 /* ─────────────────────────────────────────
-   PAGE COMPONENT
+   PRODUCTS DATA
+───────────────────────────────────────── */
+const PRODUCTS = [
+  {
+    name:     'Rose Hip Face Oil',
+    category: 'Skincare',
+    price:    '3,800',
+    rating:   4.9,
+    reviews:  124,
+    image:    'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=400&fit=crop&auto=format&q=80',
+  },
+  {
+    name:     'Argan Hair Serum',
+    category: 'Hair Care',
+    price:    '2,600',
+    rating:   4.8,
+    reviews:  98,
+    image:    'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=600&h=400&fit=crop&auto=format&q=80',
+  },
+  {
+    name:     'Charcoal Cleansing Mask',
+    category: 'Skincare',
+    price:    '2,200',
+    rating:   4.7,
+    reviews:  76,
+    image:    'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&h=400&fit=crop&auto=format&q=80',
+  },
+  {
+    name:     'Coconut Scalp Treatment',
+    category: 'Hair Care',
+    price:    '1,900',
+    rating:   4.9,
+    reviews:  143,
+    image:    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=400&fit=crop&auto=format&q=80',
+  },
+  {
+    name:     'Green Tea Toner',
+    category: 'Skincare',
+    price:    '1,600',
+    rating:   4.6,
+    reviews:  61,
+    image:    'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&h=400&fit=crop&auto=format&q=80',
+  },
+  {
+    name:     'Keratin Repair Mask',
+    category: 'Hair Care',
+    price:    '3,100',
+    rating:   4.8,
+    reviews:  89,
+    image:    'https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=600&h=400&fit=crop&auto=format&q=80',
+  },
+] as const;
+
+/* ── STAR RATING ── */
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <span style={{ display: 'inline-flex', gap: '2px', alignItems: 'center' }}>
+      {[1,2,3,4,5].map(n => (
+        <svg key={n} width="11" height="11" viewBox="0 0 24 24"
+          fill={n <= Math.round(rating) ? tokens.color.gold : 'rgba(184,134,11,0.2)'}>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+/* ── PRODUCT CARD ── */
+function ProductCard({ p, i, inView }: { p: typeof PRODUCTS[number]; i: number; inView: boolean }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError,  setImgError]  = useState(false);
+
+  return (
+    <div
+      className="prod-card"
+      style={{
+        background: 'rgba(255,255,255,0.025)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '1.25rem', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(50px)',
+        transition: `opacity 0.7s ease ${i * 0.08}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${i * 0.08}s, border-color 0.3s ease, box-shadow 0.3s ease`,
+      }}
+      onMouseEnter={e => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = 'rgba(184,134,11,0.35)';
+        el.style.transform   = 'translateY(-6px)';
+        el.style.boxShadow   = '0 24px 56px rgba(0,0,0,0.55)';
+      }}
+      onMouseLeave={e => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = 'rgba(255,255,255,0.08)';
+        el.style.transform   = 'translateY(0)';
+        el.style.boxShadow   = 'none';
+      }}
+    >
+      {/* ── IMAGE AREA ── */}
+      <div style={{
+        position: 'relative', width: '100%', height: '210px',
+        overflow: 'hidden', background: '#181818', flexShrink: 0,
+      }}>
+        {!imgLoaded && !imgError && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(90deg,#181818 25%,#242424 50%,#181818 75%)',
+            backgroundSize: '600px 100%',
+            animation: 'imgShimmer 1.4s infinite linear',
+          }} />
+        )}
+
+        {imgError ? (
+          <div style={{
+            width: '100%', height: '100%',
+            background: 'linear-gradient(135deg,#1e1a14 0%,#2a2218 100%)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+          }}>
+            <span style={{ fontSize: '2.2rem', opacity: 0.2 }}>✿</span>
+            <span style={{
+              color: 'rgba(184,134,11,0.5)', fontSize: '0.68rem',
+              fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+            }}>{p.category}</span>
+          </div>
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={p.image}
+            alt={p.name}
+            className="prod-card-img"
+            loading="lazy"
+            onLoad={()  => setImgLoaded(true)}
+            onError={() => setImgError(true)}
+            style={{ opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.5s ease' }}
+          />
+        )}
+
+        <span style={{
+          position: 'absolute', top: '0.7rem', left: '0.7rem', zIndex: 2,
+          background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+          color: tokens.color.gold, fontSize: '0.63rem', fontWeight: 700,
+          letterSpacing: '0.13em', textTransform: 'uppercase',
+          padding: '0.28rem 0.7rem', borderRadius: '999px',
+          border: '1px solid rgba(184,134,11,0.35)',
+        }}>{p.category}</span>
+
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
+          background: 'linear-gradient(to top, rgba(16,14,10,0.85) 0%, transparent 100%)',
+          pointerEvents: 'none',
+        }} />
+      </div>
+
+      {/* ── CARD BODY ── */}
+      <div style={{
+        padding: '1.1rem 1.2rem 1.3rem',
+        display: 'flex', flexDirection: 'column', gap: '0.55rem', flex: 1,
+      }}>
+        <h3 style={{
+          color: tokens.color.white,
+          fontSize: 'clamp(0.88rem, 1.2vw, 0.98rem)',
+          fontWeight: 600, margin: 0, lineHeight: 1.35,
+        }}>{p.name}</h3>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <StarRating rating={p.rating} />
+          <span style={{ color: tokens.color.whiteFaint, fontSize: '0.7rem' }}>
+            {p.rating} ({p.reviews})
+          </span>
+        </div>
+
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginTop: 'auto', paddingTop: '0.65rem', flexWrap: 'wrap', gap: '0.5rem',
+        }}>
+          <span style={{ color: tokens.color.gold, fontSize: 'clamp(0.95rem, 1.4vw, 1.08rem)', fontWeight: 700 }}>
+            Rs. {p.price}
+          </span>
+          <button
+            style={{
+              color: tokens.color.white, background: tokens.color.goldAlpha,
+              border: 'none', borderRadius: tokens.radius.cta,
+              padding: '0.42rem 1rem', fontSize: '0.76rem', fontWeight: 600,
+              cursor: 'pointer', letterSpacing: '0.05em',
+              transition: 'background 0.3s, transform 0.2s',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.gold; el.style.transform = 'scale(1.06)'; }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.goldAlpha; el.style.transform = 'scale(1)'; }}
+          >Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── PRODUCT SHOWCASE SECTION ── */
+function ProductShowcaseSection() {
+  const { ref, inView } = useInView(0.1);
+  return (
+    <section ref={ref} style={{
+      background: '#181818',
+      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)',
+      position: 'relative', overflow: 'hidden',
+    }}>
+      <div style={{
+        position: 'absolute', top: '-8rem', right: '-8rem',
+        width: '34rem', height: '34rem', borderRadius: '50%',
+        background: 'radial-gradient(circle,rgba(184,134,11,0.07) 0%,transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+
+      <div style={{
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: '1.25rem',
+        maxWidth: '1200px', margin: '0 auto',
+        marginBottom: 'clamp(2.5rem, 5vw, 4rem)',
+        position: 'relative', zIndex: 1,
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(28px)',
+        transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)',
+      }}>
+        <div>
+          <p style={{ color: tokens.color.gold, fontSize: tokens.font.label, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', margin: '0 0 0.75rem' }}>
+            Natural Products
+          </p>
+          <h2 style={{ color: tokens.color.white, fontSize: 'clamp(1.75rem, 4vw, 3rem)', fontWeight: 600, lineHeight: 1.2, margin: 0 }}>
+            Shop Our Collection
+          </h2>
+        </div>
+        <a href="/products" style={{
+          color: tokens.color.gold, fontSize: '0.85rem', fontWeight: 500,
+          textDecoration: 'none', letterSpacing: '0.15em', textTransform: 'uppercase',
+          borderBottom: '1px solid rgba(184,134,11,0.4)', paddingBottom: '3px',
+          whiteSpace: 'nowrap', transition: 'border-color 0.3s',
+        }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = tokens.color.gold; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,134,11,0.4)'; }}
+        >View All →</a>
+      </div>
+
+      <div className="prod-grid">
+        {PRODUCTS.map((p, i) => (
+          <ProductCard key={p.name} p={p} i={i} inView={inView} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────
+   PAGE
 ───────────────────────────────────────── */
 export default function Home() {
-  const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [loaded,   setLoaded]   = useState(false);
-  const { ref: footerRef, inView: footerVisible } = useInView(0.1);
-  const isMobile       = useIsMobile(1024);
-  const isNarrowScreen = useIsMobile(768);
-
-  // ── DB data state ──
+  const [menuOpen,   setMenuOpen]   = useState(false);
+  const [loaded,     setLoaded]     = useState(false);
   const [navData,    setNavData]    = useState(NAV_DEFAULTS);
   const [homeData,   setHomeData]   = useState(HOME_DEFAULTS);
   const [footerData, setFooterData] = useState(FOOTER_DEFAULTS);
 
-  // ── Secret admin triple-click ──
-  const clickCountRef = useRef(0);
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { ref: footerRef, inView: footerVisible } = useInView(0.1);
+  const isMobile       = useIsMobile(1024);
+  const isNarrowScreen = useIsMobile(768);
 
-  const handleCopyrightClick = () => {
-    clickCountRef.current += 1;
-    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-    if (clickCountRef.current >= 3) {
-      clickCountRef.current = 0;
-      router.push('/admin');
-      return;
-    }
-    clickTimerRef.current = setTimeout(() => { clickCountRef.current = 0; }, 1500);
-  };
-
-  // ── Load from DB ──
+  /* load DB data */
   useEffect(() => {
-    fetch('/api/site-data')
-      .then(r => r.json())
-      .then(data => {
-        // NAV
-        if (data?.nav) {
-          setNavData({
-            logo_text:        data.nav.logo_text        || NAV_DEFAULTS.logo_text,
-            contact_btn_text: data.nav.contact_btn_text || NAV_DEFAULTS.contact_btn_text,
-            contact_btn_link: data.nav.contact_btn_link || NAV_DEFAULTS.contact_btn_link,
-            nav_items: Array.isArray(data.nav.nav_items) && data.nav.nav_items.length > 0
-              ? data.nav.nav_items
-              : NAV_DEFAULTS.nav_items,
-          });
-        }
-        // HOME
-        if (data?.home) {
-          setHomeData({
-            hero_eyebrow:  data.home.hero_eyebrow  || HOME_DEFAULTS.hero_eyebrow,
-            hero_heading:  data.home.hero_heading  || HOME_DEFAULTS.hero_heading,
-            hero_body:     data.home.hero_body     || HOME_DEFAULTS.hero_body,
-            hero_cta_text: data.home.hero_cta_text || HOME_DEFAULTS.hero_cta_text,
-            hero_cta_link: data.home.hero_cta_link || HOME_DEFAULTS.hero_cta_link,
-          });
-        }
-        // FOOTER
-        if (data?.footer) {
-          setFooterData({
-            brand_name:      data.footer.brand_name      || FOOTER_DEFAULTS.brand_name,
-            brand_tagline:   data.footer.brand_tagline   || FOOTER_DEFAULTS.brand_tagline,
-            contact_phone:   data.footer.contact_phone   || FOOTER_DEFAULTS.contact_phone,
-            contact_email:   data.footer.contact_email   || FOOTER_DEFAULTS.contact_email,
-            contact_address: data.footer.contact_address || FOOTER_DEFAULTS.contact_address,
-            copyright_text:  data.footer.copyright_text  || FOOTER_DEFAULTS.copyright_text,
-            locations: Array.isArray(data.footer.locations) && data.footer.locations.length > 0
-              ? data.footer.locations
-              : FOOTER_DEFAULTS.locations,
-            quick_links: Array.isArray(data.footer.quick_links) && data.footer.quick_links.length > 0
-              ? data.footer.quick_links
-              : FOOTER_DEFAULTS.quick_links,
-            social_whatsapp:  data.footer.social_whatsapp  || '',
-            social_facebook:  data.footer.social_facebook  || '',
-            social_instagram: data.footer.social_instagram || '',
-          });
-        }
-      })
-      .catch(() => {
-        // DB fail — defaults thama use wenawa, silent fail
-      });
+    fetch('/api/site-data').then(r => r.json()).then(data => {
+      if (data?.nav) {
+        setNavData({
+          logo_text:        data.nav.logo_text        || NAV_DEFAULTS.logo_text,
+          contact_btn_text: data.nav.contact_btn_text || NAV_DEFAULTS.contact_btn_text,
+          contact_btn_link: data.nav.contact_btn_link || NAV_DEFAULTS.contact_btn_link,
+          nav_items: Array.isArray(data.nav.nav_items) && data.nav.nav_items.length > 0 ? data.nav.nav_items : NAV_DEFAULTS.nav_items,
+        });
+      }
+      if (data?.home) {
+        setHomeData({
+          hero_eyebrow:  data.home.hero_eyebrow  || HOME_DEFAULTS.hero_eyebrow,
+          hero_heading:  data.home.hero_heading  || HOME_DEFAULTS.hero_heading,
+          hero_body:     data.home.hero_body     || HOME_DEFAULTS.hero_body,
+          hero_cta_text: data.home.hero_cta_text || HOME_DEFAULTS.hero_cta_text,
+          hero_cta_link: data.home.hero_cta_link || HOME_DEFAULTS.hero_cta_link,
+        });
+      }
+      if (data?.footer) {
+        setFooterData({
+          brand_name:      data.footer.brand_name      || FOOTER_DEFAULTS.brand_name,
+          brand_tagline:   data.footer.brand_tagline   || FOOTER_DEFAULTS.brand_tagline,
+          contact_phone:   data.footer.contact_phone   || FOOTER_DEFAULTS.contact_phone,
+          contact_email:   data.footer.contact_email   || FOOTER_DEFAULTS.contact_email,
+          contact_address: data.footer.contact_address || FOOTER_DEFAULTS.contact_address,
+          copyright_text:  data.footer.copyright_text  || FOOTER_DEFAULTS.copyright_text,
+          locations:   Array.isArray(data.footer.locations)   && data.footer.locations.length   > 0 ? data.footer.locations   : FOOTER_DEFAULTS.locations,
+          quick_links: Array.isArray(data.footer.quick_links) && data.footer.quick_links.length > 0 ? data.footer.quick_links : FOOTER_DEFAULTS.quick_links,
+          social_whatsapp:  data.footer.social_whatsapp  || '',
+          social_facebook:  data.footer.social_facebook  || '',
+          social_instagram: data.footer.social_instagram || '',
+        });
+      }
+    }).catch(() => {});
   }, []);
 
-  // ── Loaded animation trigger ──
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(t);
@@ -1053,164 +1036,81 @@ export default function Home() {
       <style>{globalCss}</style>
       <main style={S.main}>
 
-        {/* ══════════════════════════
-            HERO
-        ══════════════════════════ */}
+        {/* ══ HERO ══ */}
         <section style={S.hero}>
-
-          {/* Background */}
           <div style={S.heroBg}>
-            <Image
-              src={backgroundImage}
-              alt="Beauty model"
-              fill priority
-              className="hero-bg-img"
-              style={{
-                objectFit: 'cover',
-                objectPosition: isNarrowScreen ? 'center 15%' : '75% center',
-              }}
-            />
+            <Image src={backgroundImage} alt="Beauty model" fill priority className="hero-bg-img"
+              style={{ objectFit: 'cover', objectPosition: isNarrowScreen ? 'center 15%' : '75% center' }} />
           </div>
-
-          {/* Overlay */}
           <div style={S.heroOverlay} className="hero-overlay" />
-
-          {/* Particles */}
           <FloatingParticles />
 
-          {/* ── Navbar ── */}
-          <nav
-            className={loaded ? 'nav-animate' : ''}
-            style={{ ...S.nav, opacity: loaded ? undefined : 0 }}
-          >
+          {/* NAV */}
+          <nav className={loaded ? 'nav-animate' : ''} style={{ ...S.nav, opacity: loaded ? undefined : 0 }}>
             <div style={S.navInner}>
-
-              {/* Logo */}
               <div style={S.logoWrap}>
                 <LogoIcon className="logo-float" />
                 <span style={S.logoText}>{navData.logo_text}</span>
               </div>
-
-              {/* Desktop nav links */}
               {!isMobile && (
                 <div style={S.navLinks}>
-                  {navData.nav_items.map((item: { label: string; href: string }, i: number) => (
-                    <a
-                      key={item.href + i}
-                      href={item.href}
-                      className="nav-link-wrap"
+                  {navData.nav_items.map((item, i) => (
+                    <a key={item.href + i} href={item.href} className="nav-link-wrap"
                       style={i === 0 ? S.navLinkActive : S.navLink}
-                      onMouseEnter={e => {
-                        if (i !== 0) (e.currentTarget as HTMLElement).style.color = tokens.color.gold;
-                      }}
-                      onMouseLeave={e => {
-                        if (i !== 0) (e.currentTarget as HTMLElement).style.color = tokens.color.white;
-                      }}
-                    >
-                      {i === 0 ? `[ ${item.label} ]` : item.label}
-                    </a>
+                      onMouseEnter={e => { if (i !== 0) (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }}
+                      onMouseLeave={e => { if (i !== 0) (e.currentTarget as HTMLElement).style.color = tokens.color.white; }}
+                    >{i === 0 ? `[ ${item.label} ]` : item.label}</a>
                   ))}
                 </div>
               )}
-
-              {/* Desktop contact button */}
               {!isMobile && (
-                <a
-                  href={navData.contact_btn_link}
-                  className="contact-btn-wrap"
-                  style={S.contactBtn}
-                >
+                <a href={navData.contact_btn_link} className="contact-btn-wrap" style={S.contactBtn}>
                   {navData.contact_btn_text}
                 </a>
               )}
-
-              {/* Mobile hamburger */}
               {isMobile && (
-                <button
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  aria-label="Toggle menu"
-                  style={{
-                    background: 'none', border: 'none', color: tokens.color.white,
-                    cursor: 'pointer', padding: '0.5rem',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
+                <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"
+                  style={{ background: 'none', border: 'none', color: tokens.color.white, cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     {menuOpen
                       ? <path d="M6 18L18 6M6 6l12 12" />
-                      : (
-                        <>
-                          <line x1="3" y1="6"  x2="21" y2="6"  />
-                          <line x1="3" y1="12" x2="21" y2="12" />
-                          <line x1="3" y1="18" x2="21" y2="18" />
-                        </>
-                      )
-                    }
+                      : (<><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>)}
                   </svg>
                 </button>
               )}
             </div>
-
-            {/* Mobile dropdown */}
             {isMobile && menuOpen && (
               <div style={{ ...S.mobileMenu, animation: 'fadeInDown 0.3s ease both' }}>
-                {navData.nav_items.map((item: { label: string; href: string }, i: number) => (
-                  <a
-                    key={item.href + i}
-                    href={item.href}
+                {navData.nav_items.map((item, i) => (
+                  <a key={item.href + i} href={item.href}
                     style={i === 0 ? S.mobileNavLinkActive : S.mobileNavLink}
-                    onClick={() => setMenuOpen(false)}
-                  >
+                    onClick={() => setMenuOpen(false)}>
                     {i === 0 ? `[ ${item.label} ]` : item.label}
                   </a>
                 ))}
-                <a
-                  href={navData.contact_btn_link}
-                  style={S.mobileContact}
-                  onClick={() => setMenuOpen(false)}
-                >
+                <a href={navData.contact_btn_link} style={S.mobileContact} onClick={() => setMenuOpen(false)}>
                   {navData.contact_btn_text}
                 </a>
               </div>
             )}
           </nav>
 
-          {/* ── Hero content ── */}
+          {/* HERO CONTENT */}
           <div style={S.heroContent}>
-            <p style={S.eyebrow} className={loaded ? 'eyebrow-animate' : ''}>
-              {homeData.hero_eyebrow}
-            </p>
-            <h1 style={S.heading} className={loaded ? 'heading-animate' : ''}>
-              {homeData.hero_heading}
-            </h1>
-            <p style={S.bodyText} className={loaded ? 'body-animate' : ''}>
-              {homeData.hero_body}
-            </p>
-            <a
-              href="https://sayoadmin.netlify.app/login"
-              style={S.ctaBtn}
+            <p style={S.eyebrow} className={loaded ? 'eyebrow-animate' : ''}>{homeData.hero_eyebrow}</p>
+            <h1 style={S.heading} className={loaded ? 'heading-animate' : ''}>{homeData.hero_heading}</h1>
+            <p style={S.bodyText} className={loaded ? 'body-animate' : ''}>{homeData.hero_body}</p>
+            <a href="https://sayoadmin.netlify.app/login" style={S.ctaBtn}
               className={`cta-btn-wrap ${loaded ? 'cta-animate' : ''}`}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = tokens.color.gold;
-                el.style.transform = 'scale(1.06)';
-                el.style.boxShadow = '0 8px 30px rgba(184,134,11,0.45)';
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = tokens.color.goldAlpha;
-                el.style.transform = 'scale(1)';
-                el.style.boxShadow = 'none';
-              }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.gold; el.style.transform = 'scale(1.06)'; el.style.boxShadow = '0 8px 30px rgba(184,134,11,0.45)'; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.goldAlpha; el.style.transform = 'scale(1)'; el.style.boxShadow = 'none'; }}
             >
               <span className="cta-shimmer">{homeData.hero_cta_text}</span>
             </a>
 
-            {/* Scroll indicator */}
             {loaded && !isMobile && (
               <div className="scroll-indicator" style={{
-                position: 'absolute', bottom: '2rem', left: '50%',
-                transform: 'translateX(-50%)',
+                position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', opacity: 0.5,
               }}>
                 <span style={{ color: tokens.color.white, fontSize: '0.7rem', letterSpacing: '0.15em' }}>SCROLL</span>
@@ -1220,33 +1120,23 @@ export default function Home() {
               </div>
             )}
           </div>
-
-          {/* Golden Curve */}
           <GoldenCurve />
         </section>
 
-        {/* ══════════════════════════
-            BRAND STORY
-        ══════════════════════════ */}
+        {/* ══ BRAND STORY (now has image) ══ */}
         <BrandStorySection />
 
-        {/* ══════════════════════════
-            FEATURED SERVICES
-        ══════════════════════════ */}
+        {/* ══ SERVICES ══ */}
         <FeaturedServicesSection />
 
-        {/* ══════════════════════════
-            PRODUCT SHOWCASE
-        ══════════════════════════ */}
+        {/* ══ PRODUCTS ══ */}
         <ProductShowcaseSection />
 
-        {/* ══════════════════════════
-            FOOTER
-        ══════════════════════════ */}
+        {/* ══ FOOTER ══ */}
         <footer style={S.footer} ref={footerRef}>
           <div className="footer-grid" style={S.footerGridBase}>
 
-            {/* Brand column */}
+            {/* brand col */}
             <div className="footer-brand-col footer-reveal" style={{
               ...S.footerBrand,
               opacity: footerVisible ? 1 : 0,
@@ -1256,35 +1146,24 @@ export default function Home() {
               <LogoIcon size={56} />
               <h2 style={S.brandName}>{footerData.brand_name}</h2>
               <p style={S.tagline}>{footerData.brand_tagline}</p>
-
-              {/* Social icons */}
               <div style={S.socialRow}>
                 {[
                   { label: 'WhatsApp',  Icon: IconWhatsApp,  href: footerData.social_whatsapp  || '/contact' },
                   { label: 'Facebook',  Icon: IconFacebook,  href: footerData.social_facebook  || '/contact' },
                   { label: 'Instagram', Icon: IconInstagram, href: footerData.social_instagram || '/contact' },
                 ].map(({ label, Icon, href }, i) => (
-                  <a
-                    key={label}
-                    href={href}
+                  <a key={label} href={href}
                     target={href.startsWith('http') ? '_blank' : undefined}
                     rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                     aria-label={label}
                     className="social-icon footer-reveal-bounce"
-                    style={{
-                      ...S.socialLink,
-                      opacity: footerVisible ? 1 : 0,
-                      transform: footerVisible ? 'scale(1)' : 'scale(0.5)',
-                      transitionDelay: `${0.4 + i * 0.1}s`,
-                    }}
-                  >
-                    <Icon />
-                  </a>
+                    style={{ ...S.socialLink, opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'scale(1)' : 'scale(0.5)', transitionDelay: `${0.4 + i * 0.1}s` }}
+                  ><Icon /></a>
                 ))}
               </div>
             </div>
 
-            {/* Quick Links column */}
+            {/* quick links */}
             <div className="footer-side-col footer-reveal" style={{
               ...S.footerCol,
               opacity: footerVisible ? 1 : 0,
@@ -1292,26 +1171,16 @@ export default function Home() {
               transitionDelay: '0.15s',
             }}>
               <p style={S.quickLabel}>Quick Links</p>
-              {footerData.quick_links.map((link: { label: string; href: string }, i: number) => (
-                <a
-                  key={link.label + i}
-                  href={link.href}
-                  className="quick-link footer-reveal-fast"
-                  style={{
-                    ...S.quickLink,
-                    opacity: footerVisible ? 1 : 0,
-                    transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                    transitionDelay: `${0.25 + i * 0.08}s`,
-                  }}
+              {footerData.quick_links.map((link, i) => (
+                <a key={link.label + i} href={link.href} className="quick-link footer-reveal-fast"
+                  style={{ ...S.quickLink, opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.25 + i * 0.08}s` }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = tokens.color.gold; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = tokens.color.whiteDim; }}
-                >
-                  {link.label}
-                </a>
+                >{link.label}</a>
               ))}
             </div>
 
-            {/* Locations column */}
+            {/* locations */}
             <div className="footer-side-col footer-reveal" style={{
               ...S.footerCol,
               opacity: footerVisible ? 1 : 0,
@@ -1319,23 +1188,16 @@ export default function Home() {
               transitionDelay: '0.25s',
             }}>
               <p style={S.quickLabel}>Our Locations</p>
-              {footerData.locations.map((loc: string, i: number) => (
-                <div
-                  key={loc + i}
-                  className="footer-item footer-reveal-fast"
-                  style={{
-                    opacity: footerVisible ? 1 : 0,
-                    transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                    transitionDelay: `${0.35 + i * 0.08}s`,
-                  }}
-                >
+              {footerData.locations.map((loc, i) => (
+                <div key={loc + i} className="footer-item footer-reveal-fast"
+                  style={{ opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: `${0.35 + i * 0.08}s` }}>
                   <span style={S.footerItemIcon}><IconLocation /></span>
                   <p style={S.footerItemText}>{loc}</p>
                 </div>
               ))}
             </div>
 
-            {/* Contact column */}
+            {/* contact */}
             <div className="footer-side-col footer-reveal" style={{
               ...S.footerCol,
               opacity: footerVisible ? 1 : 0,
@@ -1348,36 +1210,18 @@ export default function Home() {
                 { delay: '0.53s', Icon: IconMail,     text: footerData.contact_email   },
                 { delay: '0.61s', Icon: IconLocation, text: footerData.contact_address },
               ].map(({ delay, Icon, text }) => (
-                <div
-                  key={text}
-                  className="footer-item footer-reveal-fast"
-                  style={{
-                    opacity: footerVisible ? 1 : 0,
-                    transform: footerVisible ? 'translateX(0)' : 'translateX(20px)',
-                    transitionDelay: delay,
-                  }}
-                >
+                <div key={text} className="footer-item footer-reveal-fast"
+                  style={{ opacity: footerVisible ? 1 : 0, transform: footerVisible ? 'translateX(0)' : 'translateX(20px)', transitionDelay: delay }}>
                   <span style={S.footerItemIcon}><Icon /></span>
                   <p style={S.footerItemText}>{text}</p>
                 </div>
               ))}
             </div>
-
           </div>
 
-          {/* Copyright */}
-          <div
-            className="footer-reveal-simple"
-            style={{
-              ...S.footerBottom,
-              opacity: footerVisible ? 1 : 0,
-              transitionDelay: '0.7s',
-            }}
-          >
-            <p
-              style={{ ...S.copyright, cursor: 'pointer', userSelect: 'none' }}
-              onClick={handleCopyrightClick}
-            >
+          {/* ── COPYRIGHT — now plain text, no click / no link behavior ── */}
+          <div className="footer-reveal-simple" style={{ ...S.footerBottom, opacity: footerVisible ? 1 : 0, transitionDelay: '0.7s' }}>
+            <p style={S.copyright}>
               {footerData.copyright_text}
             </p>
           </div>
