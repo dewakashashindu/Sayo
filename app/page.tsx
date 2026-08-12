@@ -517,6 +517,16 @@ function BrandStorySection() {
   const { ref, inView } = useInView(0.2);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError,  setImgError]  = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const img = imgRef.current;
+    if (!img) return;
+    if (img.complete) {
+      if (img.naturalWidth > 0) setImgLoaded(true);
+      else setImgError(true);
+    }
+  }, []);
 
   return (
     <section ref={ref} style={{
@@ -569,7 +579,8 @@ function BrandStorySection() {
           ) : (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
-              src="https://img.freepik.com/premium-photo/girl-modern-beauty-salon_327483-17954.jpg"
+              ref={imgRef}
+              src="/TREt.jpg"
               alt="Natural beauty treatment at SAYO"
               className="story-img"
               loading="lazy"
