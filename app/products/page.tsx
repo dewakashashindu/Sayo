@@ -208,7 +208,7 @@ const PRODUCTS: Product[] = [
     name: 'Oud & Rose Eau de Parfum', brand: 'SAYO Gold',
     price: 'Rs. 9,500.00', badge: 'Premium',
     // Dramatic luxury perfume bottle on dark moody background
-    image: u('1541643600914-78b084683702'),
+    image: u('1594035910387-fea47794261f'),
     description: 'A sensuous blend of Bulgarian rose and aged oud wood.',
   },
   {
@@ -340,7 +340,7 @@ const CATEGORY_FALLBACKS: Record<string, string> = {
   SKIN:      'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=460&fit=crop&q=85&auto=format',
   NAIL:      'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=460&fit=crop&q=85&auto=format',
   BODY:      'https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=400&h=460&fit=crop&q=85&auto=format',
-  FRAGRANCE: 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=400&h=460&fit=crop&q=85&auto=format',
+  FRAGRANCE: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&h=460&fit=crop&q=85&auto=format',
 };
 
 function ProductCard({ product, delay = 0 }: { product: Product; delay?: number }) {
