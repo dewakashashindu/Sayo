@@ -515,18 +515,6 @@ function GoldenCurve() {
 ───────────────────────────────────────── */
 function BrandStorySection() {
   const { ref, inView } = useInView(0.2);
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError,  setImgError]  = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    const img = imgRef.current;
-    if (!img) return;
-    if (img.complete) {
-      if (img.naturalWidth > 0) setImgLoaded(true);
-      else setImgError(true);
-    }
-  }, []);
 
   return (
     <section ref={ref} style={{
@@ -542,7 +530,6 @@ function BrandStorySection() {
         gap: 'clamp(2rem, 5vw, 5rem)',
         maxWidth: '1200px', margin: '0 auto', flexWrap: 'wrap',
       }}>
-        {/* LEFT — image */}
         <div
           className="story-img-wrap"
           style={{
@@ -554,47 +541,22 @@ function BrandStorySection() {
             transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)',
           }}
         >
-          {/* shimmer skeleton while loading */}
-          {!imgLoaded && !imgError && (
-            <div style={{
+          <video
+            src="/videoplayback%20(1).mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            style={{
               position: 'absolute', inset: 0,
-              background: 'linear-gradient(90deg,#1e1a15 25%,#2a2520 50%,#1e1a15 75%)',
-              backgroundSize: '600px 100%',
-              animation: 'imgShimmer 1.4s infinite linear',
-            }} />
-          )}
+              width: '100%', height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+              background: '#2a2520',
+            }}
+          />
 
-          {imgError ? (
-            /* fallback */
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(135deg,#2a2520 0%,#1a1a1a 60%,#0d0d0d 100%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <span style={{
-                color: tokens.color.gold, opacity: 0.3,
-                fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase',
-              }}>Treatment Photo</span>
-            </div>
-          ) : (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              ref={imgRef}
-              src="/TREt.jpg"
-              alt="Natural beauty treatment at SAYO"
-              className="story-img"
-              loading="lazy"
-              onLoad={()  => setImgLoaded(true)}
-              onError={() => setImgError(true)}
-              style={{
-                position: 'absolute', inset: 0,
-                opacity: imgLoaded ? 1 : 0,
-                transition: 'opacity 0.6s ease',
-              }}
-            />
-          )}
-
-          {/* subtle overlay for text contrast if ever needed */}
           <div style={{
             position: 'absolute', inset: 0,
             background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 100%)',
@@ -608,7 +570,6 @@ function BrandStorySection() {
           }} />
         </div>
 
-        {/* RIGHT — text */}
         <div style={{
           flex: '1 1 320px', display: 'flex', flexDirection: 'column',
           justifyContent: 'center', gap: 'clamp(1rem, 2vw, 1.75rem)',
