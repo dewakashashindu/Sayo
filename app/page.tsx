@@ -1072,7 +1072,7 @@ export default function Home() {
             <p style={S.eyebrow} className={loaded ? 'eyebrow-animate' : ''}>{homeData.hero_eyebrow}</p>
             <h1 style={S.heading} className={loaded ? 'heading-animate' : ''}>{homeData.hero_heading}</h1>
             <p style={S.bodyText} className={loaded ? 'body-animate' : ''}>{homeData.hero_body}</p>
-            <a href="https://sayoadmin.netlify.app/login" style={S.ctaBtn}
+            <a href="https://sayowebsite-001-site1.itempurl.com/login" style={S.ctaBtn}
               className={`cta-btn-wrap ${loaded ? 'cta-animate' : ''}`}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.gold; el.style.transform = 'scale(1.06)'; el.style.boxShadow = '0 8px 30px rgba(184,134,11,0.45)'; }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = tokens.color.goldAlpha; el.style.transform = 'scale(1)'; el.style.boxShadow = 'none'; }}
